@@ -334,6 +334,12 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
     </div>
   </div>
 
+  <div class="seclabel">同步診斷 · SYNC</div>
+  <div class="card">
+    <div class="d" style="font-size:12px" id="diagbox">尚未執行</div>
+    <button class="btn ghost" style="margin-top:10px" onclick="runDiag()">立即測試同步</button>
+  </div>
+
   <div class="seclabel">設定 · SETTINGS</div>
   <div class="card">
     <div class="t" style="font-size:13px">我的身份</div>
@@ -502,19 +508,21 @@ async function fetchTO(url,opts,ms){
 async function cloudLoad(){
   if(!CLOUD_ID)return null;
   try{
-    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{cache:"no-store"},3500);
+    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{cache:"no-store"},4000);
     if(r.status===404)return {};
-    if(!r.ok)return null;
+    if(!r.ok){lastErr="讀取HTTP "+r.status;return null}
     var txt=await r.text();
     return txt?JSON.parse(txt):{};
-  }catch(e){return null}
+  }catch(e){lastErr="讀取例外:"+(e&&e.message||e);return null}
 }
+var lastErr="";
 async function cloudSave(obj){
   if(!CLOUD_ID)return false;
   try{
-    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{method:"PUT",headers:{"Content-Type":"text/plain"},body:JSON.stringify(obj)},3500);
+    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(obj)},4000);
+    if(!r.ok)lastErr="寫入HTTP "+r.status;
     return r.ok;
-  }catch(e){return false}
+  }catch(e){lastErr="寫入例外:"+(e&&e.message||e);return false}
 }
 async function cloudProvision(){
   try{
@@ -593,13 +601,17 @@ async function loadAll(){
     if(CLOUD_ID){
       setInterval(async function(){
         var c=await cloudLoad();
-        if(c){
-          sharedTL=c.tl||[];expenses=c.exp||[];visited=c.vis||{};activity=c.act||[];userPL=c.upl||[];
-          if(c.sc&&!Array.isArray(c.sc))scores=c.sc;
+        if(c&&Object.keys(c).length){
+          var cur=JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores});
+          var inc=JSON.stringify({tl:c.tl||[],exp:c.exp||[],vis:c.vis||{},act:c.act||[],upl:c.upl||[],sc:c.sc||scores});
+          if(cur!==inc){
+            sharedTL=c.tl||[];expenses=c.exp||[];visited=c.vis||{};activity=c.act||[];userPL=c.upl||[];
+            if(c.sc&&!Array.isArray(c.sc))scores=c.sc;
+            renderAll();
+          }
           $("syncline").textContent="雲端同步 · "+now();
-          renderAll();
         }
-      },20000);
+      },15000);
     }
   })();
 }
@@ -1130,6 +1142,23 @@ function fishTick(){
   a.innerHTML=h;
 }
 
+async function runDiag(){
+  var box=$("diagbox");
+  box.innerHTML="測試中…";
+  var lines=["資料庫ID：<span style=\'font-family:monospace\'>"+(CLOUD_ID||"（未設定）")+"</span>"];
+  lastErr="";
+  var c=await cloudLoad();
+  lines.push("讀取："+(c===null?("❌ 失敗（"+(lastErr||"未知")+"）"):("✅ 成功（"+(Object.keys(c).length?"有資料":"空的")+"）")));
+  lastErr="";
+  var stamp={_diag:now(),tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
+  var ok=await cloudSave(stamp);
+  lines.push("寫入："+(ok?"✅ 成功":("❌ 失敗（"+(lastErr||"未知")+"）")));
+  if(ok){
+    var c2=await cloudLoad();
+    lines.push("回讀驗證："+((c2&&c2._diag===stamp._diag)?"✅ 寫入的資料讀得回來，同步鏈路正常":"⚠️ 讀回的不是剛寫的資料"));
+  }
+  box.innerHTML=lines.join("<br>");
+}
 function renderAll(){renderDays();renderTL();renderMap();renderWx();renderExpForm();renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();if(curGame)renderRank()}
 loadAll();
 </script>
