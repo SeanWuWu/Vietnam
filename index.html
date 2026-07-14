@@ -471,7 +471,7 @@ function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.g
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
 /* ---------- 雲端共用層：KVdb.io（免登入，ID直接回傳於內容中，全員可讀寫）---------- */
-var CLOUD_ID=""; // 首次執行若為空，會自動建立並提示
+var CLOUD_ID="KpcQ8zsVCgGCi1GWCeih3R"; // 首次執行若為空，會自動建立並提示
 var KVDB_BASE="https://kvdb.io/";
 
 function lsk(k,shared){return (shared?"vn6s:":"vn6p:")+k}
