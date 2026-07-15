@@ -469,13 +469,37 @@ var FULL_MSG={"米其林一星":"🏅 摘星成功","必比登":"🏅 必比登�
 
 var curDay=1, curCat="全部";
 var sharedTL=[], expenses=[], visited={}, activity=[], userPL=[], scores={pho:[],lantern:[],memory:[],fish:[]};
-var celeb={}, wxCache={};
+var celeb={}, wxCache={}, dels={};
 var armed=null;
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s||"").replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]})}
 function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function unionById(a,b){
+  var seen={},out=[];
+  (a||[]).concat(b||[]).forEach(function(x){
+    if(!x||!x.id||seen[x.id])return;seen[x.id]=1;out.push(x)});
+  return out;
+}
+function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels})}
+function mergeCloud(c){
+  dels=Object.assign({},c.del||{},dels);
+  sharedTL=unionById(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
+  expenses=unionById(c.exp,expenses).filter(function(x){return !dels[x.id]});
+  userPL=unionById(c.upl,userPL).filter(function(x){return !dels[x.id]});
+  var v={};[c.vis||{},visited].forEach(function(src){
+    Object.keys(src).forEach(function(k){
+      v[k]=v[k]||[];(src[k]||[]).forEach(function(m){if(v[k].indexOf(m)<0)v[k].push(m)})})});
+  visited=v;
+  var sc={};["pho","lantern","memory","fish"].forEach(function(g){
+    var seen={},all=((c.sc||{})[g]||[]).concat(scores[g]||[]);
+    sc[g]=all.filter(function(s){var k=s.who+"|"+s.score+"|"+s.t;if(seen[k])return false;seen[k]=1;return true})
+      .sort(function(a,b){return b.score-a.score}).slice(0,5)});
+  scores=sc;
+  var seenA={},acts=(activity||[]).concat(c.act||[]);
+  activity=acts.filter(function(a){var k=a.who+"|"+a.msg+"|"+a.t;if(seenA[k])return false;seenA[k]=1;return true}).slice(0,5);
+}
 
 /* ---------- 雲端共用層：Supabase（穩定、瀏覽器直連正規支援）---------- */
 var SB_URL="https://vkczkibsqppyrivvafjk.supabase.co";
@@ -543,10 +567,9 @@ function showCloudFailBanner(){
 }
 
 async function loadAll(){
-  // 第一步:本機資料立刻渲染,絕不等待雲端
   var raw=await kvGet("trip-data",true);
   if(raw){try{var d=JSON.parse(raw);
-    sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];
+    sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];dels=d.del||{};
     if(d.sc&&!Array.isArray(d.sc))scores=d.sc;
   }catch(e){}}
   ME=await kvGet("me");
@@ -557,33 +580,25 @@ async function loadAll(){
   if(!ME)showIdPick();
   renderAll();
 
-  // 第二步:雲端同步在背景進行,有結果才覆蓋畫面,失敗不影響已顯示的內容
   (async function(){
     var cloud=CLOUD_ID?await cloudLoad():null;
     if(CLOUD_ID && cloud===null){
       showCloudFailBanner();
-    }else if(cloud && Object.keys(cloud).length){
-      sharedTL=cloud.tl||[];expenses=cloud.exp||[];visited=cloud.vis||{};activity=cloud.act||[];userPL=cloud.upl||[];
-      if(cloud.sc&&!Array.isArray(cloud.sc))scores=cloud.sc;
+    }else if(cloud){
+      var pre=snapshot();
+      if(Object.keys(cloud).length)mergeCloud(cloud);
       cloudOK=true;
       $("syncline").textContent="雲端同步 · "+now();
-      renderAll();
-    }else if(cloud && !Object.keys(cloud).length && CLOUD_ID){
-      cloudOK=true;
-      $("syncline").textContent="雲端同步 · "+now();
+      if(snapshot()!==pre)renderAll();
     }
     if(CLOUD_ID){
       setInterval(async function(){
         var c=await cloudLoad();
-        if(c&&Object.keys(c).length){
-          var cur=JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores});
-          var inc=JSON.stringify({tl:c.tl||[],exp:c.exp||[],vis:c.vis||{},act:c.act||[],upl:c.upl||[],sc:c.sc||scores});
-          if(cur!==inc){
-            sharedTL=c.tl||[];expenses=c.exp||[];visited=c.vis||{};activity=c.act||[];userPL=c.upl||[];
-            if(c.sc&&!Array.isArray(c.sc))scores=c.sc;
-            renderAll();
-          }
+        if(c){
+          var pre=snapshot();
+          if(Object.keys(c).length)mergeCloud(c);
           $("syncline").textContent="雲端同步 · "+now();
+          if(snapshot()!==pre)renderAll();
         }
       },15000);
     }
@@ -591,7 +606,11 @@ async function loadAll(){
 }
 async function saveShared(msg){
   if(msg){activity.unshift({who:ME||"?",msg:msg,t:now()});activity=activity.slice(0,5)}
-  var payload={tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
+  if(CLOUD_ID){
+    var c=await cloudLoad();
+    if(c&&Object.keys(c).length)mergeCloud(c);
+  }
+  var payload={tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels};
   await kvSet("trip-data",JSON.stringify(payload),true);
   renderAll();
   if(CLOUD_ID){
@@ -623,6 +642,7 @@ document.querySelectorAll(".tabbar button").forEach(function(b){
     document.querySelectorAll(".tabbar button").forEach(function(x){x.classList.remove("on")});
     document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
     b.classList.add("on");$("page-"+b.dataset.p).classList.add("on");
+    if(b.dataset.p!=="game"&&curGame)closeGame();
   }});
 
 /* ---------- fx ---------- */
@@ -698,8 +718,10 @@ function startVeh(){
     var t=((ts-vehStart)%dur)/dur;
     var p=path.getPointAtLength(t*L);
     var p2=path.getPointAtLength(Math.min(t*L+4,L));
-    var flip=(p2.x-p.x)<0?-1:1;
-    img.setAttribute("transform","translate("+p.x+","+p.y+") scale("+flip+",1)");
+    if($("page-tl").classList.contains("on")){
+      var flip=(p2.x-p.x)<0?-1:1;
+      img.setAttribute("transform","translate("+p.x+","+p.y+") scale("+flip+",1)");
+    }
     vehRaf=requestAnimationFrame(step);
   }
   vehRaf=requestAnimationFrame(step);
@@ -721,7 +743,8 @@ function renderTL(){
   var n=activity[0];
   if(n){$("notice").style.display="block";$("notice").innerHTML='<b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+"）"}
 }
-function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show")}
+function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
+  if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}}
 function addTimeline(){
   var t=$("f-title").value.trim();if(!t){alert("請填地點／事項");return}
   var d=parseInt($("f-day").value);
@@ -731,7 +754,7 @@ function addTimeline(){
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
 function delTL(id){
-  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
+  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
   var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("刪除了「"+t+"」")}
 
 /* ---------- expenses ---------- */
@@ -763,11 +786,11 @@ function addExpense(){
   saveShared("記了一筆「"+t+"」NT$"+Math.round(twd));
 }
 function delExp(id){
-  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;
+  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
   var t=expenses[i].title;expenses.splice(i,1);saveShared("刪除了帳目「"+t+"」")}
 function renderExp(){
   var h="";
-  expenses.forEach(function(e){
+  expenses.slice().reverse().forEach(function(e){
     h+='<div class="card exp-item"><div><div class="t" style="font-size:13.5px">'+esc(e.title)+'</div>'+
        '<div class="d">'+esc(e.payer)+" 付・"+e.split.length+"人分・"+esc(e.t)+
        '　<button class="delbtn" data-label="刪" onclick="armDel(this,function(){delExp(\''+e.id+'\')})">刪</button></div></div>'+
@@ -887,7 +910,7 @@ function addPlace(){
   saveShared("推薦了「"+n+"」");
 }
 function delPlace(id){
-  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;
+  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
   var n=userPL[i].n;userPL.splice(i,1);saveShared("刪除了推薦「"+n+"」")}
 function toggleVisit(name){
   if(!ME){showIdPick();return}
@@ -964,6 +987,11 @@ function phoTap(i){
   var c=P.grid[i];
   if(P.flag){if(!c.o){c.f=!c.f;P.flags+=c.f?1:-1}phoRender();phoStat();return}
   if(c.f||c.o)return;
+  if(c.m&&P.open===0){
+    for(var k=0;k<64;k++){if(k!==i&&!P.grid[k].m){P.grid[k].m=true;c.m=false;break}}
+    for(var k2=0;k2<64;k2++){if(P.grid[k2].m)continue;var n2=0;
+      nbrs(k2).forEach(function(j){if(P.grid[j].m)n2++});P.grid[k2].n=n2}
+  }
   if(c.m){P.dead=true;clearInterval(gTimer);gTimer=null;phoRender();phoStat();return}
   (function rv(j){var g=P.grid[j];if(g.o||g.f)return;g.o=true;P.open++;
     if(g.n===0&&!g.m)nbrs(j).forEach(rv)})(i);
@@ -1042,7 +1070,6 @@ function memInit(){
   var em=[0,1,2,3,4,5,6,7];
   var deck=em.concat(em).sort(function(){return Math.random()-0.5});
   M={deck:deck,flip:[],got:{},moves:0,sec:0,done:false};
-  gTimer=setInterval(function(){if(!M.done){M.sec++;$("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"s"}},1000);
   $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">翻出所有配對，越快越少步分越高</span></div>'+
     '<div class="gamebar"><span class="stat" id="m-stat">步數 0｜⏱ 0s</span><button onclick="memInit()">重來</button></div>'+
     '<div class="mem-grid" id="m-grid"></div>';
@@ -1050,6 +1077,7 @@ function memInit(){
 }
 function memTap(i){
   if(M.done||M.got[i]||M.flip.indexOf(i)>=0||M.flip.length>=2)return;
+  if(!gTimer)gTimer=setInterval(function(){if(!M.done){M.sec++;$("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"s"}},1000);
   M.flip.push(i);memRender();
   if(M.flip.length===2){
     M.moves++;
@@ -1133,7 +1161,9 @@ async function runDiag(){
   }
   box.innerHTML=lines.join("<br>");
 }
-function renderAll(){renderDays();renderTL();renderMap();renderWx();renderExpForm();renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();if(curGame)renderRank()}
+function renderAll(){renderDays();renderTL();renderMap();renderWx();
+  if(!$("exp-form").classList.contains("show"))renderExpForm();
+  renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();if(curGame)renderRank()}
 loadAll();
 </script>
 </body>
