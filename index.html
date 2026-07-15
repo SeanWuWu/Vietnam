@@ -338,7 +338,7 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
   <div class="card">
     <div class="d" style="font-size:12px" id="diagbox">尚未執行</div>
     <button class="btn ghost" style="margin-top:10px" onclick="runDiag()">立即測試同步</button>
-    <button class="btn ghost" style="margin-top:8px" onclick="rebuildCloud()">重建雲端資料庫（寫入失敗時用）</button>
+    
   </div>
 
   <div class="seclabel">設定 · SETTINGS</div>
@@ -477,10 +477,12 @@ function esc(s){return String(s||"").replace(/[<>&"]/g,function(c){return{"<":"&
 function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
-/* ---------- 雲端共用層：KVdb.io（免登入，ID直接回傳於內容中，全員可讀寫）---------- */
-var CLOUD_ID="KpcQ8zsVCgGCi1GWCeih3R";
-try{var _ov=localStorage.getItem("vn6-cloudid-override");if(_ov)CLOUD_ID=_ov}catch(e){}
-var KVDB_BASE="https://kvdb.io/";
+/* ---------- 雲端共用層：Supabase（穩定、瀏覽器直連正規支援）---------- */
+var SB_URL="https://vkczkibsqppyrivvafjk.supabase.co";
+var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrY3praWJzcXBweXJpdnZhZmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMjE0ODcsImV4cCI6MjA5OTY5NzQ4N30.Io9qB9Q4_-qtjQBNW-pGqrDYb3ZzjrRdOyMUR_E_cW8";
+var CLOUD_ID=SB_URL?"supabase":"";
+var cloudOK=false;
+var lastErr="";
 
 function lsk(k,shared){return (shared?"vn6s:":"vn6p:")+k}
 async function kvGet(k,shared){
@@ -498,72 +500,50 @@ async function kvSet(k,v,shared){
   return ok||true;
 }
 
-async function fetchTO(url,opts,ms){
+function fetchTO(url,opts,ms){
   var ctrl=new AbortController();
-  var t=setTimeout(function(){ctrl.abort()},ms||3500);
-  try{
-    var r=await fetch(url,Object.assign({},opts,{signal:ctrl.signal}));
-    clearTimeout(t);
-    return r;
-  }catch(e){clearTimeout(t);throw e}
+  var t=setTimeout(function(){ctrl.abort()},ms||4000);
+  return fetch(url,Object.assign({},opts,{signal:ctrl.signal})).finally(function(){clearTimeout(t)});
+}
+function sbHeaders(json){
+  var h={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY};
+  if(json)h["Content-Type"]="application/json";
+  return h;
 }
 async function cloudLoad(){
-  if(!CLOUD_ID)return null;
+  if(!SB_URL)return null;
   try{
-    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{cache:"no-store"},4000);
-    if(r.status===404)return {};
+    var r=await fetchTO(SB_URL+"/rest/v1/trip_store?id=eq.main&select=data",{headers:sbHeaders(false),cache:"no-store"},4500);
     if(!r.ok){lastErr="讀取HTTP "+r.status;return null}
-    var txt=await r.text();
-    return txt?JSON.parse(txt):{};
+    var rows=await r.json();
+    if(!rows.length)return {};
+    return rows[0].data||{};
   }catch(e){lastErr="讀取例外:"+(e&&e.message||e);return null}
 }
-var lastErr="";
 async function cloudSave(obj){
-  if(!CLOUD_ID)return false;
+  if(!SB_URL)return false;
   try{
-    var r=await fetchTO(KVDB_BASE+CLOUD_ID+"/trip-data",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(obj)},4000);
+    var r=await fetchTO(SB_URL+"/rest/v1/trip_store?on_conflict=id",{
+      method:"POST",
+      headers:Object.assign(sbHeaders(true),{"Prefer":"resolution=merge-duplicates,return=minimal"}),
+      body:JSON.stringify([{id:"main",data:obj}])
+    },4500);
     if(!r.ok)lastErr="寫入HTTP "+r.status;
     return r.ok;
   }catch(e){lastErr="寫入例外:"+(e&&e.message||e);return false}
-}
-async function cloudProvision(){
-  try{
-    var r=await fetchTO("https://kvdb.io/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"email=vn6trip@example.com"},3500);
-    if(!r.ok)return null;
-    var id=(await r.text()).trim();
-    if(id&&id.length>5&&id.indexOf(" ")<0){
-      try{await fetchTO("https://kvdb.io/"+id,{method:"PATCH",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"default_ttl=0"},3500)}catch(e){}
-      showSetupBanner(id);
-      try{localStorage.setItem("vn6-cloudid-temp",id)}catch(e){}
-      return id;
-    }
-  }catch(e){}
-  return null;
-}
-function showSetupBanner(id){
-  var b=document.createElement("div");
-  b.style.cssText="position:fixed;top:0;left:0;right:0;background:var(--ink);color:#fff;font-size:12px;padding:12px 16px;z-index:200;line-height:1.7";
-  b.innerHTML='<b style="letter-spacing:.1em">一次性設定</b><br>雲端資料庫已建立，請把這組 ID 回傳給製作者，套用到正式版：<br>'+
-    '<span style="font-family:monospace;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:3px;user-select:all">'+id+'</span>　'+
-    '<button style="margin-left:8px;background:#fff;color:var(--ink);border:none;border-radius:4px;padding:5px 10px;font-size:12px" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+id+'\');this.textContent=\'已複製\'">複製</button>'+
-    '<button style="margin-left:6px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:4px;padding:5px 10px;font-size:12px" onclick="this.parentNode.remove()">關閉</button>';
-  document.body.prepend(b);
 }
 function showCloudFailBanner(){
   if(document.getElementById("cloudfail"))return;
   var b=document.createElement("div");
   b.id="cloudfail";
   b.style.cssText="position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;font-size:12px;padding:10px 16px;z-index:199;line-height:1.6";
-  b.innerHTML='雲端連線失敗（此環境可能擋外部連線），目前使用本機模式，資料仍會保存在這台裝置上。'+
+  b.innerHTML='雲端連線失敗，目前使用本機模式，資料仍會保存在這台裝置上。'+
     '<button style="margin-left:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:4px;padding:4px 10px;font-size:12px" onclick="this.parentNode.remove()">關閉</button>';
   document.body.prepend(b);
 }
 
 async function loadAll(){
   // 第一步:本機資料立刻渲染,絕不等待雲端
-  if(!CLOUD_ID){
-    try{var t=localStorage.getItem("vn6-cloudid-temp");if(t)CLOUD_ID=t}catch(e){}
-  }
   var raw=await kvGet("trip-data",true);
   if(raw){try{var d=JSON.parse(raw);
     sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];
@@ -580,13 +560,7 @@ async function loadAll(){
   // 第二步:雲端同步在背景進行,有結果才覆蓋畫面,失敗不影響已顯示的內容
   (async function(){
     var cloud=CLOUD_ID?await cloudLoad():null;
-    var provisionFailed=false;
-    if(!cloud && !CLOUD_ID){
-      var newId=await cloudProvision();
-      if(newId){CLOUD_ID=newId;cloud=await cloudLoad()}
-      else{provisionFailed=true}
-    }
-    if(provisionFailed){
+    if(CLOUD_ID && cloud===null){
       showCloudFailBanner();
     }else if(cloud && Object.keys(cloud).length){
       sharedTL=cloud.tl||[];expenses=cloud.exp||[];visited=cloud.vis||{};activity=cloud.act||[];userPL=cloud.upl||[];
@@ -594,8 +568,6 @@ async function loadAll(){
       cloudOK=true;
       $("syncline").textContent="雲端同步 · "+now();
       renderAll();
-    }else if(CLOUD_ID && cloud===null){
-      showCloudFailBanner();
     }else if(cloud && !Object.keys(cloud).length && CLOUD_ID){
       cloudOK=true;
       $("syncline").textContent="雲端同步 · "+now();
@@ -1144,33 +1116,10 @@ function fishTick(){
   a.innerHTML=h;
 }
 
-async function rebuildCloud(){
-  var box=$("diagbox");
-  var em=prompt("請輸入你的真實 Email（KVdb 建立資料庫用，不會寄垃圾信）：");
-  if(!em||em.indexOf("@")<0){box.textContent="已取消（需要有效 Email）";return}
-  box.textContent="建立中…";
-  try{
-    var r=await fetchTO("https://kvdb.io/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"email="+encodeURIComponent(em)},5000);
-    if(!r.ok){box.textContent="建立失敗：HTTP "+r.status;return}
-    var id=(await r.text()).trim();
-    if(!id||id.length<6||id.indexOf(" ")>=0){box.textContent="建立失敗：回應異常";return}
-    box.textContent="已建立，測試寫入中…";
-    var testObj={_diag:"rebuild-"+now(),tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
-    var w=await fetchTO(KVDB_BASE+id+"/trip-data",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(testObj)},5000);
-    if(!w.ok){box.textContent="新資料庫寫入仍失敗：HTTP "+w.status+"（KVdb 此路不通，回報製作者換方案）";return}
-    var v=await fetchTO(KVDB_BASE+id+"/trip-data",{cache:"no-store"},5000);
-    var vd=v.ok?await v.json():null;
-    if(!vd||vd._diag!==testObj._diag){box.textContent="寫入成功但回讀異常，回報製作者";return}
-    CLOUD_ID=id;
-    try{localStorage.setItem("vn6-cloudid-override",id)}catch(e){}
-    box.innerHTML="✅ 重建成功！讀寫驗證全數通過。<br>新資料庫ID（請回傳給製作者寫入正式版）：<br><span style=\'font-family:monospace;background:var(--gold-soft);padding:3px 8px;border-radius:3px;user-select:all\'>"+id+"</span>";
-    $("syncline").textContent="雲端同步 · "+now();
-  }catch(e){box.textContent="建立過程例外："+(e&&e.message||e)}
-}
 async function runDiag(){
   var box=$("diagbox");
   box.innerHTML="測試中…";
-  var lines=["資料庫ID：<span style=\'font-family:monospace\'>"+(CLOUD_ID||"（未設定）")+"</span>"];
+  var lines=["後端：<span style=\'font-family:monospace\'>"+(SB_URL?"Supabase":"（未設定）")+"</span>"];
   lastErr="";
   var c=await cloudLoad();
   lines.push("讀取："+(c===null?("❌ 失敗（"+(lastErr||"未知")+"）"):("✅ 成功（"+(Object.keys(c).length?"有資料":"空的")+"）")));
