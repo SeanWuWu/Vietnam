@@ -338,6 +338,7 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
   <div class="card">
     <div class="d" style="font-size:12px" id="diagbox">尚未執行</div>
     <button class="btn ghost" style="margin-top:10px" onclick="runDiag()">立即測試同步</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="rebuildCloud()">重建雲端資料庫（寫入失敗時用）</button>
   </div>
 
   <div class="seclabel">設定 · SETTINGS</div>
@@ -477,7 +478,8 @@ function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.g
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
 /* ---------- 雲端共用層：KVdb.io（免登入，ID直接回傳於內容中，全員可讀寫）---------- */
-var CLOUD_ID="KpcQ8zsVCgGCi1GWCeih3R"; // 首次執行若為空，會自動建立並提示
+var CLOUD_ID="KpcQ8zsVCgGCi1GWCeih3R";
+try{var _ov=localStorage.getItem("vn6-cloudid-override");if(_ov)CLOUD_ID=_ov}catch(e){}
 var KVDB_BASE="https://kvdb.io/";
 
 function lsk(k,shared){return (shared?"vn6s:":"vn6p:")+k}
@@ -1142,6 +1144,29 @@ function fishTick(){
   a.innerHTML=h;
 }
 
+async function rebuildCloud(){
+  var box=$("diagbox");
+  var em=prompt("請輸入你的真實 Email（KVdb 建立資料庫用，不會寄垃圾信）：");
+  if(!em||em.indexOf("@")<0){box.textContent="已取消（需要有效 Email）";return}
+  box.textContent="建立中…";
+  try{
+    var r=await fetchTO("https://kvdb.io/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"email="+encodeURIComponent(em)},5000);
+    if(!r.ok){box.textContent="建立失敗：HTTP "+r.status;return}
+    var id=(await r.text()).trim();
+    if(!id||id.length<6||id.indexOf(" ")>=0){box.textContent="建立失敗：回應異常";return}
+    box.textContent="已建立，測試寫入中…";
+    var testObj={_diag:"rebuild-"+now(),tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
+    var w=await fetchTO(KVDB_BASE+id+"/trip-data",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(testObj)},5000);
+    if(!w.ok){box.textContent="新資料庫寫入仍失敗：HTTP "+w.status+"（KVdb 此路不通，回報製作者換方案）";return}
+    var v=await fetchTO(KVDB_BASE+id+"/trip-data",{cache:"no-store"},5000);
+    var vd=v.ok?await v.json():null;
+    if(!vd||vd._diag!==testObj._diag){box.textContent="寫入成功但回讀異常，回報製作者";return}
+    CLOUD_ID=id;
+    try{localStorage.setItem("vn6-cloudid-override",id)}catch(e){}
+    box.innerHTML="✅ 重建成功！讀寫驗證全數通過。<br>新資料庫ID（請回傳給製作者寫入正式版）：<br><span style=\'font-family:monospace;background:var(--gold-soft);padding:3px 8px;border-radius:3px;user-select:all\'>"+id+"</span>";
+    $("syncline").textContent="雲端同步 · "+now();
+  }catch(e){box.textContent="建立過程例外："+(e&&e.message||e)}
+}
 async function runDiag(){
   var box=$("diagbox");
   box.innerHTML="測試中…";
