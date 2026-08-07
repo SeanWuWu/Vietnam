@@ -628,8 +628,14 @@ async function kvSet(k,v,shared){
 
 function fetchTO(url,opts,ms){
   var ctrl=new AbortController();
-  var t=setTimeout(function(){ctrl.abort()},ms||4000);
-  return fetch(url,Object.assign({},opts,{signal:ctrl.signal})).finally(function(){clearTimeout(t)});
+  var timedOut=false;
+  var t=setTimeout(function(){timedOut=true;ctrl.abort()},ms||8000);
+  return fetch(url,Object.assign({},opts,{signal:ctrl.signal}))
+    .catch(function(e){
+      if(timedOut)throw new Error("逾時 "+((ms||8000)/1000)+" 秒無回應（伺服器可能休眠中）");
+      throw new Error("無法連線（網路或服務暫時不可用）");
+    })
+    .finally(function(){clearTimeout(t)});
 }
 function sbHeaders(json){
   var h={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY};
@@ -639,7 +645,7 @@ function sbHeaders(json){
 async function cloudLoad(){
   if(!SB_URL)return null;
   try{
-    var r=await fetchTO(SB_URL+"/rest/v1/trip_store?id=eq.main&select=data",{headers:sbHeaders(false),cache:"no-store"},4500);
+    var r=await fetchTO(SB_URL+"/rest/v1/trip_store?id=eq.main&select=data",{headers:sbHeaders(false),cache:"no-store"},12000);
     if(!r.ok){lastErr="讀取HTTP "+r.status;return null}
     var rows=await r.json();
     if(!rows.length)return {};
@@ -653,7 +659,7 @@ async function cloudSave(obj){
       method:"POST",
       headers:Object.assign(sbHeaders(true),{"Prefer":"resolution=merge-duplicates,return=minimal"}),
       body:JSON.stringify([{id:"main",data:obj}])
-    },4500);
+    },12000);
     if(!r.ok)lastErr="寫入HTTP "+r.status;
     return r.ok;
   }catch(e){lastErr="寫入例外:"+(e&&e.message||e);return false}
@@ -1285,11 +1291,22 @@ function fishTick(){
 
 async function runDiag(){
   var box=$("diagbox");
-  box.innerHTML="測試中…";
+  box.innerHTML="測試中…（最長約 30 秒，請稍候）";
   var lines=["後端：<span style=\'font-family:monospace\'>"+(SB_URL?"Supabase":"（未設定）")+"</span>"];
+  try{
+    var t0=Date.now();
+    var ping=await fetchTO(SB_URL+"/rest/v1/",{headers:sbHeaders(false)},15000);
+    lines.push("伺服器連通：✅ HTTP "+ping.status+"（"+(Date.now()-t0)+"ms）");
+  }catch(e){
+    lines.push("伺服器連通：❌ "+(e&&e.message||e));
+    lines.push("<span style=\'color:var(--accent)\'>專案可能處於休眠，請到 Supabase 後台點 Restore/Resume 後再測。</span>");
+    box.innerHTML=lines.join("<br>");return;
+  }
   lastErr="";
   var c=await cloudLoad();
   lines.push("讀取："+(c===null?("❌ 失敗（"+(lastErr||"未知")+"）"):("✅ 成功（"+(Object.keys(c).length?"有資料":"空的")+"）")));
+  if(c===null&&(lastErr||"").indexOf("404")>=0)lines.push("<span style=\'color:var(--accent)\'>找不到資料表 → 請到 SQL Editor 執行建表 SQL。</span>");
+  if(c===null&&((lastErr||"").indexOf("401")>=0||(lastErr||"").indexOf("403")>=0))lines.push("<span style=\'color:var(--accent)\'>權限被拒 → 請確認 RLS 政策已建立。</span>");
   lastErr="";
   var stamp={_diag:now(),tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
   var ok=await cloudSave(stamp);
