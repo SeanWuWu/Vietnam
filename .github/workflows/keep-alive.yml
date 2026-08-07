@@ -1,1 +1,27 @@
+name: Supabase Keep Alive
 
+# 每週三、週日 UTC 01:00（台灣時間 09:00）各戳一次資料庫
+# 7 天休眠限制 → 每 3-4 天一次，安全餘裕充足
+on:
+  schedule:
+    - cron: '0 1 * * 0,3'
+  workflow_dispatch:   # 也可以在 Actions 頁面手動按下執行
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          echo "Pinging Supabase..."
+          HTTP_CODE=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/trip_store?select=id&limit=1")
+          echo "HTTP status: $HTTP_CODE"
+          cat /tmp/out.txt
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Supabase ping failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "Supabase is alive."
