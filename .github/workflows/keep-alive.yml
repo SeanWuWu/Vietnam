@@ -1,27 +1,69 @@
 name: Supabase Keep Alive
 
 # 每週三、週日 UTC 01:00（台灣時間 09:00）各戳一次資料庫
-# 7 天休眠限制 → 每 3-4 天一次，安全餘裕充足
 on:
   schedule:
     - cron: '0 1 * * 0,3'
-  workflow_dispatch:   # 也可以在 Actions 頁面手動按下執行
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Check secrets exist
         run: |
-          echo "Pinging Supabase..."
-          HTTP_CODE=$(curl -s -o /tmp/out.txt -w "%{http_code}" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/trip_store?select=id&limit=1")
-          echo "HTTP status: $HTTP_CODE"
-          cat /tmp/out.txt
-          if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "::error::Supabase ping failed with HTTP $HTTP_CODE"
+          RAW_URL="${{ secrets.SUPABASE_URL }}"
+          RAW_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+
+          if [ -z "$RAW_URL" ]; then
+            echo "::error::SUPABASE_URL 這個 Secret 是空的或不存在。請到 Settings > Secrets and variables > Actions 確認名稱完全是 SUPABASE_URL"
             exit 1
           fi
-          echo "Supabase is alive."
+          if [ -z "$RAW_KEY" ]; then
+            echo "::error::SUPABASE_ANON_KEY 這個 Secret 是空的或不存在。請確認名稱完全是 SUPABASE_ANON_KEY"
+            exit 1
+          fi
+          echo "兩個 Secret 都有讀到（長度 URL=${#RAW_URL} KEY=${#RAW_KEY}）"
+
+      - name: Ping Supabase
+        run: |
+          # 去除前後空白與換行，並移除結尾多餘的斜線
+          URL=$(echo "${{ secrets.SUPABASE_URL }}" | tr -d '[:space:]' | sed 's#/*$##')
+          KEY=$(echo "${{ secrets.SUPABASE_ANON_KEY }}" | tr -d '[:space:]')
+
+          # 若沒有 https:// 前綴就自動補上
+          case "$URL" in
+            https://*) ;;
+            http://*)  ;;
+            *) URL="https://$URL" ;;
+          esac
+
+          echo "目標主機：$(echo "$URL" | sed 's#https\?://##' | cut -c1-12)…（已遮蔽）"
+
+          HTTP_CODE=$(curl -s -m 30 -o /tmp/out.txt -w "%{http_code}" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY" \
+            "$URL/rest/v1/trip_store?select=id&limit=1") || CURL_EXIT=$?
+
+          if [ -n "$CURL_EXIT" ]; then
+            echo "::error::curl 連線失敗，錯誤碼 $CURL_EXIT（3=網址格式錯誤、6=找不到主機、28=逾時）"
+            exit 1
+          fi
+
+          echo "HTTP 狀態：$HTTP_CODE"
+          echo "回應內容："
+          cat /tmp/out.txt
+          echo ""
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Supabase 存活，休眠計時已重置"
+          elif [ "$HTTP_CODE" = "404" ]; then
+            echo "::error::找不到 trip_store 資料表 → 請到 Supabase SQL Editor 執行建表 SQL"
+            exit 1
+          elif [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ]; then
+            echo "::error::金鑰或權限問題 → 請確認 anon key 正確、RLS 政策已建立"
+            exit 1
+          else
+            echo "::error::非預期狀態碼 $HTTP_CODE"
+            exit 1
+          fi
