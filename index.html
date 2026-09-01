@@ -511,15 +511,28 @@ var CHECK_ITEMS=[
 var checklist={};
 var RATE_T=0;   // when RATE was last edited (epoch ms) — last-write-wins across the six
 var TRIP_START="2026-10-07T00:00:00+07:00", TRIP_END="2026-10-12T23:59:00+07:00";
+/* Everything date-related is anchored to Indochina Time (UTC+7) so the
+   countdown reads the same at home (UTC+8) and on the ground in Hanoi. */
+function vnMidnight(dateLike){
+  var d=new Date(dateLike);
+  var vn=new Date(d.getTime()+7*3600000);
+  return Date.UTC(vn.getUTCFullYear(),vn.getUTCMonth(),vn.getUTCDate());
+}
 function daysUntil(){
   var now=new Date(), start=new Date(TRIP_START), end=new Date(TRIP_END);
-  var d=Math.ceil((start-now)/86400000);
+  var d=Math.round((vnMidnight(start)-vnMidnight(now))/86400000);
   return {d:d,inTrip:now>=start&&now<=end,after:now>end};
+}
+/* Which trip day is it right now (1-6), or 0 when we are not travelling. */
+function tripDayToday(){
+  if(!daysUntil().inTrip)return 0;
+  var n=Math.floor((vnMidnight(new Date())-vnMidnight(new Date(TRIP_START)))/86400000)+1;
+  return Math.min(Math.max(n,1),6);
 }
 function headerText(){
   var s=daysUntil();
   if(s.after)return {eb:"VIETNAM · MEMORY",sub:"河內的燈籠比會議室溫暖，下次再見 ✈️"};
-  if(s.inTrip)return {eb:"VIETNAM · DAY "+curDay,sub:"上班的心已累，歡迎來到河內 🌿"};
+  if(s.inTrip)return {eb:"VIETNAM · DAY "+(tripDayToday()||curDay),sub:"上班的心已累，歡迎來到河內 🌿"};
   var d=s.d,eb="VIETNAM · D-"+d,sub;
   if(d>80)sub="六天五夜，說好要一起去的河內";
   else if(d>60)sub="上班的心已經在倒數了，河內在等你";
@@ -614,8 +627,18 @@ function unionById(a,b){
   return out;
 }
 function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T})}
+var DEL_TTL=60*86400000;   // 60 days: long past the trip, short enough to stay small
+function pruneDels(d){
+  var out={},cut=Date.now()-DEL_TTL;
+  Object.keys(d||{}).forEach(function(k){
+    var t=d[k];
+    if(t===1)t=Date.now();          // migrate the old `dels[id]=1` form
+    if(typeof t==="number"&&t>cut)out[k]=t;
+  });
+  return out;
+}
 function mergeCloud(c){
-  dels=Object.assign({},c.del||{},dels);
+  dels=pruneDels(Object.assign({},c.del||{},dels));
   sharedTL=unionById(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
   expenses=unionById(c.exp,expenses).filter(function(x){return !dels[x.id]});
   userPL=unionById(c.upl,userPL).filter(function(x){return !dels[x.id]});
@@ -728,6 +751,8 @@ async function loadAll(){
   var rr=await kvGet("rate");if(rr&&!RATE_T)RATE=parseFloat(rr)||780;
   var cb=await kvGet("celeb");if(cb){try{celeb=JSON.parse(cb)||{}}catch(e){}}
   $("ratein").value=RATE;
+  var td=tripDayToday(); if(td)curDay=td;
+  if(location.hash)showTab(location.hash.slice(1));
   $("syncline").textContent="本機模式 · "+now();
   if(!ME)showIdPick();
   renderAll();
@@ -772,23 +797,40 @@ function startPolling(){schedulePoll(false)}
 document.addEventListener("visibilitychange",function(){
   if(!document.hidden)schedulePoll(true);
 });
+function localPayload(){
+  return {tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,
+          sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T};
+}
+var saveChain=Promise.resolve();
 async function saveShared(msg){
   if(msg){activity.unshift({who:ME||"?",msg:msg,t:now()});activity=activity.slice(0,5)}
-  if(CLOUD_ID){
-    var c=await cloudLoad();
-    if(c&&Object.keys(c).length)mergeCloud(c);
-  }
-  var payload={tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T};
-  await kvSet("trip-data",JSON.stringify(payload),true);
+  // write locally and repaint straight away — the trip must work offline
+  await kvSet("trip-data",JSON.stringify(localPayload()),true);
   renderAll();
   bumpSync();
-  if(CLOUD_ID){
-    cloudSave(payload).then(function(ok){
-      $("syncline").textContent=(ok?"雲端同步":"雲端寫入失敗，已存本機")+" · "+now();
-    });
-  }else{
-    $("syncline").textContent="本機模式 · "+now();
-  }
+  if(!CLOUD_ID){$("syncline").textContent="本機模式 · "+now();return}
+
+  // Serialise cloud writes. Each one re-reads, merges whatever the others
+  // wrote in the meantime, then pushes — so two people saving at once
+  // combine instead of clobbering each other.
+  saveChain=saveChain.then(async function(){
+    for(var attempt=0;attempt<2;attempt++){
+      var c=await cloudLoad();
+      if(c&&Object.keys(c).length)mergeCloud(c);
+      var payload=localPayload();
+      await kvSet("trip-data",JSON.stringify(payload),true);
+      var ok=await cloudSave(payload);
+      if(ok){
+        renderAll();
+        $("syncline").textContent="雲端同步 · "+now();
+        return;
+      }
+    }
+    $("syncline").textContent="雲端寫入失敗，已存本機 · "+now();
+  }).catch(function(){
+    $("syncline").textContent="雲端寫入失敗，已存本機 · "+now();
+  });
+  return saveChain;
 }
 
 /* ---------- identity ---------- */
@@ -811,7 +853,21 @@ document.querySelectorAll(".tabbar button").forEach(function(b){
     document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
     b.classList.add("on");$("page-"+b.dataset.p).classList.add("on");
     if(b.dataset.p!=="game"&&curGame)closeGame();
+    if(b.dataset.p==="tl")startVeh();else stopVeh();
+    if(location.hash!=="#"+b.dataset.p)history.pushState(null,"","#"+b.dataset.p);
   }});
+function showTab(p){
+  var b=document.querySelector('.tabbar button[data-p="'+p+'"]');
+  if(!b)return;
+  document.querySelectorAll(".tabbar button").forEach(function(x){x.classList.remove("on")});
+  document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
+  b.classList.add("on");$("page-"+p).classList.add("on");
+  if(p!=="game"&&curGame)closeGame();
+  if(p==="tl")startVeh();else stopVeh();
+}
+window.addEventListener("popstate",function(){
+  showTab((location.hash||"#tl").slice(1)||"tl");
+});
 
 /* ---------- fx ---------- */
 function fxCalc(){var v=parseFloat($("fxin").value)||0,o;
@@ -832,24 +888,36 @@ $("ratein").onchange=async function(){
 }
 
 /* ---------- two-step delete ---------- */
+/* Two-step delete. `armed` holds the target id, not the button element: a
+   background poll re-renders the list and would otherwise leave this pointing
+   at a detached node, silently swallowing the second tap. */
 function armDel(btn,fn){
-  if(armed===btn){armed=null;fn();return}
-  document.querySelectorAll(".delbtn.armed").forEach(function(b){b.classList.remove("armed");b.textContent=b.dataset.label});
-  armed=btn;btn.classList.add("armed");btn.textContent="確定刪除?";
-  setTimeout(function(){if(armed===btn){armed=null;btn.classList.remove("armed");btn.textContent=btn.dataset.label}},3000);
+  var key=btn.getAttribute("data-key")||btn.dataset.label;
+  if(armed===key){armed=null;fn();return}
+  document.querySelectorAll(".delbtn.armed").forEach(function(b){
+    b.classList.remove("armed");b.textContent=b.dataset.label});
+  armed=key;btn.classList.add("armed");btn.textContent="確定刪除?";
+  setTimeout(function(){
+    if(armed!==key)return;
+    armed=null;
+    document.querySelectorAll(".delbtn.armed").forEach(function(b){
+      b.classList.remove("armed");b.textContent=b.dataset.label});
+  },3000);
 }
 
 /* ---------- weather ---------- */
+var WX_TTL=30*60000;   // half an hour is plenty for a forecast row
 function renderWx(){
   var c=DAY_CITY[curDay];
-  if(wxCache[c.n]){$("wxrow").innerHTML='<span class="wxl">天氣</span><b>'+c.n+"</b>　"+wxCache[c.n];return}
+  if(wxCache[c.n]&&Date.now()-(wxCache[c.n].t||0)>WX_TTL)delete wxCache[c.n];
+  if(wxCache[c.n]){$("wxrow").innerHTML='<span class="wxl">天氣</span><b>'+c.n+"</b>　"+wxCache[c.n].h;return}
   $("wxrow").innerHTML='<span class="wxl">天氣 · DAY '+curDay+'</span><b>'+c.n+'</b><button class="wxq" onclick="wxQuery()">查詢</button>';
 }
 async function wxQuery(){
   var c=DAY_CITY[curDay];
   $("wxrow").innerHTML='<span class="wxl">天氣</span>查詢 '+c.n+" 中…";
   var h=await fetchWx(c.lat,c.lon,c.n);
-  wxCache[c.n]=h;renderWx();
+  wxCache[c.n]={h:h,t:Date.now()};renderWx();
 }
 async function fetchWx(lat,lon,name){
   try{
@@ -900,19 +968,34 @@ function startVeh(){
   }
   vehRaf=requestAnimationFrame(step);
 }
+/* "14:30" / "08:20→10:30" / "11:00" -> minutes, for ordering. Rows with no
+   clock time (「傍晚」「入住」) sort last and keep their authored order. */
+function timeKey(t){
+  var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
+  return m?(parseInt(m[1],10)*60+parseInt(m[2],10)):1e9;
+}
+function tlBaseRow(it){
+  return '<div class="card'+(it.flight?" flight":"")+'"><div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
+    (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
+    (it.q?'<a class="maplink" href="'+gm(it.q)+'" target="_blank">📍 在 Google 地圖上看</a>':"")+"</div>";
+}
+function tlMineRow(it){
+  return '<div class="card" style="border-color:var(--gold)"><span class="badge-new">NEW</span>'+
+    '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
+    (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
+    '<a class="maplink" href="'+gm(it.title)+'" target="_blank">📍 在 Google 地圖上看</a>'+
+    '<div class="meta">'+esc(it.who)+"・"+esc(it.t)+' 新增　<button class="delbtn" data-label="刪除" data-key="tl:'+jsq(it.id)+'" onclick="armDel(this,function(){delTL(\''+jsq(it.id)+'\')})">刪除</button></div></div>';
+}
 function renderTL(){
-  var h="";
-  (BASE_TL[curDay]||[]).forEach(function(it){
-    h+='<div class="card'+(it.flight?" flight":"")+'"><div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
-       (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-       (it.q?'<a class="maplink" href="'+gm(it.q)+'" target="_blank">📍 在 Google 地圖上看</a>':"")+"</div>"});
-  sharedTL.forEach(function(it){
-    if(it.day!==curDay)return;
-    h+='<div class="card" style="border-color:var(--gold)"><span class="badge-new">NEW</span>'+
-       '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
-       (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-       '<a class="maplink" href="'+gm(it.title)+'" target="_blank">📍 在 Google 地圖上看</a>'+
-       '<div class="meta">'+esc(it.who)+"・"+esc(it.t)+' 新增　<button class="delbtn" data-label="刪除" onclick="armDel(this,function(){delTL(\''+it.id+'\')})">刪除</button></div></div>'});
+  var rows=[];
+  (BASE_TL[curDay]||[]).forEach(function(it){rows.push({it:it,base:1})});
+  sharedTL.forEach(function(it){if(it.day===curDay)rows.push({it:it,base:0})});
+  rows.forEach(function(r,i){r.n=i});
+  rows.sort(function(a,b){
+    var d=timeKey(a.it.time)-timeKey(b.it.time);
+    return d?d:a.n-b.n;                 // stable on ties
+  });
+  var h=rows.map(function(r){return r.base?tlBaseRow(r.it):tlMineRow(r.it)}).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   var n=activity[0];
   if(n){$("notice").style.display="block";$("notice").innerHTML='<b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+"）"}
@@ -928,7 +1011,7 @@ function addTimeline(){
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
 function delTL(id){
-  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
+  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("刪除了「"+t+"」")}
 
 /* ---------- expenses ---------- */
@@ -961,7 +1044,7 @@ function addExpense(){
   saveShared("記了一筆「"+t+"」NT$"+Math.round(twd));
 }
 function delExp(id){
-  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
+  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var t=expenses[i].title;expenses.splice(i,1);saveShared("刪除了帳目「"+t+"」")}
 function renderExp(){
   var h="";
@@ -969,7 +1052,7 @@ function renderExp(){
     h+='<div class="card exp-item"><div><div class="t" style="font-size:13.5px">'+esc(e.title)+
        '<span class="expcat">'+esc(e.cat||"其他")+'</span></div>'+
        '<div class="d">'+esc(e.payer)+" 付・"+e.split.length+"人分・"+esc(e.t)+
-       '　<button class="delbtn" data-label="刪" onclick="armDel(this,function(){delExp(\''+e.id+'\')})">刪</button></div></div>'+
+       '　<button class="delbtn" data-label="刪" data-key="exp:'+jsq(e.id)+'" onclick="armDel(this,function(){delExp(\''+jsq(e.id)+'\')})">刪</button></div></div>'+
        '<span class="amt">NT$ '+e.twd.toLocaleString()+"</span></div>"});
   $("exp-list").innerHTML=h;
   renderCatStats();
@@ -1026,14 +1109,19 @@ function fullMsgOf(p){
   for(var i=0;i<ts.length;i++){if(FULL_MSG[ts[i]])return FULL_MSG[ts[i]]}
   return FULL_MSG["_"]}
 function renderCats(){
+  ensureCatValid();
   var pri=["全部","米其林一星","必比登"],cats=pri.slice();
   allPlaces().forEach(function(p){tagsOf(p).forEach(function(t){if(cats.indexOf(t)<0)cats.push(t)})});
-  cats=cats.filter(function(c,i){return c==="全部"||i<3?true:true});
   var h="";cats.forEach(function(c){
     if(c!=="全部"&&!allPlaces().some(function(p){return tagsOf(p).indexOf(c)>=0}))return;
     h+='<button class="'+(c===curCat?"on":"")+'" onclick="setCat(\''+jsq(c)+'\')">'+esc(c)+"</button>"});
   $("catpills").innerHTML=h}
 function setCat(c){curCat=c;renderCats();renderPl()}
+function ensureCatValid(){
+  if(curCat==="全部")return;
+  var live=allPlaces().some(function(p){return tagsOf(p).indexOf(curCat)>=0});
+  if(!live)curCat="全部";
+}
 function placeLink(p){
   return p.pid?("https://www.google.com/maps/place/?q=place_id:"+p.pid):gm(p.q||p.n)}
 function stampRow(p){
@@ -1062,21 +1150,21 @@ function renderPl(){
     var v=setList(visited[p.n]);
     var full=v.length>=MEMBERS.length;
     var isUser=i>=BASE_PL.length;
-    h+='<div class="card place'+(full?" fullcard":"")+'" id="plc-'+i+'"'+(isUser&&!full?' style="border-color:var(--gold)"':'')+'><div class="t"><span>'+esc(p.n)+"</span>"+tagHtml(p)+"</div>"+
+    h+='<div class="card place'+(full?" fullcard":"")+'" data-place="'+esc(p.n)+'"'+(isUser&&!full?' style="border-color:var(--gold)"':'')+'><div class="t"><span>'+esc(p.n)+"</span>"+tagHtml(p)+"</div>"+
        '<div class="d">'+esc(p.note)+"</div>"+stampRow(p)+
        '<div class="acts"><a href="'+placeLink(p)+'" target="_blank">查看店家 ›</a>'+
        '<button class="'+(v.indexOf(ME)>=0?"done":"")+'" onclick="toggleVisit(\''+jsq(p.n)+'\')">'+(v.indexOf(ME)>=0?"✓ 已打卡":"打卡")+"</button></div>"+
-       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　<button class=\"delbtn\" data-label=\"刪除\" onclick=\"armDel(this,function(){delPlace(\'"+jsq(p.id)+"\')})\">刪除</button></div>":"")+
+       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　<button class=\"delbtn\" data-label=\"刪除\" data-key=\"pl:"+jsq(p.id)+"\" onclick=\"armDel(this,function(){delPlace(\'"+jsq(p.id)+"\')})\">刪除</button></div>":"")+
        "</div>"});
   $("pl-list").innerHTML=h;
   checkCelebrations();
 }
 function checkCelebrations(){
   var changed=false;
-  allPlaces().forEach(function(p,i){
+  allPlaces().forEach(function(p){
     var v=setList(visited[p.n]);
     if(v.length>=MEMBERS.length&&!celeb[p.n]){
-      var el=$("plc-"+i);
+      var el=document.querySelector('.place[data-place="'+(window.CSS&&CSS.escape?CSS.escape(p.n):p.n)+'"]');
       if(el){fireConfetti(el);el.classList.add("celebrate");
         setTimeout(function(){el.classList.remove("celebrate")},2400);
         celeb[p.n]=1;changed=true}
@@ -1105,7 +1193,7 @@ function addPlace(){
   saveShared("推薦了「"+n+"」");
 }
 function delPlace(id){
-  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=1;
+  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var n=userPL[i].n;userPL.splice(i,1);saveShared("刪除了推薦「"+n+"」")}
 function toggleVisit(name){
   if(!ME){showIdPick();return}
@@ -1129,7 +1217,9 @@ function openGame(g){curGame=g;$("g-menu").style.display="none";$("g-view").styl
   renderRank();}
 function closeGame(){stopLoops();curGame=null;$("g-view").style.display="none";$("g-menu").style.display="block";renderBests()}
 function stopLoops(){clearInterval(gTimer);gTimer=null;clearInterval(lanMov);lanMov=null;clearInterval(fishLoop);fishLoop=null}
+function stopVeh(){if(vehRaf){cancelAnimationFrame(vehRaf);vehRaf=null}}
 function submitScore(g,sc){
+  if(!ME){showIdPick();return}
   scores[g]=scores[g]||[];
   scores[g].push({who:ME||"?",score:sc,t:now()});
   scores[g].sort(function(a,b){return b.score-a.score});
