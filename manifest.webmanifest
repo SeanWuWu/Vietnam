@@ -1,0 +1,12 @@
+{
+  "name": "越南六天五夜",
+  "short_name": "越南六天",
+  "description": "河內 · 陸龍灣 · 下龍灣 — 六人小隊共用手冊",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF8F3",
+  "theme_color": "#FAF8F3",
+  "lang": "zh-TW"
+}

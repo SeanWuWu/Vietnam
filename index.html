@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="越南六天五夜">
+<link rel="manifest" href="manifest.webmanifest">
 <title>越南六天五夜</title>
 <style>
 :root{
@@ -504,6 +509,7 @@ var CHECK_ITEMS=[
  {id:"slipper",label:"拖鞋"}
 ];
 var checklist={};
+var RATE_T=0;   // when RATE was last edited (epoch ms) — last-write-wins across the six
 var TRIP_START="2026-10-07T00:00:00+07:00", TRIP_END="2026-10-12T23:59:00+07:00";
 function daysUntil(){
   var now=new Date(), start=new Date(TRIP_START), end=new Date(TRIP_END);
@@ -533,7 +539,7 @@ function renderChecklist(){
   var total=CHECK_ITEMS.length*MEMBERS.length,done=0;
   var h="";
   CHECK_ITEMS.forEach(function(item){
-    var v=checklist[item.id]||[];
+    var v=setList(checklist[item.id]);
     done+=v.length;
     var mine=v.indexOf(ME)>=0;
     h+='<div class="checkitem'+(mine?" done":"")+'" onclick="toggleCheck(\''+item.id+'\')">'+
@@ -546,9 +552,8 @@ function renderChecklist(){
 }
 function toggleCheck(id){
   if(!ME){showIdPick();return}
-  var v=checklist[id]||[];var ix=v.indexOf(ME);
-  if(ix>=0)v.splice(ix,1);else v.push(ME);
-  checklist[id]=v;saveShared(null);
+  checklist[id]=setToggle(checklist[id],ME);
+  saveShared(null);
 }
 
 var ING={
@@ -569,24 +574,54 @@ var celeb={}, wxCache={}, dels={};
 var armed=null;
 
 function $(id){return document.getElementById(id)}
-function esc(s){return String(s||"").replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]})}
+function esc(s){return String(s||"").replace(/[<>&"']/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[c]})}
+function jsq(s){return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/&/g,"\\x26").replace(/</g,"\\x3c").replace(/>/g,"\\x3e").replace(/"/g,"\\x22").replace(/'/g,"\\x27")}
 function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function toast(msg){
+  var t=document.createElement("div");
+  t.className="toast";t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove()},2600);
+}
+/* --- tombstoned membership set: {member:{v:bool,t:epoch_ms}} --- */
+function setNorm(x){
+  // migrate legacy array form ["Sean","魚丸"] -> object form
+  if(Array.isArray(x)){var o={};x.forEach(function(m){o[m]={v:true,t:0}});return o}
+  return x&&typeof x==="object"?x:{};
+}
+function setHas(x,m){var o=setNorm(x),e=o[m];return !!(e&&e.v)}
+function setList(x){var o=setNorm(x);return Object.keys(o).filter(function(m){return o[m]&&o[m].v})}
+function setToggle(x,m){
+  var o=setNorm(x);
+  o[m]={v:!setHas(o,m),t:Date.now()};
+  return o;
+}
+function setMerge(a,b){
+  // last-write-wins per member, so an un-check actually sticks across devices
+  var A=setNorm(a),B=setNorm(b),out={};
+  Object.keys(A).forEach(function(m){out[m]=A[m]});
+  Object.keys(B).forEach(function(m){
+    var x=out[m],y=B[m];
+    if(!x||(y&&(y.t||0)>=(x.t||0)))out[m]=y;
+  });
+  return out;
+}
 function unionById(a,b){
   var seen={},out=[];
   (a||[]).concat(b||[]).forEach(function(x){
     if(!x||!x.id||seen[x.id])return;seen[x.id]=1;out.push(x)});
   return out;
 }
-function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist})}
+function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T})}
 function mergeCloud(c){
   dels=Object.assign({},c.del||{},dels);
   sharedTL=unionById(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
   expenses=unionById(c.exp,expenses).filter(function(x){return !dels[x.id]});
   userPL=unionById(c.upl,userPL).filter(function(x){return !dels[x.id]});
-  var v={};[c.vis||{},visited].forEach(function(src){
-    Object.keys(src).forEach(function(k){
-      v[k]=v[k]||[];(src[k]||[]).forEach(function(m){if(v[k].indexOf(m)<0)v[k].push(m)})})});
+  var v={};
+  [c.vis||{},visited].forEach(function(src){
+    Object.keys(src).forEach(function(k){v[k]=setMerge(v[k],src[k])})});
   visited=v;
   var sc={};["pho","lantern","memory","fish"].forEach(function(g){
     var seen={},all=((c.sc||{})[g]||[]).concat(scores[g]||[]);
@@ -597,10 +632,13 @@ function mergeCloud(c){
   activity=acts.filter(function(a){var k=a.who+"|"+a.msg+"|"+a.t;if(seenA[k])return false;seenA[k]=1;return true}).slice(0,5);
   var ck={};
   CHECK_ITEMS.forEach(function(item){
-    var m=(c.chk&&c.chk[item.id])||[],l=checklist[item.id]||[];
-    ck[item.id]=[]; m.concat(l).forEach(function(x){if(ck[item.id].indexOf(x)<0)ck[item.id].push(x)});
+    ck[item.id]=setMerge((c.chk&&c.chk[item.id]),checklist[item.id]);
   });
   checklist=ck;
+  if(c.rate&&(c.rateT||0)>RATE_T){
+    RATE=parseFloat(c.rate)||RATE; RATE_T=c.rateT||0;
+    var ri=$("ratein"); if(ri&&document.activeElement!==ri)ri.value=RATE;
+  }
 }
 
 /* ---------- 雲端共用層：Supabase（穩定、瀏覽器直連正規支援）---------- */
@@ -676,13 +714,18 @@ function showCloudFailBanner(){
 
 async function loadAll(){
   var raw=await kvGet("trip-data",true);
-  if(raw){try{var d=JSON.parse(raw);
+  var d=null;
+  if(raw){try{d=JSON.parse(raw);
     sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];dels=d.del||{};
     checklist=d.chk||{};
-    if(d.sc&&!Array.isArray(d.sc))scores=d.sc;
+    if(d.sc&&!Array.isArray(d.sc)){
+      ["pho","lantern","memory","fish"].forEach(function(g){
+        scores[g]=Array.isArray(d.sc[g])?d.sc[g]:[]});
+    }
   }catch(e){}}
   ME=await kvGet("me");
-  var rr=await kvGet("rate");if(rr)RATE=parseFloat(rr)||780;
+  if(d && d.rate){RATE=parseFloat(d.rate)||RATE; RATE_T=d.rateT||0}
+  var rr=await kvGet("rate");if(rr&&!RATE_T)RATE=parseFloat(rr)||780;
   var cb=await kvGet("celeb");if(cb){try{celeb=JSON.parse(cb)||{}}catch(e){}}
   $("ratein").value=RATE;
   $("syncline").textContent="本機模式 · "+now();
@@ -735,7 +778,7 @@ async function saveShared(msg){
     var c=await cloudLoad();
     if(c&&Object.keys(c).length)mergeCloud(c);
   }
-  var payload={tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist};
+  var payload={tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T};
   await kvSet("trip-data",JSON.stringify(payload),true);
   renderAll();
   bumpSync();
@@ -751,15 +794,14 @@ async function saveShared(msg){
 /* ---------- identity ---------- */
 function showIdPick(){
   $("idmask").style.display="flex";var h="";
-  MEMBERS.forEach(function(m){h+='<button onclick="pickMe(\''+m+'\')">'+m+'</button>'});
+  MEMBERS.forEach(function(m){h+='<button onclick="pickMe(\''+jsq(m)+'\')">'+m+'</button>'});
   $("id-chips").innerHTML=h;
 }
 async function pickMe(m){ME=m;await kvSet("me",m);
   $("idmask").style.display="none";renderMe();renderPl();
-  var t=document.createElement("div");t.className="toast";t.textContent="Xin ch\u00e0o, "+m+" \ud83c\udf3f";
-  document.body.appendChild(t);setTimeout(function(){t.remove()},2600)}
+  toast("Xin ch\u00e0o, "+m+" \ud83c\udf3f")}
 function renderMe(){var h="";MEMBERS.forEach(function(m){
-  h+='<button class="'+(m===ME?"on":"")+'" onclick="pickMe(\''+m+'\')">'+m+'</button>'});
+  h+='<button class="'+(m===ME?"on":"")+'" onclick="pickMe(\''+jsq(m)+'\')">'+m+'</button>'});
   $("me-chips").innerHTML=h}
 
 /* ---------- tabs ---------- */
@@ -780,8 +822,14 @@ $("fxin").oninput=fxCalc;
 $("fxdir").onclick=function(){FX_VND2TWD=!FX_VND2TWD;
   $("fxdir").textContent=FX_VND2TWD?"₫ → NT$":"NT$ → ₫";fxCalc()};
 function fxQuick(v){FX_VND2TWD=true;$("fxdir").textContent="₫ → NT$";$("fxin").value=v;fxCalc()}
-$("ratein").onchange=async function(){RATE=parseFloat(this.value)||780;
-  await kvSet("rate",String(RATE));fxCalc();renderExp()}
+$("ratein").onchange=async function(){
+  var v=parseFloat(this.value);
+  if(!(v>0)){this.value=RATE;toast("匯率請填大於 0 的數字");return}
+  RATE=v; RATE_T=Date.now();
+  await kvSet("rate",String(RATE));
+  fxCalc();
+  saveShared("把匯率改成 1 NT$ = "+RATE+" ₫");
+}
 
 /* ---------- two-step delete ---------- */
 function armDel(btn,fn){
@@ -805,7 +853,7 @@ async function wxQuery(){
 }
 async function fetchWx(lat,lon,name){
   try{
-    var r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok&forecast_days=2");
+    var r=await fetchTO("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok&forecast_days=2",{},8000);
     if(!r.ok)throw 0;
     var d=await r.json();var c=d.current,dl=d.daily;
     return "現在 "+Math.round(c.temperature_2m)+"°C"+(c.precipitation>0?" ☔":"")+"　今日 "+Math.round(dl.temperature_2m_min[0])+"–"+Math.round(dl.temperature_2m_max[0])+"°C・降雨 "+dl.precipitation_probability_max[0]+"%";
@@ -932,8 +980,10 @@ function renderExp(){
   var net={};names.forEach(function(m){net[m]=0});
   expenses.forEach(function(e){
     net[e.payer]+=e.twd;
-    var per=e.twd/e.split.length;
-    e.split.forEach(function(m){net[m]-=per})});
+    // split into whole dollars; the leftover cents land on the payer, so the
+    // ledger sums to exactly zero instead of leaving NT$1 ghosts around
+    var n=e.split.length, base=Math.floor(e.twd/n), rem=e.twd-base*n;
+    e.split.forEach(function(m,i){net[m]-=base+(i<rem?1:0)})});
   var deb=[],cre=[];
   names.forEach(function(m){var v=Math.round(net[m]);
     if(v<-1)deb.push([m,-v]);else if(v>1)cre.push([m,v])});
@@ -981,13 +1031,13 @@ function renderCats(){
   cats=cats.filter(function(c,i){return c==="全部"||i<3?true:true});
   var h="";cats.forEach(function(c){
     if(c!=="全部"&&!allPlaces().some(function(p){return tagsOf(p).indexOf(c)>=0}))return;
-    h+='<button class="'+(c===curCat?"on":"")+'" onclick="setCat(\''+c+'\')">'+esc(c)+"</button>"});
+    h+='<button class="'+(c===curCat?"on":"")+'" onclick="setCat(\''+jsq(c)+'\')">'+esc(c)+"</button>"});
   $("catpills").innerHTML=h}
 function setCat(c){curCat=c;renderCats();renderPl()}
 function placeLink(p){
   return p.pid?("https://www.google.com/maps/place/?q=place_id:"+p.pid):gm(p.q||p.n)}
 function stampRow(p){
-  var v=visited[p.n]||[];
+  var v=setList(visited[p.n]);
   var full=v.length>=MEMBERS.length;
   var isSpot=tagsOf(p).indexOf("景點")>=0;
   var ing=ingOf(p);
@@ -1009,14 +1059,14 @@ function renderPl(){
   var h="",list=allPlaces();
   list.forEach(function(p,i){
     if(curCat!=="全部"&&tagsOf(p).indexOf(curCat)<0)return;
-    var v=visited[p.n]||[];
+    var v=setList(visited[p.n]);
     var full=v.length>=MEMBERS.length;
     var isUser=i>=BASE_PL.length;
     h+='<div class="card place'+(full?" fullcard":"")+'" id="plc-'+i+'"'+(isUser&&!full?' style="border-color:var(--gold)"':'')+'><div class="t"><span>'+esc(p.n)+"</span>"+tagHtml(p)+"</div>"+
        '<div class="d">'+esc(p.note)+"</div>"+stampRow(p)+
        '<div class="acts"><a href="'+placeLink(p)+'" target="_blank">查看店家 ›</a>'+
-       '<button class="'+(v.indexOf(ME)>=0?"done":"")+'" onclick="toggleVisit(\''+esc(p.n)+'\')">'+(v.indexOf(ME)>=0?"✓ 已打卡":"打卡")+"</button></div>"+
-       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　<button class=\"delbtn\" data-label=\"刪除\" onclick=\"armDel(this,function(){delPlace(\'"+esc(p.id)+"\')})\">刪除</button></div>":"")+
+       '<button class="'+(v.indexOf(ME)>=0?"done":"")+'" onclick="toggleVisit(\''+jsq(p.n)+'\')">'+(v.indexOf(ME)>=0?"✓ 已打卡":"打卡")+"</button></div>"+
+       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　<button class=\"delbtn\" data-label=\"刪除\" onclick=\"armDel(this,function(){delPlace(\'"+jsq(p.id)+"\')})\">刪除</button></div>":"")+
        "</div>"});
   $("pl-list").innerHTML=h;
   checkCelebrations();
@@ -1024,7 +1074,7 @@ function renderPl(){
 function checkCelebrations(){
   var changed=false;
   allPlaces().forEach(function(p,i){
-    var v=visited[p.n]||[];
+    var v=setList(visited[p.n]);
     if(v.length>=MEMBERS.length&&!celeb[p.n]){
       var el=$("plc-"+i);
       if(el){fireConfetti(el);el.classList.add("celebrate");
@@ -1059,12 +1109,11 @@ function delPlace(id){
   var n=userPL[i].n;userPL.splice(i,1);saveShared("刪除了推薦「"+n+"」")}
 function toggleVisit(name){
   if(!ME){showIdPick();return}
-  var v=visited[name]||[];var ix=v.indexOf(ME);
-  if(ix>=0)v.splice(ix,1);else v.push(ME);
-  visited[name]=v;saveShared(null)}
+  visited[name]=setToggle(visited[name],ME);
+  saveShared(null)}
 function renderKings(){
   var cnt={};MEMBERS.forEach(function(m){cnt[m]=0});
-  Object.keys(visited).forEach(function(k){(visited[k]||[]).forEach(function(m){if(cnt[m]!=null)cnt[m]++})});
+  Object.keys(visited).forEach(function(k){setList(visited[k]).forEach(function(m){if(cnt[m]!=null)cnt[m]++})});
   var max=Math.max.apply(null,MEMBERS.map(function(m){return cnt[m]}));
   var h="";
   MEMBERS.forEach(function(m){
@@ -1099,7 +1148,8 @@ function renderRank(){
 function renderBests(){
   ["pho","lantern","memory","fish"].forEach(function(g){
     var b=(scores[g]||[])[0];
-    $("best-"+g).textContent=b?("最高 "+b.score+"・"+b.who):"尚無紀錄";
+    var el=$("best-"+g); if(!el)return;
+    el.textContent=b?("最高 "+b.score+"・"+b.who):"尚無紀錄";
   });
 }
 
@@ -1321,6 +1371,19 @@ function renderAll(){renderHeader();renderDays();renderTL();renderMap();renderWx
   if(!$("exp-form").classList.contains("show"))renderExpForm();
   renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();if(curGame)renderRank()}
 loadAll();
+
+/* ---------- offline: cache the page so it opens with no signal ---------- */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){/* file:// or no HTTPS */});
+  });
+}
+window.addEventListener("online",function(){
+  toast("網路恢復，正在同步…");
+  schedulePoll(true);
+  if(CLOUD_ID)saveShared(null);
+});
+window.addEventListener("offline",function(){toast("離線中，資料會存在這台裝置")});
 </script>
 </body>
 </html>
