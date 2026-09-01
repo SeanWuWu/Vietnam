@@ -626,6 +626,8 @@ function unionById(a,b){
     if(!x||!x.id||seen[x.id])return;seen[x.id]=1;out.push(x)});
   return out;
 }
+/* _diag is a write-probe marker left by runDiag(); it is deliberately not
+   part of the trip state, so it never counts as a change. */
 function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T})}
 var DEL_TTL=60*86400000;   // 60 days: long past the trip, short enough to stay small
 function pruneDels(d){
@@ -1448,7 +1450,9 @@ async function runDiag(){
   if(c===null&&(lastErr||"").indexOf("404")>=0)lines.push("<span style=\'color:var(--accent)\'>找不到資料表 → 請到 SQL Editor 執行建表 SQL。</span>");
   if(c===null&&((lastErr||"").indexOf("401")>=0||(lastErr||"").indexOf("403")>=0))lines.push("<span style=\'color:var(--accent)\'>權限被拒 → 請確認 RLS 政策已建立。</span>");
   lastErr="";
-  var stamp={_diag:now(),tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores};
+  if(c&&Object.keys(c).length)mergeCloud(c);
+  var stamp=localPayload();
+  stamp._diag=now();
   var ok=await cloudSave(stamp);
   lines.push("寫入："+(ok?"✅ 成功":("❌ 失敗（"+(lastErr||"未知")+"）")));
   if(ok){
