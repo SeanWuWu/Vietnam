@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FAF8F3">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="越南六天五夜">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>越南六天五夜</title>
 <style>
 :root{
@@ -181,26 +185,97 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
 .catbar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:6px;background:var(--line)}
 .catrow{font-size:11.5px;color:var(--ink2);display:flex;justify-content:space-between;margin-top:4px}
 .expcat{font-size:10px;border:1px solid var(--line2);color:var(--ink2);border-radius:3px;padding:1px 6px;letter-spacing:.04em;margin-left:8px}
+
+/* ---------- FX: a compact pill in the header, panel opens on tap ---------- */
+header{position:relative}
+.fxpill{position:absolute;top:20px;right:20px;display:flex;flex-direction:column;
+  align-items:flex-end;gap:1px;background:var(--card);border:1px solid var(--line);
+  border-radius:6px;padding:6px 10px;line-height:1.25}
+.fxpill .fxp-rate{font-size:11px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.fxpill .fxp-cta{font-size:10px;letter-spacing:.14em;color:var(--accent);font-weight:700}
+.fxpill .fxp-car{display:inline-block;transition:transform .2s}
+.fxpill.open{border-color:var(--accent)}
+.fxpill.open .fxp-car{transform:rotate(180deg)}
+.fxpanel{display:none;max-width:560px;margin:0 auto;padding:10px 20px 0}
+.fxpanel.open{display:block;animation:fadeUp .25s ease}
+.fxpanel .fxrow,.fxpanel .fxchips{padding-left:0;padding-right:0;max-width:none}
+
+/* ---------- primary actions: unmissable, and pinned within reach ---------- */
+.addbtn{border:none;background:var(--accent);color:#fff;border-radius:8px;
+  padding:15px 16px;font-size:15px;font-weight:700;letter-spacing:.04em;
+  justify-content:center;gap:8px;margin:0 0 14px;
+  box-shadow:0 2px 8px rgba(176,67,46,.22)}
+.addbtn::before{display:none}
+.addbtn img{width:19px;height:19px;filter:brightness(0) invert(1);opacity:.95}
+.addbtn:active{transform:scale(.985)}
+.addbtn.exp{background:var(--gold);box-shadow:0 2px 8px rgba(201,154,75,.26)}
+.addbtn.pl{background:var(--green);box-shadow:0 2px 8px rgba(74,124,99,.22)}
+.addbtn.on{background:var(--ink);box-shadow:none}
+
+/* ---------- mobile sizing: bigger tap targets, no cramped rows ---------- */
+.daytabs{gap:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.daytabs::-webkit-scrollbar{display:none}
+.daytabs button{padding:11px 14px;font-size:14px;min-height:44px}
+.catpills{scrollbar-width:none}
+.catpills::-webkit-scrollbar{display:none}
+.catpills button{padding:9px 15px;font-size:13px;min-height:38px}
+.form input,.form select{padding:12px 12px;font-size:16px}  /* 16px stops iOS zoom-on-focus */
+.fxrow input{padding:12px;font-size:16px}
+.memberchips button,.splitrow button{min-height:42px;font-size:14px}
+.place .acts a,.place .acts button{padding:11px 0;font-size:13px;min-height:42px}
+.tabbar button{padding:9px 0 8px;min-height:52px}
+.tabbar button img{width:23px;height:23px}
+.delbtn{min-height:32px;padding:4px 10px}
+.card{padding:14px 16px}
+@media (max-width:360px){
+  body{font-size:14.5px}
+  .fxpill{top:16px;right:14px;padding:5px 8px}
+  header{padding:18px 14px 0}
+  main{padding:14px 14px 10px}
+  .fxpanel{padding:10px 14px 0}
+}
+
+/* ---------- 越南小卡 ---------- */
+.cardnote{font-size:11.5px;color:var(--ink3);line-height:1.6;margin:2px 0 12px}
+.cardrow{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 4px 4px 0;padding:13px 14px;margin-bottom:8px}
+.cardrow .cw{flex:1;min-width:0}
+.cardrow .vn{font-size:17px;font-weight:700;color:var(--ink);line-height:1.35;
+  word-break:break-word}
+.cardrow .zh{font-size:13.5px;color:var(--ink2);margin-top:3px}
+.cardrow .say{font-size:11px;color:var(--ink3);margin-top:4px;letter-spacing:.02em}
+.cardrow .sayb{flex:0 0 auto;width:48px;height:48px;border-radius:50%;
+  border:1px solid var(--line2);background:var(--bg);font-size:19px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.cardrow .sayb:active,.cardrow .sayb.playing{background:var(--accent);
+  border-color:var(--accent);transform:scale(1.06)}
 </style>
 </head>
 <body>
 
 <header>
+  <button class="fxpill" id="fxpill" onclick="toggleFx()" aria-expanded="false">
+    <span class="fxp-rate" id="fxp-rate">1 NT$ ≈ 780 ₫</span>
+    <span class="fxp-cta">換匯 <span class="fxp-car" id="fxp-car">▾</span></span>
+  </button>
   <div class="eyebrow" id="hdEyebrow">VIETNAM · OCT 7 – 12</div>
   <h1><img class="lantern" src="data:image/png;base64,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" alt="">越南六天五夜</h1>
   <div class="sub" id="hdSub">河內 · 陸龍灣 · 下龍灣　—　六人小隊共用手冊</div>
 </header>
 
-<div class="fxrow">
-  <input id="fxin" type="number" inputmode="decimal" placeholder="輸入金額">
-  <button class="dir" id="fxdir">₫ → NT$</button>
-  <span class="out" id="fxout">= 0</span>
-</div>
-<div class="fxchips">
-  <button onclick="fxQuick(50000)">5萬₫</button>
-  <button onclick="fxQuick(100000)">10萬₫</button>
-  <button onclick="fxQuick(500000)">50萬₫</button>
-  <button onclick="fxQuick(1000000)">100萬₫</button>
+<div class="fxpanel" id="fxpanel">
+  <div class="fxrow">
+    <input id="fxin" type="number" inputmode="decimal" placeholder="輸入金額">
+    <button class="dir" id="fxdir">₫ → NT$</button>
+    <span class="out" id="fxout">= 0</span>
+  </div>
+  <div class="fxchips">
+    <button onclick="fxQuick(50000)">5萬₫</button>
+    <button onclick="fxQuick(100000)">10萬₫</button>
+    <button onclick="fxQuick(500000)">50萬₫</button>
+    <button onclick="fxQuick(1000000)">100萬₫</button>
+  </div>
 </div>
 
 <main>
@@ -261,7 +336,7 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
 
 <!-- ===== 分帳 ===== -->
 <div class="page" id="page-exp">
-  <button class="addbtn exp" onclick="toggleForm('exp-form',true)"><img src="data:image/png;base64,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" alt="">＋ 記帳</button>
+  <button class="addbtn exp" onclick="toggleForm('exp-form',true)"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳（全員都看得到）</button>
   <div class="form" id="exp-form">
     <div class="row">
       <div><label>項目</label><input id="e-title" placeholder="例：Day2 一日遊"></div>
@@ -323,6 +398,14 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
     <div class="seclabel">排行榜 · TOP 5</div>
     <div class="rank card" id="g-rank"></div>
   </div>
+</div>
+
+<!-- ===== 越南小卡 ===== -->
+<div class="page" id="page-card">
+  <div class="seclabel">越南小卡 · PHRASEBOOK</div>
+  <div class="catpills" id="cardpills"></div>
+  <div class="cardnote" id="cardnote"></div>
+  <div id="card-list"></div>
 </div>
 
 <!-- ===== 更多 ===== -->
@@ -397,6 +480,7 @@ main{padding:14px 20px 10px;max-width:560px;margin:0 auto}
   <button data-p="exp"><img src="data:image/png;base64,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" alt="">分帳</button>
   <button data-p="pl"><img src="data:image/png;base64,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" alt="">美食</button>
   <button data-p="game"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAoCAMAAACcjsm3AAAAw1BMVEUAAABdV09waWJ4dG2Qi4RpYlxUTUZKRD1kX1eEfneZlI3W1Muxq6f6+PSIhH3Hw7ygnpanopy7t6/Au7TQysXs6OEfHBkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxoftNAAAAMXRSTlMA/////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtxuApAAAAi5JREFUeNrVVtnaqyAMJBubIK59/0c9oNUitZ7r3wu/FhiSmUzSKvVXn54Isf9aRgBxDzAUENCvV5+UmuYwKTWGlNIMRmeotfwDB4AkQt4ZLZK/5IfQ5ts0MZFYMXSLsy+g/iGfAe3rbn804P+jwAhwsyrwjLIbG7oRpivpuOEelqi3s1IBxq+AJU8y8COuhyiFILUhvexhV/2uF2MRn+2b9yIadoUaIGUKJBmFBjbpWNP2LvcMAF1ynWJaVFvMHDBtiHVF+1XgETI+jugw7ql9MrVrpoE5CKL5qooXXDKQKUAMki6ZYizEs9oGuGuBcVJxpqUTnTXHS652V5lohVkF1PQBjyTlKBKkuJYPtduD3g+yztpFgWTkQLLRoDOSvA2786pLFR+MpyF1Yvqsrdm3g8mgMSNZjhRlqjSt8vZb9Pg2F28SX9KrSAZItU6FSWfxnXzWU+m67P5jHkexboHcds7AzihlnRLo6dJeJ0l39RGZKPbYHIwBc3H2DMuZdeNcK/BpkoVbX+PhkCRtxafHzqRDquGxhZeudRIfZmZohwtKmVQC+wuajiA4Rb1eCNCXk3QcZ4bLkGJ8V89dIrqbucJQO8BjaELvtr2bOlzPmgDTDRDuR+tl1pSx1XLcDXc3HV3F8bCC7j7DbPlRlaBPafE0mmA8cMPPerIJR/ucfGfTb0h68YMTnJni1qGVwj5PGu5Fj/HRaqYnQKPrtc5DfkJ8/vkoh+z45/4t/AO1uBAa6bwFXQAAAABJRU5ErkJggg==" alt="">遊戲</button>
+  <button data-p="card"><img src="icon.svg" alt="">小卡</button>
   <button data-p="more"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAAD49+5cVErUzcC5talrY1jv7eOTi3+oppo8NSzEvrTd2syglIjq5tm1raCAe3Lm38/Lyr8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACU3DZBAAAAMXRSTlMA//////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA77JFZgAAAu5JREFUeNrNVlmWozAMpLzvy/0vOzI2YNIkcffXkEd4gEtLqSSzbf/RgSTUX3A8W8sEoHCZWnFnCCWszTfkwiFZCEFr8sqBdaSTsqTUoEHaQE4XWTEsINUUBP1MsHLRZWSMwwhlqnDCccMlI2PfsY4RIU5AFC9gYuKmaCu+AzXLG7jeooExm+ARntCNXXwqh7fSAzWRY0fnVh0BuCicSfWJoj3M5uJ8khpZnhcurcfbVAMzLSIzh9CAiJxHbRPwVFOobGuTifE/XsEZX5LVj8Aq5X7t/owYHislUAGTSuG2JfoKDVbPtzuu9iRhiDAjfCmSKqxmr4BkbrakxeFc8PZHiwUvfk80XkAoycqN7R5vi4G7YRoxUrS5SXcgsbkmxzoBnZgUeARFPiNP1G4HuRBkRYWKV4ev1PrAoyctMN9w2DyzJerabtJgxj82DSmR8iRydy0QdzZJF4mtmA9Kn8QV0ZFRZtLX/sQKJ6nPix6OqntySDVRcIFKElnamaTx4rmkZuDoEYlnIYdCPpOVVJNeAqBpTUs9AqS+wKXwpvGDajjJjArWnERr6reoMzE7CwphpFw7XktpqE1oZnbYnhZrChY56+Cu5tGx94aHd4FCqspnm2fmSH+GWSmof0zWOiSaNV55wb2jg8YkPfKqJGmze2idzFg2LqrCXTK0OmSpQ7PCo1I1SCazn8f6KT2SHb1lTAZH5Wq6ap0QvdBkkmzyH72I80Jrq2nghqcf2w1pnfw5q54H+/60uYo+0SGSEGMLoMr1d506bNPQ66agzl6d/l/P++aFeXhiyv77rnGLH7/Zp+agP73Bw6opxu+GXtK9YbG0V42FU7o9U2zLXwJHSbaHwY/Pbo8y4ufqj7EPcQzh/LY0GBoDFr9zXjPCMrG3bLDG5lWUc9hjVW5nXwwwfqXT0ZuLqIu9oZg15KyvaRatKV1dFehVXC39pbQTuayVg5Mv1OChq/pV3YD42iGYmvn9p9/78eIyf/9B/g+2rRVtuCzTLQAAAABJRU5ErkJggg==" alt="">更多</button>
 </nav>
 
@@ -880,12 +964,25 @@ $("fxin").oninput=fxCalc;
 $("fxdir").onclick=function(){FX_VND2TWD=!FX_VND2TWD;
   $("fxdir").textContent=FX_VND2TWD?"₫ → NT$":"NT$ → ₫";fxCalc()};
 function fxQuick(v){FX_VND2TWD=true;$("fxdir").textContent="₫ → NT$";$("fxin").value=v;fxCalc()}
+/* The converter is collapsed by default so it stops eating the top of every
+   screen; the pill still shows the rate, which is the bit people glance at. */
+function toggleFx(open){
+  var panel=$("fxpanel"),pill=$("fxpill");
+  var willOpen=(open===undefined)?!panel.classList.contains("open"):!!open;
+  panel.classList.toggle("open",willOpen);
+  pill.classList.toggle("open",willOpen);
+  pill.setAttribute("aria-expanded",willOpen?"true":"false");
+  if(willOpen)setTimeout(function(){$("fxin").focus()},60);
+}
+function renderFxPill(){
+  $("fxp-rate").textContent="1 NT$ ≈ "+Math.round(RATE).toLocaleString()+" ₫";
+}
 $("ratein").onchange=async function(){
   var v=parseFloat(this.value);
   if(!(v>0)){this.value=RATE;toast("匯率請填大於 0 的數字");return}
   RATE=v; RATE_T=Date.now();
   await kvSet("rate",String(RATE));
-  fxCalc();
+  fxCalc();renderFxPill();
   saveShared("把匯率改成 1 NT$ = "+RATE+" ₫");
 }
 
@@ -1215,7 +1312,8 @@ function renderKings(){
 var curGame=null, gTimer=null;
 var GAME_META={pho:{n:"河粉掃雷"},lantern:{n:"燈籠疊疊樂"},memory:{n:"河粉記憶翻牌"},fish:{n:"下龍灣釣魚"}};
 function openGame(g){curGame=g;$("g-menu").style.display="none";$("g-view").style.display="block";
-  if(g==="pho")phoInit();else if(g==="lantern")lanInit();else if(g==="memory")memInit();else fishInit();
+  // entering from the menu always starts the ladder at level 1
+  if(g==="pho")phoInit(1);else if(g==="lantern")lanInit();else if(g==="memory")memInit(1);else fishInit();
   renderRank();}
 function closeGame(){stopLoops();curGame=null;$("g-view").style.display="none";$("g-menu").style.display="block";renderBests()}
 function stopLoops(){clearInterval(gTimer);gTimer=null;clearInterval(lanMov);lanMov=null;clearInterval(fishLoop);fishLoop=null}
@@ -1246,20 +1344,24 @@ function renderBests(){
 }
 
 /* --- game 1: pho minesweeper --- */
-var P={};
-function phoInit(){
+var P={}, phoLevel=1;
+function phoMines(){return Math.min(8+phoLevel*2,26)}          // 10, 12, 14 ... capped
+function phoLimit(){return Math.max(120-(phoLevel-1)*12,40)}   // shrinking clock
+function phoInit(reset){
   stopLoops();
-  P={grid:[],open:0,flags:0,dead:false,won:false,flag:false,sec:0};
+  if(reset)phoLevel=1;
+  var MINES=phoMines();
+  P={grid:[],open:0,flags:0,dead:false,won:false,flag:false,sec:0,mines:MINES};
   for(var i=0;i<64;i++)P.grid.push({m:false,o:false,f:false,n:0});
   var placed=0;
-  while(placed<10){var p=Math.floor(Math.random()*64);
+  while(placed<MINES){var p=Math.floor(Math.random()*64);
     if(!P.grid[p].m){P.grid[p].m=true;placed++}}
   for(var i=0;i<64;i++){if(P.grid[i].m)continue;var n=0;
     nbrs(i).forEach(function(j){if(P.grid[j].m)n++});P.grid[i].n=n}
-  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICP+'">河粉掃雷 <span style="font-size:11px;color:var(--ink2);font-weight:400">翻出所有河粉，避開魔鬼椒</span></div>'+
-    '<div class="gamebar"><span class="stat" id="p-stat">🌶 10｜⏱ 0s</span>'+
+  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICP+'">河粉掃雷 <span style="font-size:11px;color:var(--ink2);font-weight:400">LV '+phoLevel+'・'+MINES+' 顆椒・限時 '+phoLimit()+'s</span></div>'+
+    '<div class="gamebar"><span class="stat" id="p-stat">🌶 '+MINES+'｜⏱ 0s</span>'+
     '<button id="p-flag" onclick="P.flag=!P.flag;this.classList.toggle(\'on\')">🚩 插旗</button>'+
-    '<button onclick="phoInit()">重來</button></div>'+
+    '<button onclick="phoInit(1)">重來</button></div>'+
     '<div class="game-grid" id="p-grid"></div>';
   phoRender();
 }
@@ -1270,7 +1372,11 @@ function nbrs(i){var r=Math.floor(i/8),c=i%8,out=[];
   return out}
 function phoTap(i){
   if(P.dead||P.won)return;
-  if(!gTimer)gTimer=setInterval(function(){P.sec++;phoStat()},1000);
+  if(!gTimer)gTimer=setInterval(function(){
+    P.sec++;
+    if(P.sec>=phoLimit()&&!P.won&&!P.dead){
+      P.dead=true;phoLevel=1;clearInterval(gTimer);gTimer=null;phoRender();phoStat();return}
+    phoStat()},1000);
   var c=P.grid[i];
   if(P.flag){if(!c.o){c.f=!c.f;P.flags+=c.f?1:-1}phoRender();phoStat();return}
   if(c.f||c.o)return;
@@ -1279,11 +1385,15 @@ function phoTap(i){
     for(var k2=0;k2<64;k2++){if(P.grid[k2].m)continue;var n2=0;
       nbrs(k2).forEach(function(j){if(P.grid[j].m)n2++});P.grid[k2].n=n2}
   }
-  if(c.m){P.dead=true;clearInterval(gTimer);gTimer=null;phoRender();phoStat();return}
+  if(c.m){P.dead=true;phoLevel=1;clearInterval(gTimer);gTimer=null;phoRender();phoStat();return}
   (function rv(j){var g=P.grid[j];if(g.o||g.f)return;g.o=true;P.open++;
     if(g.n===0&&!g.m)nbrs(j).forEach(rv)})(i);
-  if(P.open===54){P.won=true;clearInterval(gTimer);gTimer=null;
-    var sc=Math.max(1000-P.sec*8,100);submitScore("pho",sc)}
+  if(P.open===64-P.mines){P.won=true;clearInterval(gTimer);gTimer=null;
+    var sc=Math.max(1000-P.sec*8,100)*phoLevel;
+    submitScore("pho",sc);
+    phoLevel++;
+    toast("過關！下一關 "+phoMines()+" 顆椒");
+    setTimeout(function(){if(curGame==="pho")phoInit()},1500);}
   phoRender();phoStat();
 }
 function phoRender(){
@@ -1297,10 +1407,10 @@ function phoRender(){
 }
 function phoStat(){
   var s;
-  if(P.dead)s="踩到魔鬼椒 — 按重來再挑戰";
-  else if(P.won)s="過關 · 得分 "+Math.max(1000-P.sec*8,100);
-  else s="剩 "+(10-P.flags)+"｜"+P.sec+"s";
-  $("p-stat").textContent=s;
+  if(P.dead)s=(P.sec>=phoLimit()?"時間到":"踩到魔鬼椒")+" — LV 歸 1，按重來";
+  else if(P.won)s="過關 · 得分 "+Math.max(1000-P.sec*8,100)*phoLevel;
+  else s="剩 "+(P.mines-P.flags)+"｜"+P.sec+"/"+phoLimit()+"s｜LV "+phoLevel;
+  var el=$("p-stat"); if(el)el.textContent=s;
 }
 
 /* --- game 2: lantern stack --- */
@@ -1322,18 +1432,21 @@ function lanTick(){
   if(L.x>w-40||L.x<4)L.dir*=-1;
   lanRender();
 }
+function lanWindow(){return Math.max(26-L.score*1.5,9)}  // the target narrows fast
 function lanDrop(){
   if(!L.playing)return;
   var top=L.stack[L.stack.length-1];
-  if(Math.abs(L.x-top)>26){
+  if(Math.abs(L.x-top)>lanWindow()){
     L.playing=false;clearInterval(lanMov);lanMov=null;
     $("l-stat").textContent="沒接住 · 最終高度 "+L.score;
-    if(L.score>0)submitScore("lantern",L.score*100);
+    // quadratic-ish payoff, so a tall stack is worth chasing
+    if(L.score>0)submitScore("lantern",L.score*100+L.score*L.score*20);
     lanRender();return;
   }
   L.stack.push(L.x);L.score++;
-  L.speed+=0.25;
-  $("l-stat").textContent="高度 "+L.score;
+  L.speed+=0.45;                        // was 0.25 — it plateaued far too long
+  if(L.score%5===0)toast("LEVEL "+(L.score/5+1)+"・準心變窄了");
+  $("l-stat").textContent="高度 "+L.score+"｜準心 "+Math.round(lanWindow())+"px";
   lanRender();
 }
 function lanRender(){
@@ -1351,20 +1464,29 @@ function lanRender(){
 }
 
 /* --- game 3: memory --- */
-var M={};
-function memInit(){
+var M={}, memLevel=1;
+function memLimit(){return Math.max(75-(memLevel-1)*8,30)}  // seconds, tightening
+function memPeek(){return Math.max(700-(memLevel-1)*120,220)}  // flip-back delay
+function memInit(reset){
   stopLoops();
+  if(reset)memLevel=1;
   var em=[0,1,2,3,4,5,6,7];
   var deck=em.concat(em).sort(function(){return Math.random()-0.5});
-  M={deck:deck,flip:[],got:{},moves:0,sec:0,done:false};
-  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">翻出所有配對，越快越少步分越高</span></div>'+
-    '<div class="gamebar"><span class="stat" id="m-stat">步數 0｜⏱ 0s</span><button onclick="memInit()">重來</button></div>'+
+  M={deck:deck,flip:[],got:{},moves:0,sec:0,done:false,dead:false};
+  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">LV '+memLevel+'・限時 '+memLimit()+'s・記憶時間 '+memPeek()+'ms</span></div>'+
+    '<div class="gamebar"><span class="stat" id="m-stat">步數 0｜⏱ 0/'+memLimit()+'s</span><button onclick="memInit(1)">重來</button></div>'+
     '<div class="mem-grid" id="m-grid"></div>';
   memRender();
 }
 function memTap(i){
-  if(M.done||M.got[i]||M.flip.indexOf(i)>=0||M.flip.length>=2)return;
-  if(!gTimer)gTimer=setInterval(function(){if(!M.done){M.sec++;$("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"s"}},1000);
+  if(M.done||M.dead||M.got[i]||M.flip.indexOf(i)>=0||M.flip.length>=2)return;
+  if(!gTimer)gTimer=setInterval(function(){
+    if(M.done||M.dead)return;
+    M.sec++;
+    if(M.sec>=memLimit()){                    // out of time: back to level 1
+      M.dead=true;memLevel=1;clearInterval(gTimer);gTimer=null;
+      $("m-stat").textContent="時間到 — LV 歸 1，按重來";return}
+    $("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"/"+memLimit()+"s｜LV "+memLevel},1000);
   M.flip.push(i);memRender();
   if(M.flip.length===2){
     M.moves++;
@@ -1373,14 +1495,17 @@ function memTap(i){
       M.got[a]=1;M.got[b]=1;M.flip=[];memRender();
       if(Object.keys(M.got).length===16){
         M.done=true;clearInterval(gTimer);gTimer=null;
-        var sc=Math.max(1200-M.sec*8-M.moves*10,100);
-        $("m-stat").textContent="完成 · 得分 "+sc;
+        var sc=Math.max(1200-M.sec*8-M.moves*10,100)*memLevel;
+        $("m-stat").textContent="完成 · LV "+memLevel+" · 得分 "+sc;
         submitScore("memory",sc);
+        memLevel++;
+        toast("過關！下一關限時 "+memLimit()+"s");
+        setTimeout(function(){if(curGame==="memory")memInit()},1500);
       }
     }else{
-      setTimeout(function(){M.flip=[];memRender()},700);
+      setTimeout(function(){M.flip=[];memRender()},memPeek());
     }
-    if(!M.done)$("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"s";
+    if(!M.done&&!M.dead)$("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"/"+memLimit()+"s｜LV "+memLevel;
   }
 }
 function memRender(){
@@ -1394,9 +1519,10 @@ function memRender(){
 
 /* --- game 4: fishing --- */
 var F={},fishLoop=null;
+function fishLevel(){return 1+Math.floor(F.tick/400)}   // a level roughly every 12s
 function fishInit(){
   stopLoops();
-  F={hx:150,hdir:1,hy:0,drop:false,items:[],score:0,over:false,tick:0};
+  F={hx:150,hdir:1,hy:0,drop:false,items:[],score:0,over:false,tick:0,lvl:1};
   $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICF+'">下龍灣釣魚 <span style="font-size:11px;color:var(--ink2);font-weight:400">點擊放鉤釣魚，鉤到石頭就結束</span></div>'+
     '<div class="gamebar"><span class="stat" id="f-stat">得分 0</span><button onclick="fishInit()">重來</button></div>'+
     '<div class="playarea halong" id="f-area" onclick="fishDrop()"></div>'+
@@ -1408,20 +1534,28 @@ function fishTick(){
   var a=$("f-area");if(!a||F.over)return;
   var W=a.clientWidth,H=a.clientHeight;
   F.tick++;
-  if(!F.drop){F.hx+=F.hdir*2.6;if(F.hx>W-20||F.hx<10)F.hdir*=-1}
-  else{F.hy+=5;
+  var lv=fishLevel();
+  if(lv!==F.lvl){F.lvl=lv;toast("LEVEL "+lv+"・魚變快了")}
+  // the hook sweeps faster and the water gets rockier as you survive
+  var sweep=2.6+(lv-1)*0.55;
+  if(!F.drop){F.hx+=F.hdir*sweep;if(F.hx>W-20||F.hx<10)F.hdir*=-1}
+  else{F.hy+=5+(lv-1)*0.6;
     for(var i=0;i<F.items.length;i++){var it=F.items[i];
       if(Math.abs(it.x+12-F.hx)<20&&Math.abs(it.y-(F.hy+16))<18){
         if(it.rock){F.over=true;clearInterval(fishLoop);fishLoop=null;
-          $("f-stat").textContent="鉤到石頭 · 最終得分 "+F.score;
+          $("f-stat").textContent="鉤到石頭 · LV "+fishLevel()+" · 最終得分 "+F.score;
           if(F.score>0)submitScore("fish",F.score);return}
-        F.score+=it.pts;F.items.splice(i,1);F.drop=false;F.hy=0;
-        $("f-stat").textContent="得分 "+F.score;break}}
+        F.score+=it.pts*fishLevel();      // later catches are worth more
+        F.items.splice(i,1);F.drop=false;F.hy=0;
+        $("f-stat").textContent="得分 "+F.score+"｜LV "+fishLevel();break}}
     if(F.hy>H-30){F.drop=false;F.hy=0}}
-  if(F.tick%46===0){
-    var rock=Math.random()<0.3;
-    var small=Math.random()<0.4;
-    F.items.push({x:-30,y:70+Math.random()*(H-130),sp:1.4+Math.random()*1.8,rock:rock,pts:rock?0:(small?150:100),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)});
+  var spawnEvery=Math.max(46-(lv-1)*6,16);
+  if(F.tick%spawnEvery===0){
+    var rock=Math.random()<Math.min(0.3+(lv-1)*0.05,0.55);   // more rocks later
+    var small=Math.random()<Math.min(0.4+(lv-1)*0.05,0.7);   // and smaller fish
+    var spd=(1.4+Math.random()*1.8)+(lv-1)*0.5;
+    F.items.push({x:-30,y:70+Math.random()*(H-130),sp:spd,rock:rock,
+      pts:rock?0:(small?150:100),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)});
   }
   F.items.forEach(function(it){it.x+=it.sp});
   F.items=F.items.filter(function(it){return it.x<((a.clientWidth)+30)});
@@ -1461,9 +1595,137 @@ async function runDiag(){
   }
   box.innerHTML=lines.join("<br>");
 }
-function renderAll(){renderHeader();renderDays();renderTL();renderMap();renderWx();
+
+/* ================= 越南小卡 · PHRASEBOOK ================= */
+/* vn: 越南文（河內北部腔） zh: 中文 say: 拼給台灣人念的近似音 */
+var CARD_CATS=["問候","點餐","購物殺價","交通","住宿","急難","數字"];
+var CARDS=[
+ {c:"問候",vn:"Xin chào",zh:"你好",say:"辛 早"},
+ {c:"問候",vn:"Cảm ơn",zh:"謝謝",say:"感 恩"},
+ {c:"問候",vn:"Xin lỗi",zh:"不好意思／對不起",say:"辛 羅伊"},
+ {c:"問候",vn:"Tạm biệt",zh:"再見",say:"淡 別"},
+ {c:"問候",vn:"Dạ / Vâng",zh:"是／好的",say:"呀／vång"},
+ {c:"問候",vn:"Không",zh:"不要／沒有",say:"空"},
+ {c:"問候",vn:"Tôi không hiểu",zh:"我聽不懂",say:"多伊 空 希憂"},
+ {c:"問候",vn:"Bạn nói tiếng Anh được không?",zh:"你會說英文嗎？",say:"辦 諾伊 頂 安 得 空"},
+ {c:"問候",vn:"Tôi đến từ Đài Loan",zh:"我來自台灣",say:"多伊 頂 度 呆 巒"},
+ {c:"問候",vn:"Rất vui được gặp bạn",zh:"很高興認識你",say:"熱 vui 得 尬 辦"},
+
+ {c:"點餐",vn:"Cho tôi xem thực đơn",zh:"請給我菜單",say:"左 多伊 賢 特 蹲"},
+ {c:"點餐",vn:"Cái này là gì?",zh:"這是什麼？",say:"蓋 乃 拉 汁"},
+ {c:"點餐",vn:"Cho tôi cái này",zh:"我要這個",say:"左 多伊 蓋 乃"},
+ {c:"點餐",vn:"Không cay",zh:"不要辣",say:"空 該"},
+ {c:"點餐",vn:"Không hành, không rau mùi",zh:"不要蔥、不要香菜",say:"空 漢，空 招 妹"},
+ {c:"點餐",vn:"Tôi ăn chay",zh:"我吃素",say:"多伊 安 摘"},
+ {c:"點餐",vn:"Ngon quá!",zh:"太好吃了！",say:"諾恩 誇"},
+ {c:"點餐",vn:"Tính tiền",zh:"結帳",say:"頂 店"},
+ {c:"點餐",vn:"Cho tôi thêm một cái nữa",zh:"再給我一份",say:"左 多伊 添 莫 蓋 呢"},
+ {c:"點餐",vn:"Nhà vệ sinh ở đâu?",zh:"廁所在哪裡？",say:"那 位 星 兒 都"},
+ {c:"點餐",vn:"Cho tôi một chai bia",zh:"給我一瓶啤酒",say:"左 多伊 莫 摘 比亞"},
+ {c:"點餐",vn:"Không đá",zh:"不要冰塊",say:"空 打"},
+
+ {c:"購物殺價",vn:"Bao nhiêu tiền?",zh:"多少錢？",say:"包 妞 店"},
+ {c:"購物殺價",vn:"Đắt quá!",zh:"太貴了！",say:"達 誇"},
+ {c:"購物殺價",vn:"Giảm giá được không?",zh:"可以便宜一點嗎？",say:"讓 咋 得 空"},
+ {c:"購物殺價",vn:"Rẻ hơn được không?",zh:"能再便宜嗎？",say:"雷 轟 得 空"},
+ {c:"購物殺價",vn:"Tôi không mua",zh:"我不買",say:"多伊 空 摸"},
+ {c:"購物殺價",vn:"Cho tôi xem cái kia",zh:"我想看那個",say:"左 多伊 賢 蓋 給亞"},
+ {c:"購物殺價",vn:"Tôi chỉ xem thôi",zh:"我只是看看",say:"多伊 幾 賢 拖伊"},
+
+ {c:"交通",vn:"Cho tôi đến địa chỉ này",zh:"請載我到這個地址",say:"左 多伊 頂 地 幾 乃"},
+ {c:"交通",vn:"Bao xa?",zh:"多遠？",say:"包 撒"},
+ {c:"交通",vn:"Dừng ở đây",zh:"在這裡停",say:"用 兒 day"},
+ {c:"交通",vn:"Làm ơn đi theo đồng hồ",zh:"請跳表",say:"藍 恩 低 挑 東 荷"},
+ {c:"交通",vn:"Sân bay Nội Bài",zh:"內排機場",say:"孫 掰 內 掰"},
+ {c:"交通",vn:"Đợi tôi một chút",zh:"等我一下",say:"得伊 多伊 莫 竹"},
+ {c:"交通",vn:"Nhanh lên nhé",zh:"麻煩快一點",say:"那印 冷 內"},
+
+ {c:"住宿",vn:"Tôi đã đặt phòng",zh:"我有訂房",say:"多伊 打 大 風"},
+ {c:"住宿",vn:"Cho tôi gửi hành lý",zh:"我想寄放行李",say:"左 多伊 貴 漢 里"},
+ {c:"住宿",vn:"Mật khẩu wifi là gì?",zh:"Wifi 密碼是什麼？",say:"麼 口 wifi 拉 汁"},
+ {c:"住宿",vn:"Phòng tôi có vấn đề",zh:"我的房間有問題",say:"風 多伊 過 problem"},
+ {c:"住宿",vn:"Mấy giờ trả phòng?",zh:"幾點退房？",say:"美 這 咋 風"},
+
+ {c:"急難",vn:"Giúp tôi với!",zh:"請幫幫我！",say:"竹 多伊 為伊"},
+ {c:"急難",vn:"Gọi cảnh sát!",zh:"叫警察！",say:"貴 感 撒"},
+ {c:"急難",vn:"Gọi xe cứu thương!",zh:"叫救護車！",say:"貴 些 89 湯"},
+ {c:"急難",vn:"Tôi bị ốm",zh:"我生病了",say:"多伊 逼 恩"},
+ {c:"急難",vn:"Bệnh viện ở đâu?",zh:"醫院在哪裡？",say:"邊 眼 兒 都"},
+ {c:"急難",vn:"Tôi bị mất hộ chiếu",zh:"我護照掉了",say:"多伊 逼 麼 戶 九"},
+ {c:"急難",vn:"Tôi bị dị ứng",zh:"我會過敏",say:"多伊 逼 汁 恩"},
+ {c:"急難",vn:"Gọi cho Đại sứ quán Đài Loan",zh:"請聯絡台灣辦事處",say:"貴 左 呆 使 觀 呆 巒"},
+
+ {c:"數字",vn:"Một",zh:"1",say:"莫"},
+ {c:"數字",vn:"Hai",zh:"2",say:"嗨"},
+ {c:"數字",vn:"Ba",zh:"3",say:"巴"},
+ {c:"數字",vn:"Bốn",zh:"4",say:"本"},
+ {c:"數字",vn:"Năm",zh:"5",say:"南"},
+ {c:"數字",vn:"Mười",zh:"10",say:"妹"},
+ {c:"數字",vn:"Một trăm",zh:"100",say:"莫 沾"},
+ {c:"數字",vn:"Một nghìn",zh:"1,000（1k）",say:"莫 引"},
+ {c:"數字",vn:"Mười nghìn",zh:"10,000（10k）",say:"妹 引"},
+ {c:"數字",vn:"Một trăm nghìn",zh:"100,000（100k）",say:"莫 沾 引"}
+];
+var curCard="問候";
+var vnVoice=null, voicesReady=false;
+
+/* Voices load asynchronously in most browsers; pick the best Vietnamese one
+   available and fall back to letting the engine choose by lang tag. */
+function pickVoice(){
+  if(!("speechSynthesis" in window))return;
+  var vs=speechSynthesis.getVoices()||[];
+  if(!vs.length)return;
+  voicesReady=true;
+  vnVoice=vs.filter(function(v){return /^vi/i.test(v.lang)})[0]||null;
+  if($("cardpills"))renderCards();
+}
+function sayVN(i){
+  var card=CARDS[i]; if(!card)return;
+  if(!("speechSynthesis" in window)){toast("這台裝置不支援語音");return}
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(card.vn);
+  u.lang="vi-VN";
+  if(vnVoice)u.voice=vnVoice;
+  u.rate=0.8;                        // slow enough to copy out loud
+  speechSynthesis.speak(u);
+  var btn=document.querySelector('.cardrow[data-i="'+i+'"] .sayb');
+  if(btn){btn.classList.add("playing");
+    setTimeout(function(){btn.classList.remove("playing")},900)}
+}
+function setCardCat(c){curCard=c;renderCards()}
+function renderCards(){
+  if(!$("cardpills"))return;
+  var h="";
+  CARD_CATS.forEach(function(c){
+    h+='<button class="'+(c===curCard?"on":"")+'" onclick="setCardCat(\''+jsq(c)+'\')">'+esc(c)+"</button>"});
+  $("cardpills").innerHTML=h;
+
+  var hasTTS=("speechSynthesis" in window);
+  $("cardnote").textContent = !hasTTS
+    ? "這台裝置不支援語音，直接把越南文拿給對方看即可。"
+    : (voicesReady&&!vnVoice
+       ? "這台裝置沒有越南語語音，發音鈕可能不準——照「近似音」念，或直接給對方看。"
+       : "點 🔊 聽發音，念不出來就把卡片拿給對方看。");
+
+  var rows="";
+  CARDS.forEach(function(card,i){
+    if(card.c!==curCard)return;
+    rows+='<div class="cardrow" data-i="'+i+'">'+
+      '<div class="cw">'+
+        '<div class="vn">'+esc(card.vn)+'</div>'+
+        '<div class="zh">'+esc(card.zh)+'</div>'+
+        '<div class="say">近似音：'+esc(card.say)+'</div>'+
+      '</div>'+
+      '<button class="sayb" onclick="sayVN('+i+')" aria-label="播放發音">🔊</button>'+
+    '</div>';
+  });
+  $("card-list").innerHTML=rows;
+}
+
+function renderAll(){renderHeader();renderFxPill();renderDays();renderTL();renderMap();renderWx();
   if(!$("exp-form").classList.contains("show"))renderExpForm();
-  renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();if(curGame)renderRank()}
+  renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();renderCards();if(curGame)renderRank()}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
 loadAll();
 
 /* ---------- offline: cache the page so it opens with no signal ---------- */
