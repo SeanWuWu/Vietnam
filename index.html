@@ -274,17 +274,108 @@ header{position:relative}
 @media (max-width:340px){
   #card-list{grid-template-columns:1fr}
 }
+
+/* ---------- compact layout + header tools ---------- */
+header{padding:12px 16px 0}
+header .eyebrow{font-size:10px}
+header h1{font-size:18px;margin-top:1px}
+header .sub{font-size:11px;margin-top:2px;padding-bottom:10px}
+.headtop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.brand{flex:1;min-width:0}
+.headtools{display:flex;align-items:stretch;gap:6px;flex:0 0 auto;padding-top:2px}
+.fxpill{position:static;top:auto;right:auto;padding:5px 8px}
+.fxpill .fxp-rate{font-size:10px}
+.fxpill .fxp-cta{font-size:9px}
+.wxpill{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 8px;
+  min-width:44px;min-height:44px;color:var(--ink);cursor:pointer;line-height:1.15}
+.wxpill svg{width:20px;height:20px;display:block}
+.wxpill .wxp-temp{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--accent);font-variant-numeric:tabular-nums}
+.wxpill.open{border-color:var(--accent)}
+.wxpanel{display:none;max-width:560px;margin:0 auto;padding:8px 16px 0}
+.wxpanel.open{display:block;animation:fadeUp .25s ease}
+.wxsheet{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px 8px}
+.wxhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.wxhead .wxl{font-size:10px;letter-spacing:.18em;color:var(--ink3);font-weight:700}
+.wxupd{font-size:10px;color:var(--ink3)}
+.wxtable{display:grid;gap:0}
+.wxtr{display:grid;grid-template-columns:52px 1fr 1fr;gap:6px;align-items:center;
+  padding:7px 0;border-top:1px solid var(--line)}
+.wxtr.wxth{border-top:none;padding:0 0 4px}
+.wxtr.wxth span{font-size:10px;letter-spacing:.12em;color:var(--ink2);font-weight:700}
+.wxdate{font-size:11px;color:var(--ink2);line-height:1.25}
+.wxdate b{display:block;color:var(--ink);font-size:12px}
+.wxcell{font-size:11px;color:var(--ink2);line-height:1.35}
+.wxcell b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.wxcell .rain{color:var(--green);font-weight:600}
+.wxfoot{font-size:10px;color:var(--ink3);margin-top:6px;letter-spacing:.02em}
+.fxpanel{padding:8px 16px 0}
+main{padding:10px 16px 8px}
+.syncline{margin-bottom:6px;font-size:10px}
+.notice{padding:7px 11px;margin-bottom:10px}
+.seclabel{margin:14px 0 8px}
+.daytabs{margin-bottom:8px;gap:2px}
+.daytabs button{padding:6px 8px;min-height:40px;font-size:12px}
+.daytabs button .dname{font-size:12px}
+.daytabs button .dsub{font-size:10px}
+.addbtn{padding:9px 12px;font-size:13px;margin:0 0 8px;border-radius:6px;box-shadow:none;letter-spacing:.04em}
+.addbtn img{width:15px;height:15px}
+.card{padding:10px 12px;margin-bottom:6px}
+.card .t{font-size:13.5px;padding-right:0}
+.card .d{margin-top:3px}
+.maplink{margin-top:6px;padding:1px 8px}
+.meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.editbtn{border:1px solid var(--line);background:transparent;color:var(--ink);font-size:11px;
+  padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:.04em;min-height:28px}
+.editbtn:active{background:var(--gold-soft);border-color:var(--gold)}
+.delbtn{min-height:28px}
+.badge-new{top:8px;right:10px;font-size:9px}
+.form{padding:12px;margin:6px 0}
+.form label{margin:6px 0 3px}
+.form input,.form select{padding:9px 10px;font-size:16px}
+.timesel{display:flex;align-items:center;gap:6px}
+.timesel select{flex:1;min-width:0;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.timesep{color:var(--ink2);font-weight:700}
+.formhint{font-size:11px;color:var(--accent);letter-spacing:.06em;font-weight:700;margin-bottom:4px}
+.btn{padding:10px;margin-top:10px}
+.maptoggle{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink2);
+  border-radius:4px;padding:9px 12px;font-size:11px;letter-spacing:.16em;font-weight:700;
+  display:flex;align-items:center;justify-content:space-between;margin:4px 0 0}
+.maptoggle .car{color:var(--accent);transition:transform .2s}
+.maptoggle.open .car{transform:rotate(180deg)}
+.mapwrap{display:none;margin-top:8px}
+.mapwrap.open{display:block;animation:fadeUp .25s ease}
+.wxrow{display:none}
+@media (max-width:360px){
+  .fxpill{top:auto;right:auto;padding:5px 7px}
+  header{padding:10px 12px 0}
+  main{padding:10px 12px 8px}
+  .fxpanel,.wxpanel{padding:8px 12px 0}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <button class="fxpill" id="fxpill" onclick="toggleFx()" aria-expanded="false">
-    <span class="fxp-rate" id="fxp-rate">1 NT$ ≈ 780 ₫</span>
-    <span class="fxp-cta">換匯 <span class="fxp-car" id="fxp-car">▾</span></span>
-  </button>
+  <div class="headtop">
+  <div class="brand">
   <div class="eyebrow" id="hdEyebrow">VIETNAM · OCT 7 – 12</div>
   <h1><img class="lantern" src="data:image/png;base64,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" alt="">越南六天五夜</h1>
+  </div>
+  <div class="headtools">
+    <button class="wxpill" id="wxpill" onclick="toggleWx()" aria-expanded="false" aria-label="天氣預報">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="8.5" cy="8.2" r="3.1" fill="#F6EFDF" stroke="#C99A4B" stroke-width="1.25"/>
+        <path d="M7.5 9.2c.2-2.4 2.4-4 4.6-3.6 1.8.3 3.1 1.8 3.4 3.5 1.9.1 3.5 1.6 3.5 3.6 0 2-1.6 3.5-3.6 3.5H8.2c-2 0-3.6-1.6-3.6-3.5 0-1.6 1.1-3 2.6-3.4z" fill="#FFFFFF" stroke="#6B6258" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+      <span class="wxp-temp" id="wxp-temp">天氣</span>
+    </button>
+    <button class="fxpill" id="fxpill" onclick="toggleFx()" aria-expanded="false">
+      <span class="fxp-rate" id="fxp-rate">1 NT$ ≈ 780 ₫</span>
+      <span class="fxp-cta">換匯 <span class="fxp-car" id="fxp-car">▾</span></span>
+    </button>
+  </div>
+  </div>
   <div class="sub" id="hdSub">河內 · 陸龍灣 · 下龍灣　—　六人小隊共用手冊</div>
 </header>
 
@@ -306,6 +397,17 @@ header{position:relative}
   </div>
 </div>
 
+<div class="wxpanel" id="wxpanel">
+  <div class="wxsheet">
+    <div class="wxhead">
+      <span class="wxl">六日預報</span>
+      <span class="wxupd" id="wxupd"></span>
+    </div>
+    <div class="wxtable" id="wxgrid">載入河內、下龍灣天氣中…</div>
+    <div class="wxfoot">Open-Meteo · 當地時區　溫度為當日高低、降雨為當日最高機率</div>
+  </div>
+</div>
+
 <main>
 <div class="syncline" id="syncline">尚未同步</div>
 <div class="notice" id="notice"></div>
@@ -313,23 +415,29 @@ header{position:relative}
 <!-- ===== 時間表 ===== -->
 <div class="page on" id="page-tl">
   <div class="daytabs" id="daypills"></div>
-  <div class="wxrow" id="wxrow"></div>
-  <button class="addbtn tl" onclick="toggleForm('tl-form',true)"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAADNxrqyqZrDuq3X0sb7+PFSSUOTioK5sahaVE11a2JDPTc1LymfmI9qYVmqmY2DenPn49ri3NGJgnRqW1MfGxbv7+R5PjR/f3+qqqruwbwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0Z5B2AAAAMXRSTlMA//////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA5wjBaQAAA3FJREFUeNrVVtt2pCoQpSjuF0HRTjL//6GnCltiJ/acdN6mlktA2dRlbxQh/lWbf/cue2OfvFLBePcM50ywUV6+0ja16J8BZZy1r9dheqttfBqpEWINWmjNoxs3fUDXzXtRE+gLVA2eY5mSNyZMdFunMIUQ/TRN3vvNi/fE/fyAWqYt0UvDQNPNx2hGjyxVUbeUYtymB1yqoHQzs/DhdhWPMEFYCnXBup1qJLdeS2tAhCeli++iRuQ17fY+Smb22TkpbZ4ByeO9qnEEi3Ffw0VT4xMFhFQPHn2E+0M4Zktv5DOuQpw+9l7b1OEx2Vf0XIdHTO+vAL2B33n0EYdG60vAdHh0JIuZTH3dEqc9uM+FWSllhkdMiYRlDltJZt6v3vhDdN5HmmLoRqJLWzo8uBi9qaFbpbZaa4lQa2UONmfrJx+bjZOlQQvNbKM4JMSf2C5indMRqnqtOHYUR0X7S6BprwGXA5jy1YSFOOrfECV45gzQ2wePVzkSY6Co8IBARq1EhwxpQ6tqusoRENHtgFKodUVKCf3rO4DrFVAhAu5AkOTZEc4x9Xk9BLCEqxwXAAWLFhypmzUvgD1UF4Y2L4GCc+wxU9DUmSnDPs6Dgzm8xKMIOEJ9CSgnePA4o4Ke/J0GoQAX1Yd9vAAVmZ+jXx5yXIimXkWQzJcGScSpm0CkchKASOmtxmkeoRaugXROOuZvBy6WCCCgQ1kKZeVsLsyjhhGq6qESCiUy0LlOfKExE0/40vmUHSggHMBlLXtq2KXFuQCneJeaIiGoPSIeU45qSE4esu73ZYY9C7Wcnx8fIDxJLp+3+P99B+TkvgD1j4DKeXwIFW1Yg+TcKJnOG5m6OGJI/6kcBv6Jb29vVCXkbUA0gHPE7DfcDXA9QsUOBMK9Wd5OVFc133fDt+hnB+uxHHTl/GFg2wXAfC2SQ/4GVFIN4F1yjT/Bd6nCSZtfU1RmAPtB7HPt2/yX8kp1Aob0oX/GBe3iGwwB0KkjVdtyRvpbtGYLZ5ebdaVQZXuRaIcgi9xWp+X6mcCabG618e+mlWJLyZQvt4WW4R49pj8SLTlr8E2fjn/kUukHu/Xr0/q5Ts8fJpxLjRP9BulHyBd1+Bi3rtNq1lrpQBdaCySrfqoz9UvpFmlbq7ZaSZLLNkuKVvIWlLxPpdv72cK/d+z/D1CjJUU6+D0qAAAAAElFTkSuQmCC" alt="">＋ 新增行程（全員都會看到）</button>
+  <button class="addbtn tl" onclick="openTlForm()"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAADNxrqyqZrDuq3X0sb7+PFSSUOTioK5sahaVE11a2JDPTc1LymfmI9qYVmqmY2DenPn49ri3NGJgnRqW1MfGxbv7+R5PjR/f3+qqqruwbwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0Z5B2AAAAMXRSTlMA//////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA5wjBaQAAA3FJREFUeNrVVtt2pCoQpSjuF0HRTjL//6GnCltiJ/acdN6mlktA2dRlbxQh/lWbf/cue2OfvFLBePcM50ywUV6+0ja16J8BZZy1r9dheqttfBqpEWINWmjNoxs3fUDXzXtRE+gLVA2eY5mSNyZMdFunMIUQ/TRN3vvNi/fE/fyAWqYt0UvDQNPNx2hGjyxVUbeUYtymB1yqoHQzs/DhdhWPMEFYCnXBup1qJLdeS2tAhCeli++iRuQ17fY+Smb22TkpbZ4ByeO9qnEEi3Ffw0VT4xMFhFQPHn2E+0M4Zktv5DOuQpw+9l7b1OEx2Vf0XIdHTO+vAL2B33n0EYdG60vAdHh0JIuZTH3dEqc9uM+FWSllhkdMiYRlDltJZt6v3vhDdN5HmmLoRqJLWzo8uBi9qaFbpbZaa4lQa2UONmfrJx+bjZOlQQvNbKM4JMSf2C5indMRqnqtOHYUR0X7S6BprwGXA5jy1YSFOOrfECV45gzQ2wePVzkSY6Co8IBARq1EhwxpQ6tqusoRENHtgFKodUVKCf3rO4DrFVAhAu5AkOTZEc4x9Xk9BLCEqxwXAAWLFhypmzUvgD1UF4Y2L4GCc+wxU9DUmSnDPs6Dgzm8xKMIOEJ9CSgnePA4o4Ke/J0GoQAX1Yd9vAAVmZ+jXx5yXIimXkWQzJcGScSpm0CkchKASOmtxmkeoRaugXROOuZvBy6WCCCgQ1kKZeVsLsyjhhGq6qESCiUy0LlOfKExE0/40vmUHSggHMBlLXtq2KXFuQCneJeaIiGoPSIeU45qSE4esu73ZYY9C7Wcnx8fIDxJLp+3+P99B+TkvgD1j4DKeXwIFW1Yg+TcKJnOG5m6OGJI/6kcBv6Jb29vVCXkbUA0gHPE7DfcDXA9QsUOBMK9Wd5OVFc133fDt+hnB+uxHHTl/GFg2wXAfC2SQ/4GVFIN4F1yjT/Bd6nCSZtfU1RmAPtB7HPt2/yX8kp1Aob0oX/GBe3iGwwB0KkjVdtyRvpbtGYLZ5ebdaVQZXuRaIcgi9xWp+X6mcCabG618e+mlWJLyZQvt4WW4R49pj8SLTlr8E2fjn/kUukHu/Xr0/q5Ts8fJpxLjRP9BulHyBd1+Bi3rtNq1lrpQBdaCySrfqoz9UvpFmlbq7ZaSZLLNkuKVvIWlLxPpdv72cK/d+z/D1CjJUU6+D0qAAAAAElFTkSuQmCC" alt="">＋ 新增行程</button>
   <div class="form" id="tl-form">
-    <label>DAY</label>
-    <select id="f-day"><option value="1">Day 1 (10/7 三)</option><option value="2">Day 2 (10/8 四)</option><option value="3">Day 3 (10/9 五)</option><option value="4">Day 4 (10/10 六)</option><option value="5">Day 5 (10/11 日)</option><option value="6">Day 6 (10/12 一)</option></select>
+    <div class="formhint" id="f-dayhint">加入 Day 1</div>
     <div class="row">
-      <div><label>時間</label><input id="f-time" placeholder="例：14:30"></div>
+      <div>
+        <label>時間</label>
+        <div class="timesel">
+          <select id="f-hh" aria-label="時"></select>
+          <span class="timesep">:</span>
+          <select id="f-mm" aria-label="分"></select>
+        </div>
+      </div>
       <div><label>地點／事項</label><input id="f-title" placeholder="例：午餐 Pho 10"></div>
     </div>
     <label>備註</label><input id="f-note" placeholder="選填">
-    <button class="btn" onclick="addTimeline()">新增到行程</button>
+    <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
     <button class="btn ghost" onclick="toggleForm('tl-form',false)">取消</button>
   </div>
   <div id="tl-list"></div>
   
 
-  <div class="seclabel">當日路線 · MAP</div>
+  <button class="maptoggle" id="maptoggle" onclick="toggleMapFold()">當日路線 · MAP<span class="car">▾</span></button>
+  <div class="mapwrap" id="mapwrap">
   <div class="mapcard">
     <div class="mapframe">
       <img class="mbase" id="mapimg" alt="手繪示意地圖" decoding="async" style="aspect-ratio:7/9">
@@ -360,11 +468,12 @@ header{position:relative}
     </div>
     <div class="mapdesc" id="maplegend"></div>
   </div>
+  </div>
 </div>
 
 <!-- ===== 分帳 ===== -->
 <div class="page" id="page-exp">
-  <button class="addbtn exp" onclick="toggleForm('exp-form',true)"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳（全員都看得到）</button>
+  <button class="addbtn exp" onclick="toggleForm('exp-form',true)"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳</button>
   <div class="form" id="exp-form">
     <div class="row">
       <div><label>項目</label><input id="e-title" placeholder="例：Day2 一日遊"></div>
@@ -395,7 +504,7 @@ header{position:relative}
 <!-- ===== 美食景點 ===== -->
 <div class="page" id="page-pl">
   <div class="catpills" id="catpills"></div>
-  <button class="addbtn pl" onclick="toggleForm('pl-form',true)"><img src="data:image/png;base64,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" alt="">＋ 推薦店家／景點</button>
+  <button class="addbtn pl" onclick="toggleForm('pl-form',true)"><img src="data:image/png;base64,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" alt="">＋ 推薦店家</button>
   <div class="form" id="pl-form">
     <div class="row">
       <div><label>店名／景點</label><input id="p-name" placeholder="例：Banh Mi 25"></div>
@@ -460,12 +569,8 @@ header{position:relative}
 
   <div class="seclabel">天氣 · WEATHER</div>
   <div class="card">
-    <div style="display:flex;gap:8px">
-      <button class="btn" style="margin-top:0;flex:1" onclick="getWeather(21.03,105.85,'河內','weatherbox')">查河內</button>
-      <button class="btn ghost" style="margin-top:0;flex:1" onclick="getWeather(20.95,107.02,'下龍灣','weatherbox')">查下龍灣</button>
-    </div>
-    <div class="weatherbox" id="weatherbox" style="margin-top:10px"></div>
-    <div class="d" style="margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;font-size:12px;color:var(--ink2)">
+    <div class="d" style="font-size:12px;color:var(--ink2)">
+      點右上角雲朵可看河內、下龍灣六日預報（溫度＋降雨機率）。<br>
       10月參考：河內 24–31°C、下龍灣 23–29°C，雨季尾聲偶陣雨，帶輕便雨衣＋防曬。
     </div>
   </div>
@@ -746,6 +851,21 @@ function unionById(a,b){
     if(!x||!x.id||seen[x.id])return;seen[x.id]=1;out.push(x)});
   return out;
 }
+/* Same-id rows: higher `upd` wins so an edit is not clobbered by an older
+   cloud copy. Missing upd (legacy add-only rows) stays first-write-wins. */
+function unionByIdLWW(a,b){
+  var map={}, order=[];
+  function put(x){
+    if(!x||!x.id)return;
+    var prev=map[x.id];
+    if(!prev){map[x.id]=x;order.push(x.id);return}
+    var pu=prev.upd||0, xu=x.upd||0;
+    if(xu>pu)map[x.id]=x;
+  }
+  (a||[]).forEach(put);
+  (b||[]).forEach(put);
+  return order.map(function(id){return map[id]});
+}
 /* _diag is a write-probe marker left by runDiag(); it is deliberately not
    part of the trip state, so it never counts as a change. */
 function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T})}
@@ -761,7 +881,7 @@ function pruneDels(d){
 }
 function mergeCloud(c){
   dels=pruneDels(Object.assign({},c.del||{},dels));
-  sharedTL=unionById(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
+  sharedTL=unionByIdLWW(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
   expenses=unionById(c.exp,expenses).filter(function(x){return !dels[x.id]});
   userPL=unionById(c.upl,userPL).filter(function(x){return !dels[x.id]});
   var v={};
@@ -877,7 +997,9 @@ async function loadAll(){
   if(location.hash)showTab(location.hash.slice(1));
   $("syncline").textContent="本機模式 · "+now();
   if(!ME)showIdPick();
+  initTimeSelects();
   renderAll();
+  loadWx(false);
 
   (async function(){
     var cloud=CLOUD_ID?await cloudLoad():null;
@@ -975,7 +1097,7 @@ document.querySelectorAll(".tabbar button").forEach(function(b){
     document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
     b.classList.add("on");$("page-"+b.dataset.p).classList.add("on");
     if(b.dataset.p!=="game"&&curGame)closeGame();
-    if(b.dataset.p==="tl")startVeh();else stopVeh();
+    if(b.dataset.p==="tl"&&mapOpen)startVeh();else stopVeh();
     if(location.hash!=="#"+b.dataset.p)history.pushState(null,"","#"+b.dataset.p);
   }});
 function showTab(p){
@@ -985,7 +1107,7 @@ function showTab(p){
   document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
   b.classList.add("on");$("page-"+p).classList.add("on");
   if(p!=="game"&&curGame)closeGame();
-  if(p==="tl")startVeh();else stopVeh();
+  if(p==="tl"&&mapOpen)startVeh();else stopVeh();
 }
 window.addEventListener("popstate",function(){
   showTab((location.hash||"#tl").slice(1)||"tl");
@@ -1076,7 +1198,7 @@ function toggleFx(open){
   panel.classList.toggle("open",willOpen);
   pill.classList.toggle("open",willOpen);
   pill.setAttribute("aria-expanded",willOpen?"true":"false");
-  if(willOpen)setTimeout(function(){$("fxin").focus()},60);
+  if(willOpen){toggleWx(false);setTimeout(function(){$("fxin").focus()},60)}
 }
 function renderFxPill(){
   $("fxp-rate").textContent="1 NT$ ≈ "+Math.round(RATE).toLocaleString()+" ₫";
@@ -1109,35 +1231,108 @@ function armDel(btn,fn){
 }
 
 /* ---------- weather ---------- */
-var WX_TTL=30*60000;   // half an hour is plenty for a forecast row
-function renderWx(){
-  var c=DAY_CITY[curDay], info=DAY_INFO[curDay];
-  var dayTag='DAY '+curDay+(info?' ('+info.dateStr+')':'');
-  if(wxCache[c.n]&&Date.now()-(wxCache[c.n].t||0)>WX_TTL)delete wxCache[c.n];
-  if(wxCache[c.n]){$("wxrow").innerHTML='<span class="wxl">天氣 · '+dayTag+'</span><b>'+c.n+"</b>　"+wxCache[c.n].h;return}
-  $("wxrow").innerHTML='<span class="wxl">天氣 · '+dayTag+'</span><b>'+c.n+'</b><button class="wxq" onclick="wxQuery()">查詢</button>';
+var WX_TTL=30*60000;
+var WX_CITIES=[
+  {n:"河內",lat:21.03,lon:105.85},
+  {n:"下龍灣",lat:20.95,lon:107.02}
+];
+var wxData=null, wxFetchAt=0, wxFetching=false;
+function wxCodeLabel(code){
+  if(code==null||code==="")return "—";
+  var c=+code;
+  if(c===0)return "晴";
+  if(c<=3)return "多雲";
+  if(c<=48)return "霧";
+  if(c<=57)return "毛毛雨";
+  if(c<=67)return "雨";
+  if(c<=77)return "雪";
+  if(c<=82)return "陣雨";
+  if(c<=86)return "雪";
+  return "雷雨";
 }
-async function wxQuery(){
-  var c=DAY_CITY[curDay], info=DAY_INFO[curDay];
-  var dayTag='DAY '+curDay+(info?' ('+info.dateStr+')':'');
-  $("wxrow").innerHTML='<span class="wxl">天氣 · '+dayTag+'</span>查詢 '+c.n+" 中…";
-  var h=await fetchWx(c.lat,c.lon,c.n);
-  wxCache[c.n]={h:h,t:Date.now()};renderWx();
+function wxWd(iso){
+  var d=new Date(iso+"T12:00:00+07:00");
+  return "日一二三四五六".charAt(d.getDay());
 }
-async function fetchWx(lat,lon,name){
-  try{
-    var r=await fetchTO("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok&forecast_days=2",{},8000);
-    if(!r.ok)throw 0;
-    var d=await r.json();var c=d.current,dl=d.daily;
-    return "現在 "+Math.round(c.temperature_2m)+"°C"+(c.precipitation>0?" ☔":"")+"　今日 "+Math.round(dl.temperature_2m_min[0])+"–"+Math.round(dl.temperature_2m_max[0])+"°C・降雨 "+dl.precipitation_probability_max[0]+"%";
-  }catch(e){
-    return '<a href="https://www.google.com/search?q='+encodeURIComponent(name+" weather")+'" target="_blank" style="color:var(--green);font-weight:700">此環境無法連氣象服務，點我開外部天氣頁 ›</a>';
+function wxMd(iso){
+  var p=iso.split("-");
+  return parseInt(p[1],10)+"/"+parseInt(p[2],10);
+}
+function toggleWx(open){
+  var panel=$("wxpanel"),pill=$("wxpill");
+  if(!panel||!pill)return;
+  var willOpen=(open===undefined)?!panel.classList.contains("open"):!!open;
+  panel.classList.toggle("open",willOpen);
+  pill.classList.toggle("open",willOpen);
+  pill.setAttribute("aria-expanded",willOpen?"true":"false");
+  if(willOpen){toggleFx(false);loadWx(true)}
+}
+function renderWxPill(){
+  var el=$("wxp-temp"); if(!el)return;
+  if(wxData&&wxData[0]&&wxData[0].current){
+    el.textContent=Math.round(wxData[0].current.temperature_2m)+"°";
+  }else el.textContent="天氣";
+}
+function renderWxPanel(){
+  var box=$("wxgrid"), upd=$("wxupd");
+  if(!box)return;
+  if(!wxData){
+    box.innerHTML='<div class="wxcell" style="grid-column:1/-1">載入河內、下龍灣天氣中…</div>';
+    return;
   }
+  var hn=wxData[0], hl=wxData[1];
+  if(!hn||!hn.daily||!hl||!hl.daily){
+    box.innerHTML='<div class="wxcell" style="grid-column:1/-1"><a href="https://www.google.com/search?q='+encodeURIComponent("Hanoi Ha Long weather")+'" target="_blank" style="color:var(--green);font-weight:700">此環境無法連氣象服務，點我開外部天氣頁 ›</a></div>';
+    return;
+  }
+  var days=hn.daily.time||[];
+  var h='<div class="wxtr wxth"><span></span><span>河內</span><span>下龍灣</span></div>';
+  for(var i=0;i<days.length && i<6;i++){
+    var iso=days[i];
+    h+='<div class="wxtr">'+
+      '<div class="wxdate"><b>'+wxMd(iso)+'</b>'+wxWd(iso)+'</div>'+
+      wxCell(hn,i)+wxCell(hl,i)+
+      "</div>";
+  }
+  box.innerHTML=h;
+  if(upd)upd.textContent=wxFetchAt?("更新 "+new Date(wxFetchAt).toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"})):"";
 }
-async function getWeather(lat,lon,name,box){
-  $(box).textContent="查詢中…";
-  $(box).innerHTML="<b>"+name+"</b>　"+await fetchWx(lat,lon,name);
+function wxCell(city,i){
+  var dl=city.daily;
+  var lo=Math.round(dl.temperature_2m_min[i]);
+  var hi=Math.round(dl.temperature_2m_max[i]);
+  var rain=dl.precipitation_probability_max[i];
+  if(rain==null)rain="—";
+  var lab=wxCodeLabel(dl.weather_code[i]);
+  return '<div class="wxcell">'+lab+"<br><b>"+lo+"–"+hi+"°</b><br><span class=\"rain\">降雨 "+rain+"%</span></div>";
 }
+async function fetchCityWx(city){
+  var url="https://api.open-meteo.com/v1/forecast?latitude="+city.lat+"&longitude="+city.lon+
+    "&current=temperature_2m,weather_code"+
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"+
+    "&timezone=Asia%2FBangkok&forecast_days=6";
+  var r=await fetchTO(url,{},9000);
+  if(!r.ok)throw new Error("wx "+r.status);
+  return r.json();
+}
+async function loadWx(force){
+  if(wxFetching)return;
+  if(!force && wxData && Date.now()-wxFetchAt<WX_TTL){renderWxPill();renderWxPanel();return}
+  wxFetching=true;
+  try{
+    wxData=await Promise.all([fetchCityWx(WX_CITIES[0]),fetchCityWx(WX_CITIES[1])]);
+    wxFetchAt=Date.now();
+    renderWxPill();
+    renderWxPanel();
+  }catch(e){
+    if(!wxData){
+      wxData=[{},{}];
+      renderWxPill();
+      renderWxPanel();
+    }
+  }finally{wxFetching=false}
+}
+function renderWx(){renderWxPill();if($("wxpanel")&&$("wxpanel").classList.contains("open"))renderWxPanel()}
 
 /* ---------- timeline + map ---------- */
 function renderDays(){var h="";for(var i=1;i<=6;i++){
@@ -1145,13 +1340,23 @@ function renderDays(){var h="";for(var i=1;i<=6;i++){
   var sub=info?'<span class="dsub">'+info.dateStr+'</span>':'';
   h+='<button class="'+(i===curDay?"on":"")+'" onclick="setDay('+i+')"><span class="dname">Day '+i+'</span>'+sub+"</button>"}
   $("daypills").innerHTML=h}
-function setDay(d){curDay=d;renderDays();renderTL();renderMap();renderWx()}
-var vehRaf=null,vehStart=0;
+function setDay(d){
+  curDay=d;
+  if($("tl-form")&&$("tl-form").classList.contains("show"))toggleForm("tl-form",false);
+  renderDays();renderTL();renderMap();
+}
+var vehRaf=null,vehStart=0,mapOpen=false;
+function toggleMapFold(){
+  mapOpen=!mapOpen;
+  $("mapwrap").classList.toggle("open",mapOpen);
+  $("maptoggle").classList.toggle("open",mapOpen);
+  if(mapOpen)startVeh();else stopVeh();
+}
 function renderMap(){
   for(var i=1;i<=6;i++){var g=document.getElementById("mrt-"+i);
     if(g)g.style.opacity=(i===curDay)?"1":"0.10"}
   $("maplegend").textContent=MAP_DESC[curDay]||"";
-  startVeh();
+  if(mapOpen)startVeh();else stopVeh();
 }
 function startVeh(){
   if(vehRaf)cancelAnimationFrame(vehRaf);
@@ -1181,42 +1386,162 @@ function timeKey(t){
   var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
   return m?(parseInt(m[1],10)*60+parseInt(m[2],10)):1e9;
 }
-function tlBaseRow(it){
-  return '<div class="card'+(it.flight?" flight":"")+'"><div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
-    (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    (it.q?'<a class="maplink" href="'+gm(it.q)+'" target="_blank">📍 在 Google 地圖上看</a>':"")+"</div>";
+function pad2(n){return ("0"+n).slice(-2)}
+function initTimeSelects(){
+  var hh=$("f-hh"), mm=$("f-mm");
+  if(!hh||hh.options.length)return;
+  for(var i=0;i<24;i++){
+    var o=document.createElement("option");
+    o.value=o.textContent=pad2(i);
+    hh.appendChild(o);
+  }
+  for(var i=0;i<60;i+=5){
+    var o=document.createElement("option");
+    o.value=o.textContent=pad2(i);
+    mm.appendChild(o);
+  }
+  hh.onchange=mm.onchange=function(){tlTimeTouched=true};
+}
+var tlTimeTouched=false, tlOrigTime="";
+function setTimeSelects(h,m){
+  initTimeSelects();
+  var hh=pad2(h), mm=pad2(Math.round(m/5)*5%60);
+  if(m>=58){hh=pad2((h+1)%24);mm="00"}
+  if(!$("f-hh").querySelector('option[value="'+hh+'"]')){
+    var o=document.createElement("option");o.value=o.textContent=hh;$("f-hh").appendChild(o);
+  }
+  if(!$("f-mm").querySelector('option[value="'+mm+'"]')){
+    var o=document.createElement("option");o.value=o.textContent=mm;$("f-mm").appendChild(o);
+  }
+  $("f-hh").value=hh;$("f-mm").value=mm;
+}
+function setTimeSelectsNow(){
+  var d=new Date();
+  setTimeSelects(d.getHours(),d.getMinutes());
+}
+function parseClock(t){
+  var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
+  return m?{h:+m[1],m:+m[2]}:null;
+}
+function fillTlHint(){
+  var info=DAY_INFO[curDay];
+  var day='Day '+curDay+(info?' · '+info.fullDate:"");
+  $("f-dayhint").textContent=tlEditing?("修改 "+day):("加入 "+day);
+  $("tl-save").textContent=tlEditing?"儲存修改":"新增到行程";
+}
+var tlEditing=null;
+function openTlForm(kind,a,b){
+  initTimeSelects();
+  tlTimeTouched=false;tlOrigTime="";
+  if(!kind){
+    tlEditing=null;
+    $("f-title").value="";$("f-note").value="";
+    setTimeSelectsNow();
+  }else if(kind==="base"){
+    var src=(BASE_TL[a]||[])[b]||{};
+    var ov=sharedTL.find(function(x){return x.id===baseKey(a,b)});
+    var it=ov||src;
+    tlEditing={kind:"base",day:a,idx:b};
+    $("f-title").value=it.title||"";
+    $("f-note").value=it.note||"";
+    tlOrigTime=it.time||"";
+    var ck=parseClock(it.time);
+    if(ck)setTimeSelects(ck.h,ck.m);else setTimeSelectsNow();
+  }else{
+    var it=sharedTL.find(function(x){return x.id===a});
+    if(!it)return;
+    tlEditing={kind:"user",id:a};
+    $("f-title").value=it.title||"";
+    $("f-note").value=it.note||"";
+    tlOrigTime=it.time||"";
+    var ck=parseClock(it.time);
+    if(ck)setTimeSelects(ck.h,ck.m);else setTimeSelectsNow();
+  }
+  fillTlHint();
+  toggleForm("tl-form",true);
+  setTimeout(function(){$("f-title").focus()},40);
+}
+function baseKey(day,idx){return "b"+day+"-"+idx}
+function tlEditBtn(kind,a,b){
+  if(kind==="base")return '<button class="editbtn" onclick="openTlForm(\'base\','+a+','+b+')">修改</button>';
+  return '<button class="editbtn" onclick="openTlForm(\'user\',\''+jsq(a)+'\')">修改</button>';
+}
+function tlBaseRow(it,idx){
+  var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
+  var row=ov||it;
+  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"><div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
+    (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
+    (row.q||it.q?'<a class="maplink" href="'+gm(row.q||it.q)+'" target="_blank">地圖</a>':"")+
+    '<div class="meta">'+tlEditBtn("base",curDay,idx)+(ov?'　'+esc(ov.who||"")+" 改過":"")+"</div></div>";
 }
 function tlMineRow(it){
-  return '<div class="card" style="border-color:var(--gold)"><span class="badge-new">NEW</span>'+
+  return '<div class="card" style="border-color:var(--gold)">'+
     '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    '<a class="maplink" href="'+gm(it.title)+'" target="_blank">📍 在 Google 地圖上看</a>'+
-    '<div class="meta">'+esc(it.who)+"・"+esc(it.t)+' 新增　<button class="delbtn" data-label="刪除" data-key="tl:'+jsq(it.id)+'" onclick="armDel(this,function(){delTL(\''+jsq(it.id)+'\')})">刪除</button></div></div>';
+    '<a class="maplink" href="'+gm(it.title)+'" target="_blank">地圖</a>'+
+    '<div class="meta">'+tlEditBtn("user",it.id)+
+    '<button class="delbtn" data-label="刪除" data-key="tl:'+jsq(it.id)+'" onclick="armDel(this,function(){delTL(\''+jsq(it.id)+'\')})">刪除</button>'+
+    '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
 }
+function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
 function renderTL(){
   var rows=[];
-  (BASE_TL[curDay]||[]).forEach(function(it){rows.push({it:it,base:1})});
-  sharedTL.forEach(function(it){if(it.day===curDay)rows.push({it:it,base:0})});
+  (BASE_TL[curDay]||[]).forEach(function(it,idx){
+    var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
+    rows.push({it:ov||it, src:it, base:1, idx:idx});
+  });
+  sharedTL.forEach(function(it){
+    if(it.day===curDay && !isBaseOverride(it)) rows.push({it:it, base:0});
+  });
   rows.forEach(function(r,i){r.n=i});
   rows.sort(function(a,b){
     var d=timeKey(a.it.time)-timeKey(b.it.time);
-    return d?d:a.n-b.n;                 // stable on ties
+    return d?d:a.n-b.n;
   });
-  var h=rows.map(function(r){return r.base?tlBaseRow(r.it):tlMineRow(r.it)}).join("");
+  var h=rows.map(function(r){return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it)}).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   var n=activity[0];
   if(n){$("notice").style.display="block";$("notice").innerHTML='<b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+"）"}
 }
 function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
-  if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}}
-function addTimeline(){
+  if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}
+  if(id==="tl-form"&&!s)tlEditing=null}
+function saveTimeline(){
   var t=$("f-title").value.trim();if(!t){alert("請填地點／事項");return}
-  var d=parseInt($("f-day").value);
-  sharedTL.push({id:uid(),day:d,time:$("f-time").value.trim()||"—",title:t,note:$("f-note").value.trim(),who:ME,t:now()});
-  $("f-title").value="";$("f-time").value="";$("f-note").value="";
+  var clock=pad2($("f-hh").value)+":"+pad2($("f-mm").value);
+  var time=(!tlTimeTouched && tlOrigTime)?tlOrigTime:clock;
+  var note=$("f-note").value.trim();
+  if(tlEditing&&tlEditing.kind==="user"){
+    var it=sharedTL.find(function(x){return x.id===tlEditing.id});
+    if(!it)return;
+    it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();
+    toggleForm("tl-form",false);
+    $("f-title").value="";$("f-note").value="";
+    saveShared("修改了「"+t+"」");
+    return;
+  }
+  if(tlEditing&&tlEditing.kind==="base"){
+    var id=baseKey(tlEditing.day,tlEditing.idx);
+    var src=(BASE_TL[tlEditing.day]||[])[tlEditing.idx]||{};
+    var it=sharedTL.find(function(x){return x.id===id});
+    var day=tlEditing.day;
+    if(it){
+      it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();it.day=day;
+    }else{
+      sharedTL.push({id:id,day:day,time:time,title:t,note:note,q:src.q,flight:src.flight,who:ME,t:now(),upd:Date.now()});
+    }
+    toggleForm("tl-form",false);
+    $("f-title").value="";$("f-note").value="";
+    saveShared("修改了 Day"+day+"「"+t+"」");
+    return;
+  }
+  var d=curDay;
+  sharedTL.push({id:uid(),day:d,time:time,title:t,note:note,who:ME,t:now(),upd:Date.now()});
+  $("f-title").value="";$("f-note").value="";
   toggleForm("tl-form",false);
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
+function addTimeline(){saveTimeline()}
 function delTL(id){
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("刪除了「"+t+"」")}

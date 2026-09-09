@@ -2,7 +2,7 @@
    The whole app is one self-contained index.html (images are inlined as
    base64), so caching that single file is enough to open with no signal.
    Data still lives in localStorage and syncs to Supabase when back online. */
-var CACHE = "vn6-v2";
+var CACHE = "vn6-v3";
 var SHELL = ["./", "./index.html", "./manifest.webmanifest",
              "./icon.svg", "./favicon.ico", "./apple-touch-icon.png",
              "./icon-192.png", "./icon-512.png"];
