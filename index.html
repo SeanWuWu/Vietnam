@@ -323,7 +323,7 @@ header .sub{font-size:11px;margin-top:2px;padding-bottom:10px}
 .notice{display:flex;align-items:flex-start;gap:8px}
 .notice .nx{margin-left:auto;border:none;background:none;color:var(--ink3);font-size:16px;line-height:1;padding:0 2px}
 body.has-banner{padding-top:46px}
-.tabbar button[data-p="game"]{display:none}
+
 .netgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .netcard{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
 .netcard .k{font-size:10px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
@@ -1071,6 +1071,7 @@ async function loadAll(){
   loadLiveRate(false);
   (async function(){
     await syncFromCloud();
+    if(migratedEnc)await saveShared(null);
     startPolling();
   })();
 }
