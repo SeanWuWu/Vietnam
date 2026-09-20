@@ -2,8 +2,8 @@
    The whole app is one self-contained index.html (images are inlined as
    base64), so caching that single file is enough to open with no signal.
    Data still lives in localStorage and syncs to Supabase when back online. */
-var CACHE = "vn6-v7";
-var SHELL = ["./", "./index.html", "./manifest.webmanifest",
+var CACHE = "vn6-v8";
+var SHELL = ["./", "./index.html", "./manifest.webmanifest", "./vn-core.js",
              "./icon.svg", "./favicon.ico", "./apple-touch-icon.png",
              "./icon-192.png", "./icon-512.png",
              "./wx-sun.png", "./wx-partly.png", "./wx-cloud.png",
@@ -55,7 +55,22 @@ self.addEventListener("fetch", function (e) {
     return;
   }
 
-  // Same-origin assets: cache first, then network.
+  var path = url.pathname;
+  var htmlish = /(?:\/|index\.html|vn-core\.js)$/.test(path);
+  if (htmlish) {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        var copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        return res;
+      }).catch(function () {
+        return caches.match(req).then(function (hit) { return hit || caches.match("./index.html"); });
+      })
+    );
+    return;
+  }
+
+  // Other same-origin assets: cache first, then network.
   e.respondWith(
     caches.match(req).then(function (hit) {
       return hit || fetch(req).then(function (res) {

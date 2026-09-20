@@ -292,8 +292,8 @@ header .sub{font-size:11px;margin-top:2px;padding-bottom:10px}
 .wxpill img{width:26px;height:26px;object-fit:contain;display:block}
 .wxpill .wxp-temp{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--accent);font-variant-numeric:tabular-nums}
 .wxpill.open{border-color:var(--accent)}
-.wxpanel,.fxpanel{display:none;max-width:560px;margin:0 auto;padding:8px 16px 0;max-height:none;overflow:visible;opacity:1;pointer-events:auto}
-.wxpanel.open,.fxpanel.open{display:block}
+.wxpanel,.fxpanel{display:block;visibility:hidden;height:0;overflow:hidden;max-width:560px;margin:0 auto;padding:0 16px;opacity:0;pointer-events:none}
+.wxpanel.open,.fxpanel.open{visibility:visible;height:auto;overflow:visible;padding:8px 16px 0;opacity:1;pointer-events:auto}
 .wxsheet{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px 6px}
 .wxhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
 .wxhead .wxl{font-size:10px;letter-spacing:.16em;color:var(--ink3);font-weight:700}
@@ -311,6 +311,19 @@ header .sub{font-size:11px;margin-top:2px;padding-bottom:10px}
 .wxcell b{display:block;color:var(--ink);font-weight:700;font-size:12px;font-variant-numeric:tabular-nums}
 .wxcell .rain{font-size:10px;color:var(--green);font-weight:600}
 .wxfoot{font-size:10px;color:var(--ink3);margin-top:4px}
+.formerr{display:none;font-size:12px;color:var(--accent);margin-top:8px}
+.formerr.on{display:block}
+.notice{display:flex;align-items:flex-start;gap:8px}
+.notice .nx{margin-left:auto;border:none;background:none;color:var(--ink3);font-size:16px;line-height:1;padding:0 2px}
+body.has-banner{padding-top:46px}
+.tabbar button[data-p="game"]{display:none}
+.netgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.netcard{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.netcard .k{font-size:10px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
+.netcard .v{font-size:16px;font-weight:800;margin-top:2px}
+.netcard.owe .v{color:var(--accent)}
+.netcard.ok .v{color:var(--green)}
+.secwarn{font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.5}
 main{padding:10px 16px 8px}
 .syncline{margin-bottom:6px;font-size:10px}
 .notice{padding:7px 11px;margin-bottom:10px}
@@ -327,7 +340,7 @@ main{padding:10px 16px 8px}
 .maplink{margin-top:6px;padding:1px 8px}
 .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #tl-list .card{padding-right:40px}
-.penbtn{position:absolute;top:6px;right:6px;width:32px;height:32px;border:none;background:transparent;
+.penbtn{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;background:transparent;
   color:var(--ink2);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}
 .penbtn svg{width:16px;height:16px;display:block}
 .penbtn:active{background:var(--gold-soft);color:var(--accent)}
@@ -370,6 +383,7 @@ main{padding:10px 16px 8px}
   </div>
   </div>
   <div class="sub" id="hdSub">河內 · 陸龍灣 · 下龍灣　—　六人小隊共用手冊</div>
+  <div class="sub" id="hdPlace" style="border-bottom:none;padding-bottom:0;color:var(--ink3);font-size:11px">河內 · 陸龍灣 · 下龍灣</div>
 </header>
 
 <div class="fxpanel" id="fxpanel">
@@ -397,7 +411,7 @@ main{padding:10px 16px 8px}
       <span class="wxupd" id="wxupd"></span>
     </div>
     <div class="wxtable" id="wxgrid">載入中…</div>
-    <div class="wxfoot">icon＝天氣　數字＝高低溫／降雨機率</div>
+    <div class="wxfoot">icon＝天氣　數字＝高低溫／降雨％（出發前為估計）</div>
   </div>
 </div>
 
@@ -418,11 +432,16 @@ main{padding:10px 16px 8px}
           <select id="f-hh" aria-label="時"></select>
           <span class="timesep">:</span>
           <select id="f-mm" aria-label="分"></select>
+          <span class="timesep" id="f-endlab">→</span>
+          <select id="f-hh2" aria-label="結束時"></select>
+          <span class="timesep">:</span>
+          <select id="f-mm2" aria-label="結束分"></select>
         </div>
       </div>
       <div><label>地點／事項</label><input id="f-title" placeholder="例：午餐 Pho 10"></div>
     </div>
     <label>備註</label><input id="f-note" placeholder="選填">
+    <div class="formerr" id="tl-err"></div>
     <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
     <button class="btn ghost" onclick="toggleForm('tl-form',false)">取消</button>
   </div>
@@ -459,16 +478,17 @@ main{padding:10px 16px 8px}
       </svg>
     </div>
     <div class="mapdesc" id="maplegend"></div>
+    <div class="mapdesc">地名：陸龍灣＝寧平 Ninh Binh　下龍灣＝Ha Long　河內＝Hanoi</div>
   </div>
 </div>
 
 <!-- ===== 分帳 ===== -->
 <div class="page" id="page-exp">
-  <button class="addbtn exp" onclick="toggleForm('exp-form',true)"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳</button>
+  <button class="addbtn exp" onclick="openExpForm()"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳</button>
   <div class="form" id="exp-form">
     <div class="row">
       <div><label>項目</label><input id="e-title" placeholder="例：Day2 一日遊"></div>
-      <div><label>金額</label><input id="e-amt" type="number" inputmode="decimal" placeholder="0"></div>
+      <div><label>金額</label><input id="e-amt" type="text" inputmode="decimal" placeholder="0"></div>
     </div>
     <label>類別</label>
     <select id="e-cat"></select>
@@ -479,10 +499,12 @@ main{padding:10px 16px 8px}
     <label>分攤的人（綠色打勾＝有分攤）</label>
     <div class="splitrow" id="e-split"></div>
     <div class="splitpreview" id="e-preview"></div>
-    <button class="btn" onclick="addExpense()">記一筆</button>
+    <div class="formerr" id="exp-err"></div>
+    <button class="btn" id="exp-save" onclick="saveExpense()">記一筆</button>
     <button class="btn ghost" onclick="toggleForm('exp-form',false)">取消</button>
   </div>
 
+  <div class="netgrid" id="netgrid" style="display:none"></div>
   <div class="settle"><h3>結算建議 · SETTLE UP</h3><div id="settle-list" class="li">還沒有帳目</div></div>
   <div class="card" id="statcard" style="display:none">
     <div class="t" style="font-size:12px;letter-spacing:.1em;color:var(--ink2)">旅費統計 · BY CATEGORY</div>
@@ -502,6 +524,9 @@ main{padding:10px 16px 8px}
       <div><label>分類</label><input id="p-cat" placeholder="例：小吃"></div>
     </div>
     <label>一句話特色</label><input id="p-note" placeholder="例：老城區人氣法國麵包">
+    <label>城市</label>
+    <select id="p-city"><option value="Hanoi">河內</option><option value="Ha Long">下龍灣</option><option value="Ninh Binh">寧平／陸龍灣</option></select>
+    <div class="formerr" id="pl-err"></div>
     <button class="btn" onclick="addPlace()">新增（全員都會看到）</button>
     <button class="btn ghost" onclick="toggleForm('pl-form',false)">取消</button>
   </div>
@@ -555,6 +580,12 @@ main{padding:10px 16px 8px}
     <span class="arrow">›</span>
   </a>
 
+  <button class="card morelink" type="button" onclick="showTab('game')" style="width:100%;text-align:left">
+    <span class="ic" style="background:var(--gold)"></span>
+    <span><span class="t2">迷你遊戲</span><br><span class="d2">掃雷、燈籠、翻牌、釣魚</span></span>
+    <span class="arrow">›</span>
+  </button>
+
   <div class="seclabel">打卡王 · CHECK-IN KINGS</div>
   <div class="card"><div class="kingbox" id="kingbox"></div></div>
 
@@ -591,6 +622,7 @@ main{padding:10px 16px 8px}
   <div class="card">
     <div class="t" style="font-size:13px">我的身份</div>
     <div class="memberchips" id="me-chips"></div>
+    <div class="secwarn">換人請再點一次自己的名字並確認，避免誤改成別人。此網址含雲端寫入權限，請勿轉傳團外。</div>
   </div>
   <div class="card">
     <div class="t" style="font-size:13px">匯率 · LIVE</div>
@@ -618,6 +650,7 @@ main{padding:10px 16px 8px}
   </div>
 </div>
 
+<script src="vn-core.js"></script>
 <script>
 var MEMBERS=["Sean","魚丸","姆斯","尼佛","陳皮","阿綸"];
 var RATE=780, ME=null, FX_VND2TWD=true;
@@ -645,11 +678,11 @@ function gm(q){return "https://www.google.com/maps/search/"+encodeURIComponent(q
 var BASE_TL={
  1:[{time:"08:20→10:30",title:"CI791 華航｜Sean・魚丸",note:"桃園 T1 → 河內 T2。早班先落地，可先寄放行李、逛老城區（航廈以登機證為準）",flight:1,q:"Noi Bai International Airport"},
     {time:"14:40→16:50",title:"JX717 星宇｜姆斯・尼佛・陳皮・阿綸",note:"桃園 T1 → 河內 T2（A321neo）",flight:1,q:"Noi Bai International Airport"},
-    {time:"接機",title:"包車 機場→飯店",note:"Klook 機場接送。兩組抵達差約6小時，接送分批或後到組自行 Grab（待確認）"},
+    {time:"接機",title:"包車 機場→飯店",note:"Klook 機場接送。兩組抵達差約6小時，接送分批或後到組自行 Grab。出發前向領隊確認車行、司機與車牌。"},
     {time:"傍晚",title:"全員飯店會合",note:"晚餐 Option：The Rhythms Restaurant"},
-    {time:"入住",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonia Majesty Hotel and Spa Hanoi"}],
+    {time:"入住",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonía Majesty Hotel and Spa Hanoi"}],
  2:[{time:"07:00–19:30",title:"陸龍灣一日遊",note:"華閭・三谷/長安・舞洞，含晚餐（姆斯先墊 12,684NT）",q:"Trang An Ninh Binh"},
-    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonia Majesty Hotel and Spa Hanoi"}],
+    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonía Majesty Hotel and Spa Hanoi"}],
  3:[{time:"上午",title:"河內市區逛逛",note:"",q:"Hoan Kiem Lake"},
     {time:"11:30 午餐",title:"La Badiane 法式料理",note:"殖民老宅米其林推薦，午餐供應至13:30，建議訂位",q:"La Badiane Hanoi"},
     {time:"午後",title:"車程前往下龍灣",note:"約 2.5–3 小時，預計傍晚抵達"},
@@ -688,7 +721,7 @@ var DAY_CITY={
  3:{n:"下龍灣",lat:20.95,lon:107.02},4:{n:"下龍灣",lat:20.95,lon:107.02},
  5:{n:"河內",lat:21.03,lon:105.85},6:{n:"河內",lat:21.03,lon:105.85}};
 var BASE_PL=[
- {n:"La Badiane",tags:["法餐"],note:"殖民老宅法式料理，米其林推薦（週日公休，午餐至13:30）",pid:"ChIJ5TdcJJerNTERUplhitZYbdk",q:"La Badiane Hanoi"},
+ {n:"La Badiane",tags:["法餐","米其林推薦"],note:"殖民老宅法式料理，米其林推薦（週日公休，午餐至13:30）",pid:"ChIJ5TdcJJerNTERUplhitZYbdk",q:"La Badiane Hanoi"},
  {n:"Pavilion Restaurant",tags:["下龍灣"],note:"Vinpearl 島上西餐，Day3 晚餐已預訂・低消5000NT",pid:"ChIJjX5HYpNZSjER9gBJJyZutGM",q:"Pavilion Restaurant Bai Chay"},
  {n:"Nhà hàng Gia",tags:["米其林一星"],note:"文廟旁當代越南套餐，女主廚米其林一星，預約制（週日一公休）",pid:"ChIJd-kmys-rNTER_J9m_DM-oAY",q:"Gia Restaurant Hanoi"},
  {n:"Tầm vị",tags:["米其林一星"],note:"古宅裡的傳統北越家常菜，焦糖滷肉必點",pid:"ChIJq43P62mrNTERNsxL8Wjpvjs",q:"Tam Vi Hanoi"},
@@ -764,6 +797,7 @@ function renderHeader(){
   var h=headerText();
   $("hdEyebrow").textContent=h.eb;
   $("hdSub").textContent=h.sub;
+  var pl=$("hdPlace"); if(pl)pl.textContent="河內 · 陸龍灣 · 下龍灣";
 }
 function renderChecklist(){
   var total=CHECK_ITEMS.length*MEMBERS.length,done=0;
@@ -837,30 +871,11 @@ function setMerge(a,b){
   });
   return out;
 }
-function unionById(a,b){
-  var seen={},out=[];
-  (a||[]).concat(b||[]).forEach(function(x){
-    if(!x||!x.id||seen[x.id])return;seen[x.id]=1;out.push(x)});
-  return out;
-}
-/* Same-id rows: higher `upd` wins so an edit is not clobbered by an older
-   cloud copy. Missing upd (legacy add-only rows) stays first-write-wins. */
-function unionByIdLWW(a,b){
-  var map={}, order=[];
-  function put(x){
-    if(!x||!x.id)return;
-    var prev=map[x.id];
-    if(!prev){map[x.id]=x;order.push(x.id);return}
-    var pu=prev.upd||0, xu=x.upd||0;
-    if(xu>pu)map[x.id]=x;
-  }
-  (a||[]).forEach(put);
-  (b||[]).forEach(put);
-  return order.map(function(id){return map[id]});
-}
+function unionById(a,b){return VN.unionById(a,b)}
+function unionByIdLWW(a,b){return VN.unionByIdLWW(a,b)}
 /* _diag is a write-probe marker left by runDiag(); it is deliberately not
    part of the trip state, so it never counts as a change. */
-function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T})}
+function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,celeb:celeb})}
 var DEL_TTL=60*86400000;   // 60 days: long past the trip, short enough to stay small
 function pruneDels(d){
   var out={},cut=Date.now()-DEL_TTL;
@@ -874,8 +889,9 @@ function pruneDels(d){
 function mergeCloud(c){
   dels=pruneDels(Object.assign({},c.del||{},dels));
   sharedTL=unionByIdLWW(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
-  expenses=unionById(c.exp,expenses).filter(function(x){return !dels[x.id]});
-  userPL=unionById(c.upl,userPL).filter(function(x){return !dels[x.id]});
+  expenses=unionByIdLWW(c.exp,expenses).filter(function(x){return !dels[x.id]});
+  userPL=unionByIdLWW(c.upl,userPL).filter(function(x){return !dels[x.id]});
+  if(c.celeb){Object.keys(c.celeb).forEach(function(k){if(c.celeb[k])celeb[k]=c.celeb[k]})}
   var v={};
   [c.vis||{},visited].forEach(function(src){
     Object.keys(src).forEach(function(k){v[k]=setMerge(v[k],src[k])})});
@@ -961,7 +977,8 @@ function showCloudFailBanner(){
   b.id="cloudfail";
   b.style.cssText="position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;font-size:12px;padding:10px 16px;z-index:199;line-height:1.6";
   b.innerHTML='雲端連線失敗，目前使用本機模式，資料仍會保存在這台裝置上。'+
-    '<button style="margin-left:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:4px;padding:4px 10px;font-size:12px" onclick="this.parentNode.remove()">關閉</button>';
+    '<button style="margin-left:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:4px;padding:4px 10px;font-size:12px" onclick="document.body.classList.remove(\'has-banner\');this.parentNode.remove()">關閉</button>';
+  document.body.classList.add("has-banner");
   document.body.prepend(b);
 }
 
@@ -971,15 +988,15 @@ async function loadAll(){
   if(raw){try{d=JSON.parse(raw);
     sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];dels=d.del||{};
     checklist=d.chk||{};
+    if(d.celeb)celeb=d.celeb;
     if(d.sc&&!Array.isArray(d.sc)){
       ["pho","lantern","memory","fish"].forEach(function(g){
         scores[g]=Array.isArray(d.sc[g])?d.sc[g]:[]});
     }
   }catch(e){}}
   ME=await kvGet("me");
-  if(d && d.rate){RATE=parseFloat(d.rate)||RATE; RATE_T=d.rateT||0}
-  var rr=await kvGet("rate");if(rr&&!RATE_T)RATE=parseFloat(rr)||780;
-  var cb=await kvGet("celeb");if(cb){try{celeb=JSON.parse(cb)||{}}catch(e){}}
+  var rr=await kvGet("rate");if(rr)RATE=parseFloat(rr)||RATE;
+  var cb=await kvGet("celeb");if(cb){try{Object.assign(celeb,JSON.parse(cb)||{})}catch(e){}}
   var td=tripDayToday(); if(td)curDay=td;
   if(location.hash)showTab(location.hash.slice(1));
   $("syncline").textContent="本機模式 · "+now();
@@ -1031,7 +1048,7 @@ document.addEventListener("visibilitychange",function(){
 });
 function localPayload(){
   return {tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,
-          sc:scores,del:dels,chk:checklist,rate:RATE,rateT:RATE_T};
+          sc:scores,del:dels,chk:checklist,celeb:celeb};
 }
 var saveChain=Promise.resolve();
 async function saveShared(msg){
@@ -1046,7 +1063,7 @@ async function saveShared(msg){
   // wrote in the meantime, then pushes — so two people saving at once
   // combine instead of clobbering each other.
   saveChain=saveChain.then(async function(){
-    for(var attempt=0;attempt<2;attempt++){
+    for(var attempt=0;attempt<3;attempt++){
       var c=await cloudLoad();
       if(c&&Object.keys(c).length)mergeCloud(c);
       var payload=localPayload();
@@ -1071,8 +1088,22 @@ function showIdPick(){
   MEMBERS.forEach(function(m){h+='<button onclick="pickMe(\''+jsq(m)+'\')">'+m+'</button>'});
   $("id-chips").innerHTML=h;
 }
-async function pickMe(m){ME=m;await kvSet("me",m);
-  $("idmask").style.display="none";renderMe();renderPl();
+function requireMe(){
+  if(ME)return true;
+  showIdPick();
+  toast("先選你是誰，資料才會記在你名下");
+  return false;
+}
+function formErr(id,msg){
+  var el=$(id); if(!el){if(msg)alert(msg);return}
+  el.textContent=msg||"";
+  el.classList.toggle("on",!!msg);
+}
+async function pickMe(m){
+  if(ME && ME!==m && !confirm("要把身份從 "+ME+" 換成 "+m+" 嗎？"))return;
+  ME=m;await kvSet("me",m);
+  $("idmask").style.display="none";
+  renderAll();
   toast("Xin ch\u00e0o, "+m+" \ud83c\udf3f")}
 function renderMe(){var h="";MEMBERS.forEach(function(m){
   h+='<button class="'+(m===ME?"on":"")+'" onclick="pickMe(\''+jsq(m)+'\')">'+m+'</button>'});
@@ -1089,11 +1120,16 @@ document.querySelectorAll(".tabbar button").forEach(function(b){
     if(location.hash!=="#"+b.dataset.p)history.pushState(null,"","#"+b.dataset.p);
   }});
 function showTab(p){
+  var page=$("page-"+p); if(!page)return;
   var b=document.querySelector('.tabbar button[data-p="'+p+'"]');
-  if(!b)return;
   document.querySelectorAll(".tabbar button").forEach(function(x){x.classList.remove("on")});
   document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on")});
-  b.classList.add("on");$("page-"+p).classList.add("on");
+  if(b)b.classList.add("on");
+  else{
+    var more=document.querySelector('.tabbar button[data-p="more"]');
+    if(more)more.classList.add("on");
+  }
+  page.classList.add("on");
   if(p!=="game"&&curGame)closeGame();
   if(p==="tl")startVeh();else stopVeh();
 }
@@ -1135,7 +1171,7 @@ function renderFxUI(){
 }
 
 function fxCalc(){
-  var v=parseFloat($("fxin").value)||0,o;
+  var v=VN.parseAmt($("fxin").value)||0,o;
   if(FX_VND2TWD){
     var twd=v/RATE;
     o="= NT$ "+twd.toLocaleString("zh-TW",{maximumFractionDigits:0});
@@ -1205,7 +1241,7 @@ function renderRateLive(){
   var when=RATE_T?new Date(RATE_T).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
   el.textContent="1 NT$ ≈ "+Math.round(RATE).toLocaleString()+" ₫"+(when?"　更新 "+when:"");
 }
-var RATE_TTL=15*60000, rateFetching=false;
+var RATE_TTL=15*60000, rateFetching=false, LIVE_AT=0, RATE_LIVE=false;
 async function fetchLiveRate(){
   var urls=[
     "https://open.er-api.com/v6/latest/TWD",
@@ -1227,13 +1263,13 @@ async function fetchLiveRate(){
 }
 async function loadLiveRate(force){
   if(rateFetching)return;
-  if(!force && RATE_T && Date.now()-RATE_T<RATE_TTL){renderFxPill();renderRateLive();return}
+  if(!force && LIVE_AT && Date.now()-LIVE_AT<RATE_TTL){renderFxPill();renderRateLive();return}
   rateFetching=true;
   var el=$("rate-live");
   if(el&&force)el.textContent="更新即時匯率中…";
   try{
     var v=await fetchLiveRate();
-    RATE=v; RATE_T=Date.now();
+    RATE=v; RATE_T=Date.now(); LIVE_AT=Date.now(); RATE_LIVE=true;
     await kvSet("rate",String(RATE));
     fxCalc();renderFxPill();renderRateLive();
     if(force)toast("匯率已更新 1 NT$ ≈ "+Math.round(RATE)+" ₫");
@@ -1250,15 +1286,20 @@ async function loadLiveRate(force){
 function armDel(btn,fn){
   var key=btn.getAttribute("data-key")||btn.dataset.label;
   if(armed===key){armed=null;fn();return}
-  document.querySelectorAll(".delbtn.armed").forEach(function(b){
-    b.classList.remove("armed");b.textContent=b.dataset.label});
-  armed=key;btn.classList.add("armed");btn.textContent="確定刪除?";
+  armed=key;
+  paintArmed();
   setTimeout(function(){
     if(armed!==key)return;
     armed=null;
-    document.querySelectorAll(".delbtn.armed").forEach(function(b){
-      b.classList.remove("armed");b.textContent=b.dataset.label});
+    paintArmed();
   },3000);
+}
+function paintArmed(){
+  document.querySelectorAll(".delbtn").forEach(function(b){
+    var key=b.getAttribute("data-key")||b.dataset.label;
+    if(armed && armed===key){b.classList.add("armed");b.textContent="確定刪除?"}
+    else{b.classList.remove("armed");b.textContent=b.dataset.label}
+  });
 }
 
 /* ---------- weather ---------- */
@@ -1290,19 +1331,18 @@ function wxCodeLabel(code){
   if(c<=86)return "雪";
   return "雷雨";
 }
-var WX_ICONS={sun:"wx-sun.png",partly:"wx-partly.png",cloud:"wx-cloud.png",rain:"wx-rain.png",storm:"wx-storm.png"};
-function wxIconSrc(code){
-  var c=code==null||code===""?3:+code;
-  if(c===0)return WX_ICONS.sun;
-  if(c<=2)return WX_ICONS.partly;
-  if(c<=48)return WX_ICONS.cloud;
-  if(c>=95)return WX_ICONS.storm;
-  if(c>=51)return WX_ICONS.rain;
-  return WX_ICONS.cloud;
+var WX_ICONS={sun:"wx-sun.png",partly:"wx-partly.png",cloud:"wx-cloud.png",rain:"wx-rain.png",storm:"wx-storm.png",wind:"wx-wind.png"};
+function wxWindAt(city,i){
+  var w=city&&city.daily&&city.daily.wind_speed_10m_max;
+  return w&&w[i]!=null?w[i]:null;
 }
-function wxIcon(code){
+function wxIconSrc(code,wind){
+  return WX_ICONS[VN.wxKindFromCode(code,wind)]||WX_ICONS.cloud;
+}
+function wxIcon(code,wind){
   var lab=wxCodeLabel(code);
-  return '<img class="wxico" src="'+wxIconSrc(code)+'" alt="'+lab+'">';
+  if(VN.wxKindFromCode(code,wind)==="wind")lab="強風";
+  return '<img class="wxico" src="'+wxIconSrc(code,wind)+'" alt="'+lab+'">';
 }
 function wxWd(iso){
   var d=new Date(iso+"T12:00:00+07:00");
@@ -1322,6 +1362,8 @@ function toggleWx(open){
   if(willOpen){toggleFx(false);loadWx(true)}
 }
 function wxDayIndex(){
+  var s=daysUntil();
+  if(s.after)return 5;
   var t=tripDayToday();
   return t?t-1:0;
 }
@@ -1331,7 +1373,7 @@ function renderWxPill(){
   if(dl&&dl.temperature_2m_max&&dl.temperature_2m_max[i]!=null){
     el.textContent=Math.round(dl.temperature_2m_max[i])+"°";
     var ic=$("wxp-icon");
-    if(ic){ic.src=wxIconSrc(dl.weather_code&&dl.weather_code[i]);ic.alt=wxCodeLabel(dl.weather_code&&dl.weather_code[i])}
+    if(ic){var wind=wxWindAt(hn,i);ic.src=wxIconSrc(dl.weather_code&&dl.weather_code[i],wind);ic.alt=wxCodeLabel(dl.weather_code&&dl.weather_code[i])}
   }else el.textContent="天氣";
 }
 function renderWxPanel(){
@@ -1372,7 +1414,7 @@ function wxCell(city,iso){
   var rain=dl.precipitation_probability_max[i];
   if(rain==null)rain="—";
   else rain=Math.round(rain);
-  return '<div class="wxcell">'+wxIcon(dl.weather_code[i])+
+  return '<div class="wxcell">'+wxIcon(dl.weather_code[i],wxWindAt(city,i))+
     '<div class="wxnum"><b>'+lo+"–"+hi+'°</b><span class="rain">'+rain+"%</span></div></div>";
 }
 function wxRainFromMembers(daily,i){
@@ -1397,7 +1439,7 @@ function normalizeWx(d){
 async function fetchCityWx(city){
   var dates=tripIsoDates();
   var start=dates[0], end=dates[dates.length-1];
-  var daily="weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max";
+  var daily="weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max";
   var q="latitude="+city.lat+"&longitude="+city.lon+"&daily="+daily+"&timezone=Asia%2FBangkok&start_date="+start+"&end_date="+end;
   try{
     var r=await fetchTO("https://api.open-meteo.com/v1/forecast?"+q,{},9000);
@@ -1407,7 +1449,7 @@ async function fetchCityWx(city){
     }
   }catch(e){}
   var r2=await fetchTO("https://ensemble-api.open-meteo.com/v1/ensemble?latitude="+city.lat+"&longitude="+city.lon+
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok&start_date="+start+"&end_date="+end,{},9000);
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=Asia%2FBangkok&start_date="+start+"&end_date="+end,{},9000);
   if(!r2.ok)throw new Error("wx "+r2.status);
   return normalizeWx(await r2.json());
 }
@@ -1437,6 +1479,7 @@ function renderDays(){var h="";for(var i=1;i<=6;i++){
   h+='<button class="'+(i===curDay?"on":"")+'" onclick="setDay('+i+')"><span class="dname">Day '+i+'</span>'+sub+"</button>"}
   $("daypills").innerHTML=h}
 function setDay(d){
+  if($("tl-form")&&$("tl-form").classList.contains("show")&&!confirm("表單還沒存，要換到別天嗎？"))return;
   curDay=d;
   if($("tl-form")&&$("tl-form").classList.contains("show"))toggleForm("tl-form",false);
   renderDays();renderTL();renderMap();
@@ -1472,13 +1515,9 @@ function startVeh(){
 }
 /* "14:30" / "08:20→10:30" / "11:00" -> minutes, for ordering. Rows with no
    clock time (「傍晚」「入住」) sort last and keep their authored order. */
-function timeKey(t){
-  var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
-  return m?(parseInt(m[1],10)*60+parseInt(m[2],10)):1e9;
-}
-function pad2(n){return ("0"+n).slice(-2)}
-function initTimeSelects(){
-  var hh=$("f-hh"), mm=$("f-mm");
+function timeKey(t){return VN.timeKey(t)}
+function pad2(n){return VN.pad2(n)}
+function fillSelectPair(hh,mm){
   if(!hh||hh.options.length)return;
   for(var i=0;i<24;i++){
     var o=document.createElement("option");
@@ -1490,7 +1529,13 @@ function initTimeSelects(){
     o.value=o.textContent=pad2(i);
     mm.appendChild(o);
   }
-  hh.onchange=mm.onchange=function(){tlTimeTouched=true};
+}
+function initTimeSelects(){
+  fillSelectPair($("f-hh"),$("f-mm"));
+  fillSelectPair($("f-hh2"),$("f-mm2"));
+  ["f-hh","f-mm","f-hh2","f-mm2"].forEach(function(id){
+    var el=$(id); if(el)el.onchange=function(){tlTimeTouched=true};
+  });
 }
 var tlTimeTouched=false, tlOrigTime="";
 function setTimeSelects(h,m){
@@ -1508,11 +1553,25 @@ function setTimeSelects(h,m){
 function setTimeSelectsNow(){
   var d=new Date();
   setTimeSelects(d.getHours(),d.getMinutes());
+  $("f-hh2").value=$("f-hh").value;$("f-mm2").value=$("f-mm").value;
 }
-function parseClock(t){
-  var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
-  return m?{h:+m[1],m:+m[2]}:null;
+function applyTimeToForm(t){
+  var rg=VN.parseClockRange(t);
+  if(!rg){setTimeSelectsNow();return}
+  setTimeSelects(rg.h1,rg.m1);
+  if(rg.h2!=null){
+    $("f-hh2").value=pad2(rg.h2);$("f-mm2").value=pad2(rg.m2);
+  }else{
+    $("f-hh2").value=pad2(rg.h1);$("f-mm2").value=pad2(rg.m1);
+  }
 }
+function readTimeFromForm(){
+  if(!tlTimeTouched && tlOrigTime)return tlOrigTime;
+  var h1=$("f-hh").value,m1=$("f-mm").value,h2=$("f-hh2").value,m2=$("f-mm2").value;
+  if(h2!==h1||m2!==m1)return VN.formatClockRange(+h1,+m1,+h2,+m2);
+  return pad2(h1)+":"+pad2(m1);
+}
+function parseClock(t){return VN.parseClock(t)}
 function fillTlHint(){
   var info=DAY_INFO[curDay];
   var day='Day '+curDay+(info?' · '+info.fullDate:"");
@@ -1521,7 +1580,9 @@ function fillTlHint(){
 }
 var tlEditing=null;
 function openTlForm(kind,a,b){
+  if(!requireMe())return;
   initTimeSelects();
+  formErr("tl-err","");
   tlTimeTouched=false;tlOrigTime="";
   if(!kind){
     tlEditing=null;
@@ -1535,8 +1596,7 @@ function openTlForm(kind,a,b){
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
     tlOrigTime=it.time||"";
-    var ck=parseClock(it.time);
-    if(ck)setTimeSelects(ck.h,ck.m);else setTimeSelectsNow();
+    applyTimeToForm(it.time);
   }else{
     var it=sharedTL.find(function(x){return x.id===a});
     if(!it)return;
@@ -1544,8 +1604,7 @@ function openTlForm(kind,a,b){
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
     tlOrigTime=it.time||"";
-    var ck=parseClock(it.time);
-    if(ck)setTimeSelects(ck.h,ck.m);else setTimeSelectsNow();
+    applyTimeToForm(it.time);
   }
   fillTlHint();
   toggleForm("tl-form",true);
@@ -1563,13 +1622,14 @@ function tlBaseRow(it,idx){
     '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
     (row.q||it.q?'<a class="maplink" href="'+gm(row.q||it.q)+'" target="_blank">地圖</a>':"")+
+    (ov?'<div class="meta"><button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" onclick="armDel(this,function(){restoreBase('+curDay+','+idx+')})">恢復原行程</button></div>':"")+
     "</div>";
 }
 function tlMineRow(it){
   return '<div class="card" style="border-color:var(--gold)">'+tlPen("user",it.id)+
     '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    '<a class="maplink" href="'+gm(it.title)+'" target="_blank">地圖</a>'+
+    '<a class="maplink" href="'+gm(it.q||it.title)+'" target="_blank">地圖</a>'+
     '<div class="meta"><button class="delbtn" data-label="刪除" data-key="tl:'+jsq(it.id)+'" onclick="armDel(this,function(){delTL(\''+jsq(it.id)+'\')})">刪除</button>'+
     '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
 }
@@ -1590,16 +1650,28 @@ function renderTL(){
   });
   var h=rows.map(function(r){return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it)}).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
+  paintArmed();
+  var n=activity[0], dismissed=null;
+  try{dismissed=sessionStorage.getItem("vn-notice")}catch(e){}
+  if(n && dismissed!==n.who+"|"+n.msg+"|"+n.t){
+    $("notice").style.display="flex";
+    $("notice").innerHTML='<span><b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+'）</span><button class="nx" aria-label="關閉" onclick="dismissNotice()">×</button>';
+  }else $("notice").style.display="none";
+}
+function dismissNotice(){
   var n=activity[0];
-  if(n){$("notice").style.display="block";$("notice").innerHTML='<b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+"）"}
+  try{if(n)sessionStorage.setItem("vn-notice",n.who+"|"+n.msg+"|"+n.t)}catch(e){}
+  $("notice").style.display="none";
 }
 function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
   if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}
-  if(id==="tl-form"&&!s)tlEditing=null}
+  if(id==="tl-form"&&!s)tlEditing=null;
+  if(id==="exp-form"&&!s)expEditing=null}
 function saveTimeline(){
-  var t=$("f-title").value.trim();if(!t){alert("請填地點／事項");return}
-  var clock=pad2($("f-hh").value)+":"+pad2($("f-mm").value);
-  var time=(!tlTimeTouched && tlOrigTime)?tlOrigTime:clock;
+  if(!requireMe())return;
+  formErr("tl-err","");
+  var t=$("f-title").value.trim();if(!t){formErr("tl-err","請填地點／事項");return}
+  var time=readTimeFromForm();
   var note=$("f-note").value.trim();
   if(tlEditing&&tlEditing.kind==="user"){
     var it=sharedTL.find(function(x){return x.id===tlEditing.id});
@@ -1626,15 +1698,22 @@ function saveTimeline(){
     return;
   }
   var d=curDay;
-  sharedTL.push({id:uid(),day:d,time:time,title:t,note:note,who:ME,t:now(),upd:Date.now()});
+  sharedTL.push({id:uid(),day:d,time:time,title:t,note:note,q:t,who:ME,t:now(),upd:Date.now()});
   $("f-title").value="";$("f-note").value="";
   toggleForm("tl-form",false);
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
 function addTimeline(){saveTimeline()}
 function delTL(id){
+  if(!requireMe())return;
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("刪除了「"+t+"」")}
+function restoreBase(day,idx){
+  if(!requireMe())return;
+  var id=baseKey(day,idx);
+  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
+  dels[id]=Date.now();
+  var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("恢復了「"+t+"」原行程")}
 
 /* ---------- expenses ---------- */
 function renderExpForm(){
@@ -1648,24 +1727,61 @@ function updPreview(){
   document.querySelectorAll("#e-split button").forEach(function(b){
     b.querySelector(".box").textContent=b.classList.contains("on")?"☑":"☐"});
   var n=document.querySelectorAll("#e-split button.on").length;
-  var a=parseFloat($("e-amt").value)||0;
+  var a=VN.parseAmt($("e-amt").value)||0;
   var twd=$("e-cur").value==="VND"?a/RATE:a;
   $("e-preview").textContent=n?("已選 "+n+" 人"+(twd?"，每人分攤 NT$ "+Math.round(twd/n).toLocaleString():"")):"⚠️ 還沒選分攤的人";
 }
 document.addEventListener("input",function(e){if(e.target.id==="e-amt")updPreview()});
 document.addEventListener("change",function(e){if(e.target.id==="e-cur")updPreview()});
-function addExpense(){
-  var t=$("e-title").value.trim(),a=parseFloat($("e-amt").value);
-  if(!t||!a){alert("請填項目與金額");return}
-  var twd=$("e-cur").value==="VND"?a/RATE:a;
+var expEditing=null;
+function openExpForm(id){
+  if(!requireMe())return;
+  formErr("exp-err","");
+  toggleForm("exp-form",true);
+  if(!id){expEditing=null;$("exp-save").textContent="記一筆";return}
+  var e=expenses.find(function(x){return x.id===id}); if(!e)return;
+  expEditing=id;
+  $("e-title").value=e.title||"";
+  $("e-amt").value=e.cur==="VND"&&e.vnd!=null?e.vnd:e.twd;
+  $("e-cur").value=e.cur||"TWD";
+  $("e-cat").value=e.cat||"其他";
+  $("e-payer").value=e.payer||ME;
+  document.querySelectorAll("#e-split button").forEach(function(b){
+    b.classList.toggle("on",(e.split||[]).indexOf(b.dataset.m)>=0)});
+  $("exp-save").textContent="儲存修改";
+  updPreview();
+}
+function addExpense(){saveExpense()}
+function saveExpense(){
+  if(!requireMe())return;
+  formErr("exp-err","");
+  var t=$("e-title").value.trim(),a=VN.parseAmt($("e-amt").value);
+  if(!t){formErr("exp-err","請填項目");return}
+  if(!isFinite(a)){formErr("exp-err","請填金額");return}
+  if(a<0){formErr("exp-err","金額不能是負的");return}
+  var cur=$("e-cur").value;
+  if(cur==="VND"&&!RATE_LIVE){formErr("exp-err","即時匯率還沒抓到，請稍候或改記台幣");return}
+  var twd=cur==="VND"?a/RATE:a;
   var sp=[].map.call(document.querySelectorAll("#e-split button.on"),function(b){return b.dataset.m});
-  if(!sp.length){alert("至少選一個分攤的人");return}
-  expenses.push({id:uid(),title:t,cat:$("e-cat").value||"其他",twd:Math.round(twd),payer:$("e-payer").value,split:sp,who:ME,t:now()});
+  if(!sp.length){formErr("exp-err","至少選一個分攤的人");return}
+  var row={title:t,cat:$("e-cat").value||"其他",twd:Math.round(twd),cur:cur,vnd:cur==="VND"?a:null,rate:RATE,payer:$("e-payer").value,split:sp,who:ME,t:now(),upd:Date.now()};
+  if(expEditing){
+    var it=expenses.find(function(x){return x.id===expEditing});
+    if(!it)return;
+    Object.keys(row).forEach(function(k){it[k]=row[k]});
+    toggleForm("exp-form",false);expEditing=null;
+    $("e-title").value="";$("e-amt").value="";
+    saveShared("修改了帳目「"+t+"」");
+    return;
+  }
+  row.id=uid();
+  expenses.push(row);
   $("e-title").value="";$("e-amt").value="";
   toggleForm("exp-form",false);
   saveShared("記了一筆「"+t+"」NT$"+Math.round(twd));
 }
 function delExp(id){
+  if(!requireMe())return;
   var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var t=expenses[i].title;expenses.splice(i,1);saveShared("刪除了帳目「"+t+"」")}
 function renderExp(){
@@ -1674,31 +1790,34 @@ function renderExp(){
     h+='<div class="card exp-item"><div><div class="t" style="font-size:13.5px">'+esc(e.title)+
        '<span class="expcat">'+esc(e.cat||"其他")+'</span></div>'+
        '<div class="d">'+esc(e.payer)+" 付・"+e.split.length+"人分・"+esc(e.t)+
+       (e.cur==="VND"&&e.vnd!=null?"・"+Number(e.vnd).toLocaleString()+"₫":"")+
+       '　<button class="penbtn" style="position:static;width:36px;height:28px;display:inline-flex" onclick="openExpForm(\''+jsq(e.id)+'\')" aria-label="修改帳目"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>'+
        '　<button class="delbtn" data-label="刪" data-key="exp:'+jsq(e.id)+'" onclick="armDel(this,function(){delExp(\''+jsq(e.id)+'\')})">刪</button></div></div>'+
        '<span class="amt">NT$ '+e.twd.toLocaleString()+"</span></div>"});
   $("exp-list").innerHTML=h;
+  paintArmed();
   renderCatStats();
-  var names=MEMBERS.slice();
-  expenses.forEach(function(e){
-    if(names.indexOf(e.payer)<0)names.push(e.payer);
-    e.split.forEach(function(m){if(names.indexOf(m)<0)names.push(m)})});
-  var net={};names.forEach(function(m){net[m]=0});
-  expenses.forEach(function(e){
-    net[e.payer]+=e.twd;
-    // split into whole dollars; the leftover cents land on the payer, so the
-    // ledger sums to exactly zero instead of leaving NT$1 ghosts around
-    var n=e.split.length, base=Math.floor(e.twd/n), rem=e.twd-base*n;
-    e.split.forEach(function(m,i){net[m]-=base+(i<rem?1:0)})});
-  var deb=[],cre=[];
-  names.forEach(function(m){var v=Math.round(net[m]);
-    if(v<-1)deb.push([m,-v]);else if(v>1)cre.push([m,v])});
-  deb.sort(function(a,b){return b[1]-a[1]});cre.sort(function(a,b){return b[1]-a[1]});
-  var out=[],di=0,ci=0;
-  while(di<deb.length&&ci<cre.length){
-    var pay=Math.min(deb[di][1],cre[ci][1]);
-    out.push(deb[di][0]+" → "+cre[ci][0]+"：NT$ "+Math.round(pay).toLocaleString());
-    deb[di][1]-=pay;cre[ci][1]-=pay;
-    if(deb[di][1]<1)di++;if(cre[ci][1]<1)ci++}
+  var st=VN.settleFromExpenses(expenses,MEMBERS);
+  var mine=ME&&st.net[ME]!=null?st.net[ME]:0;
+  var ng=$("netgrid");
+  if(ng){
+    if(!expenses.length)ng.style.display="none";
+    else{
+      ng.style.display="grid";
+      var paid=0, owed=0;
+      expenses.forEach(function(e){
+        if(e.payer===ME)paid+=e.twd;
+        if((e.split||[]).indexOf(ME)>=0){
+          var n=e.split.length, base=Math.floor(e.twd/n), rem=e.twd-base*n, i=e.split.indexOf(ME);
+          owed+=base+(i<rem?1:0);
+        }
+      });
+      ng.innerHTML='<div class="netcard"><div class="k">我付了</div><div class="v">NT$ '+paid.toLocaleString()+'</div></div>'+
+        '<div class="netcard"><div class="k">我該分</div><div class="v">NT$ '+owed.toLocaleString()+'</div></div>'+
+        '<div class="netcard '+(mine>=0?"ok":"owe")+'"><div class="k">淨額</div><div class="v">'+(mine>=0?"別人欠我 ":"我欠人 ")+"NT$ "+Math.abs(mine).toLocaleString()+'</div></div>';
+    }
+  }
+  var out=st.transfers.map(function(t){return t.from+" → "+t.to+"：NT$ "+t.amt.toLocaleString()});
   $("settle-list").innerHTML=out.length?out.map(function(s){return '<div class="li">'+s+"</div>"}).join(""):"目前不用互轉 🎉";
 }
 function renderCatStats(){
@@ -1792,7 +1911,7 @@ function checkCelebrations(){
         celeb[p.n]=1;changed=true}
     }
   });
-  if(changed)kvSet("celeb",JSON.stringify(celeb));
+  if(changed){kvSet("celeb",JSON.stringify(celeb));saveShared(null)}
 }
 function fireConfetti(el){
   var colors=["#B0432E","#C99A4B","#4A7C63","#8E4B5E","#E0B968"];
@@ -1808,13 +1927,17 @@ function fireConfetti(el){
   }
 }
 function addPlace(){
-  var n=$("p-name").value.trim();if(!n){alert("請填店名");return}
-  userPL.push({id:uid(),n:n,tags:[$("p-cat").value.trim()||"其他"],note:$("p-note").value.trim(),q:n+" Hanoi",who:ME});
+  if(!requireMe())return;
+  formErr("pl-err","");
+  var n=$("p-name").value.trim();if(!n){formErr("pl-err","請填店名");return}
+  var city=$("p-city")?$("p-city").value:"Hanoi";
+  userPL.push({id:uid(),n:n,tags:[$("p-cat").value.trim()||"其他"],note:$("p-note").value.trim(),q:n+" "+city,who:ME,upd:Date.now()});
   $("p-name").value="";$("p-cat").value="";$("p-note").value="";
   toggleForm("pl-form",false);
   saveShared("推薦了「"+n+"」");
 }
 function delPlace(id){
+  if(!requireMe())return;
   var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
   var n=userPL[i].n;userPL.splice(i,1);saveShared("刪除了推薦「"+n+"」")}
 function toggleVisit(name){
@@ -1913,8 +2036,10 @@ function phoTap(i){
     if(g.n===0&&!g.m)nbrs(j).forEach(rv)})(i);
   if(P.open===64-P.mines){P.won=true;clearInterval(gTimer);gTimer=null;
     var sc=Math.max(1000-P.sec*8,100)*phoLevel;
+    var wonLevel=phoLevel;
     submitScore("pho",sc);
     phoLevel++;
+    P.wonScore=sc;P.wonLevel=wonLevel;
     toast("過關！下一關 "+phoMines()+" 顆椒");
     setTimeout(function(){if(curGame==="pho")phoInit()},1500);}
   phoRender();phoStat();
@@ -1931,7 +2056,7 @@ function phoRender(){
 function phoStat(){
   var s;
   if(P.dead)s=(P.sec>=phoLimit()?"時間到":"踩到魔鬼椒")+" — LV 歸 1，按重來";
-  else if(P.won)s="過關 · 得分 "+Math.max(1000-P.sec*8,100)*phoLevel;
+  else if(P.won)s="過關 · LV "+(P.wonLevel||phoLevel)+" · 得分 "+(P.wonScore||Math.max(1000-P.sec*8,100)*phoLevel);
   else s="剩 "+(P.mines-P.flags)+"｜"+P.sec+"/"+phoLimit()+"s｜LV "+phoLevel;
   var el=$("p-stat"); if(el)el.textContent=s;
 }
@@ -1940,7 +2065,7 @@ function phoStat(){
 var L={},lanMov=null;
 function lanInit(){
   stopLoops();
-  L={x:20,dir:1,speed:2.4,stack:[130],playing:true,score:0};
+  L={x:0.18,dir:1,speed:0.012,stack:[0.42],playing:true,score:0};
   $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICL+'">燈籠疊疊樂 <span style="font-size:11px;color:var(--ink2);font-weight:400">對準下方燈籠時放下，疊越高分越高</span></div>'+
     '<div class="gamebar"><span class="stat" id="l-stat">高度 0</span><button onclick="lanInit()">重來</button></div>'+
     '<div class="playarea hanoi" id="l-area" onclick="lanDrop()"></div>'+
@@ -1951,15 +2076,15 @@ function lanInit(){
 function lanTick(){
   if(!L.playing)return;
   L.x+=L.dir*L.speed;
-  var w=$("l-area")?$("l-area").clientWidth:300;
-  if(L.x>w-40||L.x<4)L.dir*=-1;
+  if(L.x>0.9||L.x<0.04)L.dir*=-1;
   lanRender();
 }
 function lanWindow(){return Math.max(26-L.score*1.5,9)}  // the target narrows fast
 function lanDrop(){
   if(!L.playing)return;
   var top=L.stack[L.stack.length-1];
-  if(Math.abs(L.x-top)>lanWindow()){
+  var w=$("l-area")?$("l-area").clientWidth:300;
+  if(Math.abs(L.x-top)*w>lanWindow()){
     L.playing=false;clearInterval(lanMov);lanMov=null;
     $("l-stat").textContent="沒接住 · 最終高度 "+L.score;
     // quadratic-ish payoff, so a tall stack is worth chasing
@@ -1967,21 +2092,21 @@ function lanDrop(){
     lanRender();return;
   }
   L.stack.push(L.x);L.score++;
-  L.speed+=0.45;                        // was 0.25 — it plateaued far too long
+  L.speed+=0.002;
   if(L.score%5===0)toast("LEVEL "+(L.score/5+1)+"・準心變窄了");
   $("l-stat").textContent="高度 "+L.score+"｜準心 "+Math.round(lanWindow())+"px";
   lanRender();
 }
 function lanRender(){
   var a=$("l-area");if(!a)return;
-  var H=a.clientHeight,h="";
+  var H=a.clientHeight,W=a.clientWidth,h="";
   var vis=L.stack.slice(-7);
   vis.forEach(function(x,i){
     var y=H-34-(i*30);
-    h+='<img src="'+ICL+'" style="position:absolute;left:'+x+'px;top:'+y+'px;width:26px;height:30px;object-fit:contain">'});
+    h+='<img src="'+ICL+'" style="position:absolute;left:'+(x*(W-26))+'px;top:'+y+'px;width:26px;height:30px;object-fit:contain">'});
   if(L.playing){
     var my=H-34-(Math.min(L.stack.length,7)*30);
-    h+='<img src="'+ICL+'" style="position:absolute;left:'+L.x+'px;top:'+my+'px;width:26px;height:30px;object-fit:contain">';
+    h+='<img src="'+ICL+'" style="position:absolute;left:'+(L.x*(W-26))+'px;top:'+my+'px;width:26px;height:30px;object-fit:contain">';
   }
   a.innerHTML=h;
 }
@@ -1994,7 +2119,7 @@ function memInit(reset){
   stopLoops();
   if(reset)memLevel=1;
   var em=[0,1,2,3,4,5,6,7];
-  var deck=em.concat(em).sort(function(){return Math.random()-0.5});
+  var deck=VN.shuffle(em.concat(em));
   M={deck:deck,flip:[],got:{},moves:0,sec:0,done:false,dead:false};
   $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">LV '+memLevel+'・限時 '+memLimit()+'s・記憶時間 '+memPeek()+'ms</span></div>'+
     '<div class="gamebar"><span class="stat" id="m-stat">步數 0｜⏱ 0/'+memLimit()+'s</span><button onclick="memInit(1)">重來</button></div>'+
@@ -2053,13 +2178,18 @@ function fishInit(){
   fishLoop=setInterval(fishTick,30);
 }
 function fishDrop(){if(!F.over&&!F.drop)F.drop=true}
+function fishEnsureDom(a){
+  if(a.querySelector(".fline"))return;
+  a.innerHTML='<div class="fline" style="position:absolute;top:0;width:1.5px;background:#6B6258"></div>'+
+    '<img class="fhook" src="'+SVG_HOOK+'" style="position:absolute;width:16px;height:26px">';
+}
 function fishTick(){
   var a=$("f-area");if(!a||F.over)return;
+  fishEnsureDom(a);
   var W=a.clientWidth,H=a.clientHeight;
   F.tick++;
   var lv=fishLevel();
   if(lv!==F.lvl){F.lvl=lv;toast("LEVEL "+lv+"・魚變快了")}
-  // the hook sweeps faster and the water gets rockier as you survive
   var sweep=2.6+(lv-1)*0.55;
   if(!F.drop){F.hx+=F.hdir*sweep;if(F.hx>W-20||F.hx<10)F.hdir*=-1}
   else{F.hy+=5+(lv-1)*0.6;
@@ -2068,24 +2198,33 @@ function fishTick(){
         if(it.rock){F.over=true;clearInterval(fishLoop);fishLoop=null;
           $("f-stat").textContent="鉤到石頭 · LV "+fishLevel()+" · 最終得分 "+F.score;
           if(F.score>0)submitScore("fish",F.score);return}
-        F.score+=it.pts*fishLevel();      // later catches are worth more
+        F.score+=it.pts*fishLevel();
+        if(it.el&&it.el.parentNode)it.el.parentNode.removeChild(it.el);
         F.items.splice(i,1);F.drop=false;F.hy=0;
         $("f-stat").textContent="得分 "+F.score+"｜LV "+fishLevel();break}}
     if(F.hy>H-30){F.drop=false;F.hy=0}}
   var spawnEvery=Math.max(46-(lv-1)*6,16);
   if(F.tick%spawnEvery===0){
-    var rock=Math.random()<Math.min(0.3+(lv-1)*0.05,0.55);   // more rocks later
-    var small=Math.random()<Math.min(0.4+(lv-1)*0.05,0.7);   // and smaller fish
+    var rock=Math.random()<Math.min(0.3+(lv-1)*0.05,0.55);
+    var small=Math.random()<Math.min(0.4+(lv-1)*0.05,0.7);
     var spd=(1.4+Math.random()*1.8)+(lv-1)*0.5;
-    F.items.push({x:-30,y:70+Math.random()*(H-130),sp:spd,rock:rock,
-      pts:rock?0:(small?150:100),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)});
+    var it={x:-30,y:70+Math.random()*(H-130),sp:spd,rock:rock,
+      pts:rock?0:(small?150:100),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)};
+    it.el=document.createElement("img");
+    it.el.src=it.em;
+    it.el.style.cssText="position:absolute;width:"+(it.rock?24:(it.pts===150?22:30))+"px";
+    a.appendChild(it.el);
+    F.items.push(it);
   }
   F.items.forEach(function(it){it.x+=it.sp});
-  F.items=F.items.filter(function(it){return it.x<((a.clientWidth)+30)});
-  var h='<div style="position:absolute;left:'+(F.hx-1)+'px;top:0;width:1.5px;height:'+(F.hy+10)+'px;background:#6B6258"></div>'+
-        '<img src="'+SVG_HOOK+'" style="position:absolute;left:'+(F.hx-8)+'px;top:'+F.hy+'px;width:16px;height:26px">';
-  F.items.forEach(function(it){h+='<img src="'+it.em+'" style="position:absolute;left:'+it.x+'px;top:'+it.y+'px;width:'+(it.rock?24:(it.pts===150?22:30))+'px">'});
-  a.innerHTML=h;
+  F.items=F.items.filter(function(it){
+    if(it.x>=W+30){if(it.el&&it.el.parentNode)it.el.parentNode.removeChild(it.el);return false}
+    if(it.el){it.el.style.left=it.x+"px";it.el.style.top=it.y+"px"}
+    return true;
+  });
+  var line=a.querySelector(".fline"), hook=a.querySelector(".fhook");
+  if(line){line.style.left=(F.hx-1)+"px";line.style.height=(F.hy+10)+"px"}
+  if(hook){hook.style.left=(F.hx-8)+"px";hook.style.top=F.hy+"px"}
 }
 
 async function runDiag(){
@@ -2107,7 +2246,11 @@ async function runDiag(){
   if(c===null&&(lastErr||"").indexOf("404")>=0)lines.push("<span style=\'color:var(--accent)\'>找不到資料表 → 請到 SQL Editor 執行建表 SQL。</span>");
   if(c===null&&((lastErr||"").indexOf("401")>=0||(lastErr||"").indexOf("403")>=0))lines.push("<span style=\'color:var(--accent)\'>權限被拒 → 請確認 RLS 政策已建立。</span>");
   lastErr="";
-  if(c&&Object.keys(c).length)mergeCloud(c);
+  if(c===null){
+    lines.push("寫入：⏭ 讀取失敗，不回寫以免覆蓋雲端");
+    box.innerHTML=lines.join("<br>");return;
+  }
+  if(Object.keys(c).length)mergeCloud(c);
   var stamp=localPayload();
   stamp._diag=now();
   var ok=await cloudSave(stamp);
@@ -2132,7 +2275,7 @@ var CARDS=[
  {c:"問候",vn:"Tôi không hiểu",zh:"我聽不懂",say:"多伊 空 希憂"},
  {c:"問候",vn:"Bạn nói tiếng Anh được không?",zh:"你會說英文嗎？",say:"辦 諾伊 頂 安 得 空"},
  {c:"問候",vn:"Tôi đến từ Đài Loan",zh:"我來自台灣",say:"多伊 頂 度 呆 巒"},
- {c:"問候",vn:"Rất vui được gặp bạn",zh:"很高興認識你",say:"熱 vui 得 尬 辦"},
+ {c:"問候",vn:"Rất vui được gặp bạn",zh:"很高興認識你",say:"熱 微 得 尬 辦"},
 
  {c:"點餐",vn:"Cho tôi xem thực đơn",zh:"請給我菜單",say:"左 多伊 賢 特 蹲"},
  {c:"點餐",vn:"Cái này là gì?",zh:"這是什麼？",say:"蓋 乃 拉 汁"},
@@ -2166,12 +2309,12 @@ var CARDS=[
  {c:"住宿",vn:"Tôi đã đặt phòng",zh:"我有訂房",say:"多伊 打 大 風"},
  {c:"住宿",vn:"Cho tôi gửi hành lý",zh:"我想寄放行李",say:"左 多伊 貴 漢 里"},
  {c:"住宿",vn:"Mật khẩu wifi là gì?",zh:"Wifi 密碼是什麼？",say:"麼 口 wifi 拉 汁"},
- {c:"住宿",vn:"Phòng tôi có vấn đề",zh:"我的房間有問題",say:"風 多伊 過 problem"},
+ {c:"住宿",vn:"Phòng tôi có vấn đề",zh:"我的房間有問題",say:"風 多伊 過 文 疊"},
  {c:"住宿",vn:"Mấy giờ trả phòng?",zh:"幾點退房？",say:"美 這 咋 風"},
 
  {c:"急難",vn:"Giúp tôi với!",zh:"請幫幫我！",say:"竹 多伊 為伊"},
  {c:"急難",vn:"Gọi cảnh sát!",zh:"叫警察！",say:"貴 感 撒"},
- {c:"急難",vn:"Gọi xe cứu thương!",zh:"叫救護車！",say:"貴 些 89 湯"},
+ {c:"急難",vn:"Gọi xe cứu thương!",zh:"叫救護車！",say:"貴 些 救 湯"},
  {c:"急難",vn:"Tôi bị ốm",zh:"我生病了",say:"多伊 逼 恩"},
  {c:"急難",vn:"Bệnh viện ở đâu?",zh:"醫院在哪裡？",say:"邊 眼 兒 都"},
  {c:"急難",vn:"Tôi bị mất hộ chiếu",zh:"我護照掉了",say:"多伊 逼 麼 戶 九"},
@@ -2183,6 +2326,10 @@ var CARDS=[
  {c:"數字",vn:"Ba",zh:"3",say:"巴"},
  {c:"數字",vn:"Bốn",zh:"4",say:"本"},
  {c:"數字",vn:"Năm",zh:"5",say:"南"},
+ {c:"數字",vn:"Sáu",zh:"6",say:"哨"},
+ {c:"數字",vn:"Bảy",zh:"7",say:"擺"},
+ {c:"數字",vn:"Tám",zh:"8",say:"譚"},
+ {c:"數字",vn:"Chín",zh:"9",say:"整"},
  {c:"數字",vn:"Mười",zh:"10",say:"妹"},
  {c:"數字",vn:"Một trăm",zh:"100",say:"莫 沾"},
  {c:"數字",vn:"Một nghìn",zh:"1,000（1k）",say:"莫 引"},
@@ -2204,7 +2351,7 @@ function pickVoice(){
 }
 function sayVN(i){
   var card=CARDS[i]; if(!card)return;
-  if(!("speechSynthesis" in window)){toast("這台裝置不支援語音");return}
+  if(!("speechSynthesis" in window)||(voicesReady&&!vnVoice)){toast("這台裝置沒有越南語語音，請看近似音");return}
   speechSynthesis.cancel();
   var u=new SpeechSynthesisUtterance(card.vn);
   u.lang="vi-VN";
@@ -2237,7 +2384,7 @@ function renderCards(){
       '<div class="cw">'+
         '<div class="top-row">'+
           '<div class="vn">'+esc(card.vn)+'</div>'+
-          '<button class="sayb" onclick="sayVN('+i+')" aria-label="播放發音">🔊</button>'+
+          ((hasTTS&&!(voicesReady&&!vnVoice))?'<button class="sayb" onclick="sayVN('+i+')" aria-label="播放發音">🔊</button>':'')+
         '</div>'+
         '<div class="zh">'+esc(card.zh)+'</div>'+
         '<div class="say">近似音：'+esc(card.say)+'</div>'+
@@ -2247,7 +2394,7 @@ function renderCards(){
   $("card-list").innerHTML=rows;
 }
 
-function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI();renderDays();renderTL();renderMap();renderWx();
+function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI();renderDays();renderTL();renderMap();renderWx();paintArmed();
   if(!$("exp-form").classList.contains("show"))renderExpForm();
   renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();renderCards();if(curGame)renderRank()}
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
