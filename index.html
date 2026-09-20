@@ -356,9 +356,18 @@ main{padding:10px 16px 8px}
 .form{padding:12px;margin:6px 0}
 .form label{margin:6px 0 3px}
 .form input,.form select{padding:9px 10px;font-size:16px}
-.timesel{display:flex;align-items:center;gap:6px}
-.timesel select{flex:1;min-width:0;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
-.timesep{color:var(--ink2);font-weight:700}
+.timesel{display:grid;grid-template-columns:minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr);align-items:center;gap:4px;width:100%}
+.timesel select{
+  width:100%;min-width:0;height:44px;padding:0 22px 0 8px;
+  text-align:center;text-align-last:center;
+  font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);
+  -webkit-text-fill-color:var(--ink);background-color:var(--bg);
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%238A8177' d='M1 1l5 5 5-5'/></svg>");
+  background-repeat:no-repeat;background-position:right 7px center;background-size:10px 7px;
+}
+.timesel select:focus{border-color:var(--accent);outline:none}
+.timesep{color:var(--ink2);font-weight:700;padding:0 1px}
 .formhint{font-size:11px;color:var(--accent);letter-spacing:.06em;font-weight:700;margin-bottom:4px}
 .btn{padding:10px;margin-top:10px}
 .wxrow{display:none}
@@ -432,21 +441,18 @@ main{padding:10px 16px 8px}
   <button class="addbtn tl" onclick="openTlForm()"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAADNxrqyqZrDuq3X0sb7+PFSSUOTioK5sahaVE11a2JDPTc1LymfmI9qYVmqmY2DenPn49ri3NGJgnRqW1MfGxbv7+R5PjR/f3+qqqruwbwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0Z5B2AAAAMXRSTlMA//////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA5wjBaQAAA3FJREFUeNrVVtt2pCoQpSjuF0HRTjL//6GnCltiJ/acdN6mlktA2dRlbxQh/lWbf/cue2OfvFLBePcM50ywUV6+0ja16J8BZZy1r9dheqttfBqpEWINWmjNoxs3fUDXzXtRE+gLVA2eY5mSNyZMdFunMIUQ/TRN3vvNi/fE/fyAWqYt0UvDQNPNx2hGjyxVUbeUYtymB1yqoHQzs/DhdhWPMEFYCnXBup1qJLdeS2tAhCeli++iRuQ17fY+Smb22TkpbZ4ByeO9qnEEi3Ffw0VT4xMFhFQPHn2E+0M4Zktv5DOuQpw+9l7b1OEx2Vf0XIdHTO+vAL2B33n0EYdG60vAdHh0JIuZTH3dEqc9uM+FWSllhkdMiYRlDltJZt6v3vhDdN5HmmLoRqJLWzo8uBi9qaFbpbZaa4lQa2UONmfrJx+bjZOlQQvNbKM4JMSf2C5indMRqnqtOHYUR0X7S6BprwGXA5jy1YSFOOrfECV45gzQ2wePVzkSY6Co8IBARq1EhwxpQ6tqusoRENHtgFKodUVKCf3rO4DrFVAhAu5AkOTZEc4x9Xk9BLCEqxwXAAWLFhypmzUvgD1UF4Y2L4GCc+wxU9DUmSnDPs6Dgzm8xKMIOEJ9CSgnePA4o4Ke/J0GoQAX1Yd9vAAVmZ+jXx5yXIimXkWQzJcGScSpm0CkchKASOmtxmkeoRaugXROOuZvBy6WCCCgQ1kKZeVsLsyjhhGq6qESCiUy0LlOfKExE0/40vmUHSggHMBlLXtq2KXFuQCneJeaIiGoPSIeU45qSE4esu73ZYY9C7Wcnx8fIDxJLp+3+P99B+TkvgD1j4DKeXwIFW1Yg+TcKJnOG5m6OGJI/6kcBv6Jb29vVCXkbUA0gHPE7DfcDXA9QsUOBMK9Wd5OVFc133fDt+hnB+uxHHTl/GFg2wXAfC2SQ/4GVFIN4F1yjT/Bd6nCSZtfU1RmAPtB7HPt2/yX8kp1Aob0oX/GBe3iGwwB0KkjVdtyRvpbtGYLZ5ebdaVQZXuRaIcgi9xWp+X6mcCabG618e+mlWJLyZQvt4WW4R49pj8SLTlr8E2fjn/kUukHu/Xr0/q5Ts8fJpxLjRP9BulHyBd1+Bi3rtNq1lrpQBdaCySrfqoz9UvpFmlbq7ZaSZLLNkuKVvIWlLxPpdv72cK/d+z/D1CjJUU6+D0qAAAAAElFTkSuQmCC" alt="">＋ 新增行程</button>
   <div class="form" id="tl-form">
     <div class="formhint" id="f-dayhint">加入 Day 1</div>
-    <div class="row">
-      <div>
-        <label>時間</label>
-        <div class="timesel">
-          <select id="f-hh" aria-label="時"></select>
-          <span class="timesep">:</span>
-          <select id="f-mm" aria-label="分"></select>
-          <span class="timesep" id="f-endlab">→</span>
-          <select id="f-hh2" aria-label="結束時"></select>
-          <span class="timesep">:</span>
-          <select id="f-mm2" aria-label="結束分"></select>
-        </div>
-      </div>
-      <div><label>地點／事項</label><input id="f-title" placeholder="例：午餐 Pho 10"></div>
+    <label>時間</label>
+    <div class="timesel">
+      <select id="f-hh" aria-label="開始時"></select>
+      <span class="timesep">:</span>
+      <select id="f-mm" aria-label="開始分"></select>
+      <span class="timesep" id="f-endlab">→</span>
+      <select id="f-hh2" aria-label="結束時"></select>
+      <span class="timesep">:</span>
+      <select id="f-mm2" aria-label="結束分"></select>
     </div>
+    <label>地點／事項</label>
+    <input id="f-title" placeholder="例：午餐 Pho 10">
     <label>備註</label><input id="f-note" placeholder="選填">
     <div class="formerr" id="tl-err"></div>
     <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
@@ -1630,7 +1636,13 @@ function initTimeSelects(){
   fillSelectPair($("f-hh"),$("f-mm"));
   fillSelectPair($("f-hh2"),$("f-mm2"));
   ["f-hh","f-mm","f-hh2","f-mm2"].forEach(function(id){
-    var el=$(id); if(el)el.onchange=function(){tlTimeTouched=true};
+    var el=$(id); if(!el)return;
+    el.onchange=function(){
+      tlTimeTouched=true;
+      var v=el.value;
+      el.value="";
+      el.value=v;
+    };
   });
 }
 var tlTimeTouched=false, tlOrigTime="";
