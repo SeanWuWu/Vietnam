@@ -2,7 +2,7 @@
    The whole app is one self-contained index.html (images are inlined as
    base64), so caching that single file is enough to open with no signal.
    Data still lives in localStorage and syncs to Supabase when back online. */
-var CACHE = "vn6-v8";
+var CACHE = "vn6-v9";
 var SHELL = ["./", "./index.html", "./manifest.webmanifest", "./vn-core.js",
              "./icon.svg", "./favicon.ico", "./apple-touch-icon.png",
              "./icon-192.png", "./icon-512.png",
@@ -45,8 +45,10 @@ self.addEventListener("fetch", function (e) {
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put("./index.html", copy); });
+        if (res && res.ok && /text\/html/i.test(res.headers.get("content-type") || "text/html")) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put("./index.html", copy); });
+        }
         return res;
       }).catch(function () {
         return caches.match("./index.html");
@@ -60,8 +62,10 @@ self.addEventListener("fetch", function (e) {
   if (htmlish) {
     e.respondWith(
       fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        }
         return res;
       }).catch(function () {
         return caches.match(req).then(function (hit) { return hit || caches.match("./index.html"); });

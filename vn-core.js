@@ -107,6 +107,147 @@
     if (c >= 51) return "rain";
     return "cloud";
   }
+
+  var SAFE_TABS = { tl: 1, exp: 1, pl: 1, more: 1, game: 1, card: 1 };
+  var LIMITS = {
+    title: 120, note: 400, who: 24, id: 64, msg: 80, cat: 32,
+    list: 800, scores: 5, activity: 5, dels: 2000, audit: 40
+  };
+  var SENSITIVE_RE = /護照|护照|passport|身分證|身份证|credit\s*card|cvv|\b[A-Z]{1,2}\d{8,9}\b/i;
+  var MEMBERS_FALLBACK = ["Sean", "魚丸", "姆斯", "尼佛", "陳皮", "阿綸"];
+
+  function clipStr(s, n) {
+    s = String(s == null ? "" : s);
+    if (s.length > n) s = s.slice(0, n);
+    return s;
+  }
+  function looksSensitive(s) {
+    return SENSITIVE_RE.test(String(s || ""));
+  }
+  function ownKeys(obj) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) return [];
+    return Object.keys(obj).filter(function (k) {
+      return k !== "__proto__" && k !== "constructor" && k !== "prototype";
+    });
+  }
+  function copyOwn(src) {
+    var out = Object.create(null);
+    ownKeys(src).forEach(function (k) { out[k] = src[k]; });
+    return out;
+  }
+  function safeTab(p) {
+    p = String(p || "").replace(/^#/, "");
+    return SAFE_TABS[p] ? p : "tl";
+  }
+  function mapsQueryUrl(q) {
+    var s = clipStr(q, 200).replace(/[\u0000-\u001f]/g, "");
+    if (/^\s*javascript:/i.test(s) || /^\s*data:/i.test(s)) s = "";
+    s = s.replace(/^https?:\/\//i, "");
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s);
+  }
+  function placeIdUrl(pid) {
+    var id = clipStr(pid, 120).replace(/[^A-Za-z0-9_\-]/g, "");
+    if (!id) return mapsQueryUrl("");
+    return "https://www.google.com/maps/place/?q=place_id:" + encodeURIComponent(id);
+  }
+  function rateInBand(v) {
+    return typeof v === "number" && isFinite(v) && v >= 500 && v <= 1200;
+  }
+  function newId() {
+    try {
+      if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+        var b = new Uint8Array(16);
+        crypto.getRandomValues(b);
+        b[6] = (b[6] & 0x0f) | 0x40;
+        b[8] = (b[8] & 0x3f) | 0x80;
+        var h = [];
+        for (var i = 0; i < 16; i++) h.push(("0" + b[i].toString(16)).slice(-2));
+        return h.join("").slice(0, 20);
+      }
+    } catch (e) {}
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+  function sanitizeScore(s, members) {
+    if (!s || typeof s !== "object") return null;
+    var who = clipStr(s.who, LIMITS.who);
+    var allow = members || MEMBERS_FALLBACK;
+    if (allow.indexOf(who) < 0) return null;
+    var score = Math.round(+s.score);
+    if (!isFinite(score) || score < 0 || score > 1e7) return null;
+    return { who: who, score: score, t: clipStr(s.t, 8) };
+  }
+  function sanitizeItem(x, kind) {
+    if (!x || typeof x !== "object") return null;
+    var id = clipStr(x.id, LIMITS.id);
+    if (!id) return null;
+    var o = { id: id, who: clipStr(x.who, LIMITS.who), t: clipStr(x.t, 16), upd: +x.upd || 0 };
+    if (kind === "tl") {
+      o.day = Math.min(6, Math.max(1, +x.day || 1));
+      o.time = clipStr(x.time, 24);
+      o.title = clipStr(x.title, LIMITS.title);
+      o.note = clipStr(x.note, LIMITS.note);
+      o.q = clipStr(x.q, 200);
+      if (x.flight) o.flight = true;
+      if (looksSensitive(o.title + o.note)) return null;
+    } else if (kind === "exp") {
+      o.title = clipStr(x.title, LIMITS.title);
+      o.cat = clipStr(x.cat, LIMITS.cat);
+      o.twd = Math.round(+x.twd || 0);
+      if (!isFinite(o.twd) || o.twd < 0 || o.twd > 1e8) return null;
+      o.cur = x.cur === "VND" ? "VND" : "TWD";
+      o.vnd = x.vnd == null ? null : +x.vnd;
+      o.rate = +x.rate || 0;
+      o.payer = clipStr(x.payer, LIMITS.who);
+      o.split = (Array.isArray(x.split) ? x.split : []).map(function (m) { return clipStr(m, LIMITS.who); }).slice(0, 8);
+      if (looksSensitive(o.title)) return null;
+    } else if (kind === "pl") {
+      o.n = clipStr(x.n, LIMITS.title);
+      o.note = clipStr(x.note, LIMITS.note);
+      o.q = clipStr(x.q, 200);
+      o.tags = (Array.isArray(x.tags) ? x.tags : []).map(function (t) { return clipStr(t, LIMITS.cat); }).slice(0, 6);
+      if (looksSensitive(o.n + o.note)) return null;
+    }
+    return o;
+  }
+  function sanitizeTrip(raw, members) {
+    var c = raw && typeof raw === "object" ? raw : {};
+    var out = {
+      tl: [], exp: [], upl: [], vis: {}, act: [], sc: { pho: [], lantern: [], memory: [], fish: [] },
+      del: {}, chk: {}, celeb: {}, audit: [], rev: +c.rev || 0
+    };
+    (Array.isArray(c.tl) ? c.tl : []).slice(0, LIMITS.list).forEach(function (x) {
+      var s = sanitizeItem(x, "tl"); if (s) out.tl.push(s);
+    });
+    (Array.isArray(c.exp) ? c.exp : []).slice(0, LIMITS.list).forEach(function (x) {
+      var s = sanitizeItem(x, "exp"); if (s) out.exp.push(s);
+    });
+    (Array.isArray(c.upl) ? c.upl : []).slice(0, LIMITS.list).forEach(function (x) {
+      var s = sanitizeItem(x, "pl"); if (s) out.upl.push(s);
+    });
+    ownKeys(c.vis).slice(0, LIMITS.list).forEach(function (k) { out.vis[clipStr(k, LIMITS.title)] = c.vis[k]; });
+    ownKeys(c.del).slice(0, LIMITS.dels).forEach(function (k) {
+      var t = c.del[k];
+      if (t === 1) t = Date.now();
+      if (typeof t === "number") out.del[clipStr(k, LIMITS.id)] = t;
+    });
+    ownKeys(c.chk).forEach(function (k) { out.chk[clipStr(k, 40)] = c.chk[k]; });
+    ownKeys(c.celeb).slice(0, 200).forEach(function (k) { if (c.celeb[k]) out.celeb[clipStr(k, LIMITS.title)] = 1; });
+    ["pho", "lantern", "memory", "fish"].forEach(function (g) {
+      var arr = (c.sc && Array.isArray(c.sc[g])) ? c.sc[g] : [];
+      out.sc[g] = arr.map(function (s) { return sanitizeScore(s, members); }).filter(Boolean).slice(0, LIMITS.scores);
+    });
+    (Array.isArray(c.act) ? c.act : []).slice(0, LIMITS.activity).forEach(function (a) {
+      if (!a) return;
+      out.act.push({ who: clipStr(a.who, LIMITS.who), msg: clipStr(a.msg, LIMITS.msg), t: clipStr(a.t, 16) });
+    });
+    (Array.isArray(c.audit) ? c.audit : []).slice(0, LIMITS.audit).forEach(function (a) {
+      if (!a) return;
+      out.audit.push({ who: clipStr(a.who, LIMITS.who), op: clipStr(a.op, 24), id: clipStr(a.id, LIMITS.id), t: +a.t || 0 });
+    });
+    return out;
+  }
+  var XSS_FIXTURE = "<img src=x onerror=alert(1)>\"'><script>alert(1)</script>";
+
   var api = {
     pad2: pad2,
     timeKey: timeKey,
@@ -118,7 +259,21 @@
     unionByIdLWW: unionByIdLWW,
     shuffle: shuffle,
     settleFromExpenses: settleFromExpenses,
-    wxKindFromCode: wxKindFromCode
+    wxKindFromCode: wxKindFromCode,
+    SAFE_TABS: SAFE_TABS,
+    LIMITS: LIMITS,
+    clipStr: clipStr,
+    looksSensitive: looksSensitive,
+    ownKeys: ownKeys,
+    copyOwn: copyOwn,
+    safeTab: safeTab,
+    mapsQueryUrl: mapsQueryUrl,
+    placeIdUrl: placeIdUrl,
+    rateInBand: rateInBand,
+    newId: newId,
+    sanitizeTrip: sanitizeTrip,
+    sanitizeItem: sanitizeItem,
+    XSS_FIXTURE: XSS_FIXTURE
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.VN = api;

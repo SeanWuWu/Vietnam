@@ -8,6 +8,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="越南六天五夜">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://vkczkibsqppyrivvafjk.supabase.co https://api.open-meteo.com https://ensemble-api.open-meteo.com https://open.er-api.com https://cdn.jsdelivr.net https://latest.currency-api.pages.dev; media-src 'none'; object-src 'none'; worker-src 'self'">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -569,12 +576,12 @@ main{padding:10px 16px 8px}
     <div id="ck-list" style="margin-top:10px"></div>
   </div>
 
-  <a class="card morelink" href="https://docs.google.com/presentation/d/1tAgGuh_22QScWoSq-A9TG4-0LviGyS2D3PkK4Idl730/edit" target="_blank">
+  <a class="card morelink" href="https://docs.google.com/presentation/d/1tAgGuh_22QScWoSq-A9TG4-0LviGyS2D3PkK4Idl730/edit" target="_blank" rel="noopener noreferrer">
     <span class="ic"></span>
     <span><span class="t2">行程規劃 PPT</span><br><span class="d2">最初版完整企劃簡報（Google Slides）</span></span>
     <span class="arrow">›</span>
   </a>
-  <a class="card morelink" href="https://drive.google.com/drive/folders/1Wv8mhOgw8FTPaiVHq5MZV7Ic1KrihxuG" target="_blank">
+  <a class="card morelink" href="https://drive.google.com/drive/folders/1Wv8mhOgw8FTPaiVHq5MZV7Ic1KrihxuG" target="_blank" rel="noopener noreferrer">
     <span class="ic" style="background:var(--gold)"></span>
     <span><span class="t2">電子票券（雲端資料夾）</span><br><span class="d2">機票、接送、郵輪、飯店訂單截圖都放這</span></span>
     <span class="arrow">›</span>
@@ -613,16 +620,31 @@ main{padding:10px 16px 8px}
 
   <div class="seclabel">同步診斷 · SYNC</div>
   <div class="card">
-    <div class="d" style="font-size:12px" id="diagbox">尚未執行</div>
+    <div class="d" style="font-size:12px" id="diagbox">尚未執行（只讀，不會改雲端資料）</div>
     <button class="btn ghost" style="margin-top:10px" onclick="runDiag()">立即測試同步</button>
-    
+    <div class="d" style="margin-top:8px;font-size:11px;color:var(--ink3)">失敗時只顯示摘要，細節摺在下方。</div>
+    <pre id="diagdetail" style="display:none;margin-top:8px;font-size:11px;white-space:pre-wrap;color:var(--ink2)"></pre>
   </div>
 
   <div class="seclabel">設定 · SETTINGS</div>
   <div class="card">
     <div class="t" style="font-size:13px">我的身份</div>
     <div class="memberchips" id="me-chips"></div>
-    <div class="secwarn">換人請再點一次自己的名字並確認，避免誤改成別人。此網址含雲端寫入權限，請勿轉傳團外。</div>
+    <div class="secwarn" id="me-lock-note">身分選定後會鎖在這台裝置。要換人請輸入對方名字確認。</div>
+  </div>
+  <div class="card">
+    <div class="t" style="font-size:13px">團密 · 雲端加密</div>
+    <div class="d" style="margin-top:6px;font-size:12px">六人必須用同一句團密。雲端只存密文，沒有團密讀不到帳本。建議：<b>20261007</b></div>
+    <div class="d" id="lock-status" style="margin-top:6px">尚未解鎖</div>
+    <button class="btn ghost" style="margin-top:10px" onclick="showLockPick(true)">重新輸入團密</button>
+  </div>
+  <div class="card">
+    <div class="t" style="font-size:13px">Supabase RLS（需進後台貼一次）</div>
+    <div class="d" style="margin-top:6px;font-size:12px;line-height:1.55">前端鎖不住資料庫。請到 SQL Editor 執行：</div>
+    <pre style="margin-top:8px;font-size:10px;white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px">alter table trip_store enable row level security;
+-- 可選：僅允許已知 anon，仍請搭配團密加密
+create policy if not exists trip_anon_rw on trip_store
+  for all to anon using (true) with check (octet_length(data::text) &lt; 1500000);</pre>
   </div>
   <div class="card">
     <div class="t" style="font-size:13px">匯率 · LIVE</div>
@@ -645,12 +667,22 @@ main{padding:10px 16px 8px}
   <div class="idbox">
     <div style="font-size:10px;letter-spacing:.28em;color:var(--accent);font-weight:700;margin-bottom:6px">XIN CH&Agrave;O</div>
     <h2>歡迎來到河內</h2>
-    <p>選擇你的名字，開始這趟六天五夜（只需選一次）</p>
+    <p>選擇你的名字，開始這趟六天五夜（這台裝置只需選一次）</p>
     <div class="memberchips" id="id-chips"></div>
   </div>
 </div>
+<div class="idmask" id="lockmask" style="display:none;z-index:220">
+  <div class="idbox">
+    <div style="font-size:10px;letter-spacing:.28em;color:var(--accent);font-weight:700;margin-bottom:6px">ĐOÀN MẬT</div>
+    <h2>輸入團密</h2>
+    <p>六人同一句，用來加密雲端帳本。沒有這句，路人就算拿到網址也讀不懂。</p>
+    <input id="lock-in" type="password" autocomplete="current-password" placeholder="例如 20261007" style="width:100%;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:6px;font-size:16px">
+    <div id="lock-err" class="formerr"></div>
+    <button class="btn" type="button" onclick="submitLock()">解鎖並加密</button>
+  </div>
+</div>
 
-<script src="vn-core.js"></script>
+<script src="vn-core.js" integrity="sha384-CBrdyTB7zOSoVgIr/KQh87HMNewPxatJ90nvq5PKJh5cZR8t9bht6HwDG8WzbomL"></script>
 <script>
 var MEMBERS=["Sean","魚丸","姆斯","尼佛","陳皮","阿綸"];
 var RATE=780, ME=null, FX_VND2TWD=true;
@@ -673,7 +705,7 @@ var SVG_FISH=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20"><
 var SVG_FISHS=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20"><path d="M7 10c3-4 9-5 14-2l5-3-2 5 2 5-5-3c-5 3-11 2-14-2z" fill="#DCE9E4" stroke="#4A7C63" stroke-width="1.2"/><circle cx="11" cy="9" r="1" fill="#26211E"/></svg>');
 var SVG_ROCK=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M4 14c-2-5 3-10 8-10s10 4 8 9c-1 3-14 4-16 1z" fill="#E3E0D8" stroke="#6B6258" stroke-width="1.2"/></svg>');
 var SVG_HOOK=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 26"><path d="M8 1v14c0 4 6 5 7 1" fill="none" stroke="#6B6258" stroke-width="1.6" stroke-linecap="round"/><path d="M13.2 18.5l1.8-2.2" stroke="#6B6258" stroke-width="1.4" stroke-linecap="round"/></svg>');
-function gm(q){return "https://www.google.com/maps/search/"+encodeURIComponent(q)}
+function gm(q){return VN.mapsQueryUrl(q)}
 
 var BASE_TL={
  1:[{time:"08:20→10:30",title:"CI791 華航｜Sean・魚丸",note:"桃園 T1 → 河內 T2。早班先落地，可先寄放行李、逛老城區（航廈以登機證為準）",flight:1,q:"Noi Bai International Airport"},
@@ -834,14 +866,14 @@ var FULL_MSG={"米其林一星":"🏅 摘星成功","必比登":"🏅 必比登�
 
 var curDay=1, curCat="全部";
 var sharedTL=[], expenses=[], visited={}, activity=[], userPL=[], scores={pho:[],lantern:[],memory:[],fish:[]};
-var celeb={}, wxCache={}, dels={};
+var celeb={}, wxCache={}, dels={}, tripRev=0, ME_LOCKED=false, TRIP_PASS=null, lastSaveAt=0;
 var armed=null;
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s||"").replace(/[<>&"']/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[c]})}
 function jsq(s){return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/&/g,"\\x26").replace(/</g,"\\x3c").replace(/>/g,"\\x3e").replace(/"/g,"\\x22").replace(/'/g,"\\x27")}
 function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function uid(){return VN.newId()}
 function toast(msg){
   var t=document.createElement("div");
   t.className="toast";t.textContent=msg;
@@ -875,7 +907,8 @@ function unionById(a,b){return VN.unionById(a,b)}
 function unionByIdLWW(a,b){return VN.unionByIdLWW(a,b)}
 /* _diag is a write-probe marker left by runDiag(); it is deliberately not
    part of the trip state, so it never counts as a change. */
-function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,celeb:celeb})}
+var auditLog=[];
+function snapshot(){return JSON.stringify({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,sc:scores,del:dels,chk:checklist,celeb:celeb,audit:auditLog,rev:tripRev})}
 var DEL_TTL=60*86400000;   // 60 days: long past the trip, short enough to stay small
 function pruneDels(d){
   var out={},cut=Date.now()-DEL_TTL;
@@ -887,11 +920,18 @@ function pruneDels(d){
   return out;
 }
 function mergeCloud(c){
+  c=VN.sanitizeTrip(c,MEMBERS);
+  if(c.rev && c.rev>tripRev)tripRev=c.rev;
   dels=pruneDels(Object.assign({},c.del||{},dels));
+  var dk=Object.keys(dels);
+  if(dk.length>VN.LIMITS.dels){
+    dk.sort(function(a,b){return dels[a]-dels[b]});
+    dk.slice(0,dk.length-VN.LIMITS.dels).forEach(function(k){delete dels[k]});
+  }
   sharedTL=unionByIdLWW(c.tl,sharedTL).filter(function(x){return !dels[x.id]});
   expenses=unionByIdLWW(c.exp,expenses).filter(function(x){return !dels[x.id]});
   userPL=unionByIdLWW(c.upl,userPL).filter(function(x){return !dels[x.id]});
-  if(c.celeb){Object.keys(c.celeb).forEach(function(k){if(c.celeb[k])celeb[k]=c.celeb[k]})}
+  if(c.celeb){VN.ownKeys(c.celeb).forEach(function(k){if(c.celeb[k])celeb[k]=c.celeb[k]})}
   var v={};
   [c.vis||{},visited].forEach(function(src){
     Object.keys(src).forEach(function(k){v[k]=setMerge(v[k],src[k])})});
@@ -908,6 +948,8 @@ function mergeCloud(c){
     ck[item.id]=setMerge((c.chk&&c.chk[item.id]),checklist[item.id]);
   });
   checklist=ck;
+  var seenU={},aud=(auditLog||[]).concat(c.audit||[]);
+  auditLog=aud.filter(function(a){var k=a.who+"|"+a.op+"|"+a.id+"|"+a.t;if(seenU[k])return false;seenU[k]=1;return true}).slice(0,VN.LIMITS.audit);
 }
 
 /* ---------- 雲端共用層：Supabase（穩定、瀏覽器直連正規支援）---------- */
@@ -919,18 +961,11 @@ var lastErr="";
 
 function lsk(k,shared){return (shared?"vn6s:":"vn6p:")+k}
 async function kvGet(k,shared){
-  if(window.storage){
-    try{var r=await window.storage.get(k,!!shared);if(r&&r.value)return r.value}catch(e){}
-  }
   try{return localStorage.getItem(lsk(k,shared))}catch(e){return null}
 }
 async function kvSet(k,v,shared){
-  var ok=false;
-  if(window.storage){
-    try{var r=await window.storage.set(k,v,!!shared);if(r)ok=true}catch(e){}
-  }
   try{localStorage.setItem(lsk(k,shared),v)}catch(e){}
-  return ok||true;
+  return true;
 }
 
 function fetchTO(url,opts,ms){
@@ -949,27 +984,70 @@ function sbHeaders(json){
   if(json)h["Content-Type"]="application/json";
   return h;
 }
+function b64enc(buf){
+  var u=new Uint8Array(buf),s="";
+  for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);
+  return btoa(s);
+}
+function b64dec(s){
+  var bin=atob(s),u=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return u;
+}
+async function deriveTripKey(pass,salt){
+  var enc=new TextEncoder();
+  var km=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:salt,iterations:120000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function encryptPayload(obj,pass){
+  var salt=crypto.getRandomValues(new Uint8Array(16));
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  var key=await deriveTripKey(pass,salt);
+  var ct=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,new TextEncoder().encode(JSON.stringify(obj)));
+  return {enc:1,v:1,salt:b64enc(salt),iv:b64enc(iv),ct:b64enc(ct),rev:obj.rev||0};
+}
+async function decryptPayload(env,pass){
+  if(!env||env.enc!==1||!env.ct)throw new Error("not-enc");
+  var key=await deriveTripKey(pass,b64dec(env.salt));
+  var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64dec(env.iv)},key,b64dec(env.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function isEncEnvelope(x){return !!(x&&typeof x==="object"&&x.enc===1&&x.ct)}
+async function unwrapCloud(raw){
+  if(raw==null)return null;
+  if(isEncEnvelope(raw)){
+    if(!TRIP_PASS)return {__needpass:1};
+    try{return await decryptPayload(raw,TRIP_PASS)}
+    catch(e){return {__badpass:1}}
+  }
+  return raw;
+}
+async function wrapCloud(obj){
+  if(!TRIP_PASS)return obj;
+  return encryptPayload(obj,TRIP_PASS);
+}
 async function cloudLoad(){
   if(!SB_URL)return null;
   try{
     var r=await fetchTO(SB_URL+"/rest/v1/trip_store?id=eq.main&select=data",{headers:sbHeaders(false),cache:"no-store"},12000);
-    if(!r.ok){lastErr="讀取HTTP "+r.status;return null}
+    if(!r.ok){lastErr="讀取失敗";return null}
     var rows=await r.json();
     if(!rows.length)return {};
-    return rows[0].data||{};
-  }catch(e){lastErr="讀取例外:"+(e&&e.message||e);return null}
+    return await unwrapCloud(rows[0].data||{});
+  }catch(e){lastErr="讀取失敗";return null}
 }
 async function cloudSave(obj){
   if(!SB_URL)return false;
   try{
+    var body=await wrapCloud(obj);
     var r=await fetchTO(SB_URL+"/rest/v1/trip_store?on_conflict=id",{
       method:"POST",
       headers:Object.assign(sbHeaders(true),{"Prefer":"resolution=merge-duplicates,return=minimal"}),
-      body:JSON.stringify([{id:"main",data:obj}])
+      body:JSON.stringify([{id:"main",data:body}])
     },12000);
-    if(!r.ok)lastErr="寫入HTTP "+r.status;
+    if(!r.ok)lastErr="寫入失敗";
     return r.ok;
-  }catch(e){lastErr="寫入例外:"+(e&&e.message||e);return false}
+  }catch(e){lastErr="寫入失敗";return false}
 }
 function showCloudFailBanner(){
   if(document.getElementById("cloudfail"))return;
@@ -982,43 +1060,64 @@ function showCloudFailBanner(){
   document.body.prepend(b);
 }
 
+function applyLocalTrip(d){
+  d=VN.sanitizeTrip(d||{},MEMBERS);
+  sharedTL=d.tl;expenses=d.exp;visited=d.vis||{};activity=d.act;userPL=d.upl;
+  dels=d.del||{};checklist=d.chk||{};celeb=d.celeb||{};scores=d.sc;auditLog=d.audit||[];
+  tripRev=d.rev||0;
+}
 async function loadAll(){
+  if(location.protocol==="file:")toast("請用 https 網址開啟，不要用檔案直接開");
+  if(location.protocol==="http:"&&location.hostname!=="localhost"&&location.hostname!=="127.0.0.1")toast("請改用 HTTPS");
+  TRIP_PASS=await kvGet("trip-pass");
+  ME_LOCKED=(await kvGet("me-locked"))==="1";
   var raw=await kvGet("trip-data",true);
-  var d=null;
-  if(raw){try{d=JSON.parse(raw);
-    sharedTL=d.tl||[];expenses=d.exp||[];visited=d.vis||{};activity=d.act||[];userPL=d.upl||[];dels=d.del||{};
-    checklist=d.chk||{};
-    if(d.celeb)celeb=d.celeb;
-    if(d.sc&&!Array.isArray(d.sc)){
-      ["pho","lantern","memory","fish"].forEach(function(g){
-        scores[g]=Array.isArray(d.sc[g])?d.sc[g]:[]});
-    }
-  }catch(e){}}
+  if(raw){
+    try{
+      var parsed=JSON.parse(raw);
+      if(isEncEnvelope(parsed)){
+        if(TRIP_PASS){
+          try{applyLocalTrip(await decryptPayload(parsed,TRIP_PASS))}
+          catch(e){showLockPick(true);formErr("lock-err","本機密文與團密不符")}
+        }else showLockPick(true);
+      }else applyLocalTrip(parsed);
+    }catch(e){}
+  }
   ME=await kvGet("me");
-  var rr=await kvGet("rate");if(rr)RATE=parseFloat(rr)||RATE;
-  var cb=await kvGet("celeb");if(cb){try{Object.assign(celeb,JSON.parse(cb)||{})}catch(e){}}
+  if(ME&&MEMBERS.indexOf(ME)<0)ME=null;
+  var rr=await kvGet("rate");if(rr){var rv=parseFloat(rr);if(VN.rateInBand(rv))RATE=rv}
+  var cb=await kvGet("celeb");if(cb){try{var co=JSON.parse(cb);VN.ownKeys(co).forEach(function(k){if(co[k])celeb[k]=1})}catch(e){}}
   var td=tripDayToday(); if(td)curDay=td;
-  if(location.hash)showTab(location.hash.slice(1));
+  if(location.hash)showTab(VN.safeTab(location.hash.slice(1)));
   $("syncline").textContent="本機模式 · "+now();
+  if(!TRIP_PASS)showLockPick(false);
   if(!ME)showIdPick();
   initTimeSelects();
   renderAll();
+  renderLockStatus();
   loadWx(false);
   loadLiveRate(false);
-
   (async function(){
-    var cloud=CLOUD_ID?await cloudLoad():null;
-    if(CLOUD_ID && cloud===null){
-      showCloudFailBanner();
-    }else if(cloud){
-      var pre=snapshot();
-      if(Object.keys(cloud).length)mergeCloud(cloud);
-      cloudOK=true;
-      $("syncline").textContent="雲端同步 · "+now();
-      if(snapshot()!==pre)renderAll();
-    }
+    if(!TRIP_PASS)return;
+    await syncFromCloud();
     startPolling();
   })();
+}
+async function syncFromCloud(){
+  var cloud=CLOUD_ID?await cloudLoad():null;
+  if(CLOUD_ID && cloud===null){
+    showCloudFailBanner();
+    return;
+  }
+  if(cloud&&cloud.__needpass){showLockPick(true);return}
+  if(cloud&&cloud.__badpass){showLockPick(true);formErr("lock-err","團密不對，解不開雲端");return}
+  if(cloud){
+    var pre=snapshot();
+    if(VN.ownKeys(cloud).length)mergeCloud(cloud);
+    cloudOK=true;
+    $("syncline").textContent="雲端同步 · "+now();
+    if(snapshot()!==pre)renderAll();
+  }
 }
 var pollTimer=null, activeUntil=0;
 function bumpSync(){
@@ -1031,9 +1130,11 @@ function schedulePoll(immediate){
   var run=async function(){
     if(document.hidden){pollTimer=setTimeout(run,4000);return}
     var c=await cloudLoad();
+    if(c&&c.__needpass){showLockPick(true);return}
+    if(c&&c.__badpass){showLockPick(true);return}
     if(c){
       var pre=snapshot();
-      if(Object.keys(c).length)mergeCloud(c);
+      if(VN.ownKeys(c).length)mergeCloud(c);
       $("syncline").textContent="雲端同步"+(Date.now()<activeUntil?" ⚡":"")+" · "+now();
       if(snapshot()!==pre)renderAll();
     }
@@ -1047,27 +1148,40 @@ document.addEventListener("visibilitychange",function(){
   if(!document.hidden)schedulePoll(true);
 });
 function localPayload(){
-  return {tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,
-          sc:scores,del:dels,chk:checklist,celeb:celeb};
+  tripRev=(+tripRev||0)+1;
+  return VN.sanitizeTrip({tl:sharedTL,exp:expenses,vis:visited,act:activity,upl:userPL,
+          sc:scores,del:dels,chk:checklist,celeb:celeb,audit:auditLog,rev:tripRev},MEMBERS);
+}
+function pushAudit(op,id){
+  auditLog.unshift({who:ME||"?",op:op,id:id||"",t:Date.now()});
+  auditLog=auditLog.slice(0,VN.LIMITS.audit);
+}
+async function persistLocal(payload){
+  var raw=payload;
+  if(TRIP_PASS){
+    try{raw=await encryptPayload(payload,TRIP_PASS)}catch(e){raw=payload}
+  }
+  await kvSet("trip-data",JSON.stringify(raw),true);
 }
 var saveChain=Promise.resolve();
 async function saveShared(msg){
-  if(msg){activity.unshift({who:ME||"?",msg:msg,t:now()});activity=activity.slice(0,5)}
-  // write locally and repaint straight away — the trip must work offline
-  await kvSet("trip-data",JSON.stringify(localPayload()),true);
+  if(Date.now()-lastSaveAt<400){/* client throttle */}
+  lastSaveAt=Date.now();
+  if(msg){activity.unshift({who:ME||"?",msg:VN.clipStr(msg,VN.LIMITS.msg),t:now()});activity=activity.slice(0,5)}
+  var payload=localPayload();
+  await persistLocal(payload);
   renderAll();
   bumpSync();
   if(!CLOUD_ID){$("syncline").textContent="本機模式 · "+now();return}
+  if(!TRIP_PASS){showLockPick(true);return}
 
-  // Serialise cloud writes. Each one re-reads, merges whatever the others
-  // wrote in the meantime, then pushes — so two people saving at once
-  // combine instead of clobbering each other.
   saveChain=saveChain.then(async function(){
     for(var attempt=0;attempt<3;attempt++){
       var c=await cloudLoad();
-      if(c&&Object.keys(c).length)mergeCloud(c);
+      if(c&&c.__badpass){showLockPick(true);return}
+      if(c&&!c.__needpass&&VN.ownKeys(c).length)mergeCloud(c);
       var payload=localPayload();
-      await kvSet("trip-data",JSON.stringify(payload),true);
+      await persistLocal(payload);
       var ok=await cloudSave(payload);
       if(ok){
         renderAll();
@@ -1099,9 +1213,37 @@ function formErr(id,msg){
   el.textContent=msg||"";
   el.classList.toggle("on",!!msg);
 }
+function showLockPick(bad){
+  var el=$("lockmask"); if(!el)return;
+  el.style.display="flex";
+  if(bad)formErr("lock-err","團密不對");
+  setTimeout(function(){var i=$("lock-in");if(i)i.focus()},40);
+}
+function renderLockStatus(){
+  var el=$("lock-status"); if(!el)return;
+  el.textContent=TRIP_PASS?"這台已解鎖，雲端以 AES-GCM 加密":"尚未解鎖 — 無法安全同步";
+}
+async function submitLock(){
+  formErr("lock-err","");
+  var p=($("lock-in")&&$("lock-in").value||"").trim();
+  if(p.length<6){formErr("lock-err","至少 6 個字");return}
+  TRIP_PASS=p;
+  await kvSet("trip-pass",p);
+  $("lockmask").style.display="none";
+  renderLockStatus();
+  await persistLocal(localPayload());
+  await syncFromCloud();
+  startPolling();
+  toast("團密已套用");
+}
 async function pickMe(m){
-  if(ME && ME!==m && !confirm("要把身份從 "+ME+" 換成 "+m+" 嗎？"))return;
-  ME=m;await kvSet("me",m);
+  if(MEMBERS.indexOf(m)<0)return;
+  if(ME_LOCKED && ME && ME!==m){
+    var typed=prompt("這台已鎖定為 "+ME+"。要換成 "+m+"，請輸入對方全名：");
+    if(typed!==m){toast("未切換身分");return}
+  }
+  ME=m;ME_LOCKED=true;
+  await kvSet("me",m);await kvSet("me-locked","1");
   $("idmask").style.display="none";
   renderAll();
   toast("Xin ch\u00e0o, "+m+" \ud83c\udf3f")}
@@ -1117,9 +1259,10 @@ document.querySelectorAll(".tabbar button").forEach(function(b){
     b.classList.add("on");$("page-"+b.dataset.p).classList.add("on");
     if(b.dataset.p!=="game"&&curGame)closeGame();
     if(b.dataset.p==="tl")startVeh();else stopVeh();
-    if(location.hash!=="#"+b.dataset.p)history.pushState(null,"","#"+b.dataset.p);
+    if(location.hash!=="#"+b.dataset.p)history.pushState(null,"","#"+VN.safeTab(b.dataset.p));
   }});
 function showTab(p){
+  p=VN.safeTab(p);
   var page=$("page-"+p); if(!page)return;
   var b=document.querySelector('.tabbar button[data-p="'+p+'"]');
   document.querySelectorAll(".tabbar button").forEach(function(x){x.classList.remove("on")});
@@ -1134,7 +1277,7 @@ function showTab(p){
   if(p==="tl")startVeh();else stopVeh();
 }
 window.addEventListener("popstate",function(){
-  showTab((location.hash||"#tl").slice(1)||"tl");
+  showTab(VN.safeTab((location.hash||"#tl").slice(1)));
 });
 
 /* ---------- fx ---------- */
@@ -1248,7 +1391,7 @@ async function fetchLiveRate(){
     "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.json",
     "https://latest.currency-api.pages.dev/v1/currencies/twd.json"
   ];
-  var lastErr;
+  var lastErr,hits=[];
   for(var i=0;i<urls.length;i++){
     try{
       var r=await fetchTO(urls[i],{cache:"no-store"},8000);
@@ -1256,10 +1399,14 @@ async function fetchLiveRate(){
       var d=await r.json();
       var v=d&&d.rates?d.rates.VND:null;
       if(!(v>0)&&d&&d.twd)v=d.twd.vnd;
-      if(v>0)return v;
+      if(VN.rateInBand(+v))hits.push(+v);
     }catch(e){lastErr=e}
   }
-  throw lastErr||new Error("匯率服務無回應");
+  if(!hits.length)throw lastErr||new Error("匯率服務無回應");
+  hits.sort(function(a,b){return a-b});
+  if(hits.length>=2 && Math.abs(hits[0]-hits[hits.length-1])/hits[0]>0.05)
+    throw new Error("兩個匯率來源差太多，先不採用");
+  return hits[Math.floor(hits.length/2)];
 }
 async function loadLiveRate(force){
   if(rateFetching)return;
@@ -1283,9 +1430,19 @@ async function loadLiveRate(force){
 /* Two-step delete. `armed` holds the target id, not the button element: a
    background poll re-renders the list and would otherwise leave this pointing
    at a detached node, silently swallowing the second tap. */
+function canMutate(row){
+  if(!requireMe())return false;
+  if(row&&row.who&&row.who!==ME){toast("只能改自己新增的項目");return false}
+  return true;
+}
 function armDel(btn,fn){
   var key=btn.getAttribute("data-key")||btn.dataset.label;
-  if(armed===key){armed=null;fn();return}
+  if(armed===key){
+    armed=null;
+    if(confirm("確定刪除？此動作會同步到其他人的手機。"))fn();
+    paintArmed();
+    return;
+  }
   armed=key;
   paintArmed();
   setTimeout(function(){
@@ -1386,7 +1543,7 @@ function renderWxPanel(){
   }
   var hn=wxData[0], hl=wxData[1];
   if(!hn||!hn.daily||!hl||!hl.daily){
-    box.innerHTML='<div class="wxcell" style="grid-column:1/-1"><a href="https://www.google.com/search?q='+encodeURIComponent("Hanoi Ha Long 10月天氣")+'" target="_blank" style="color:var(--green);font-weight:700">無法連氣象服務，開外部頁 ›</a></div>';
+    box.innerHTML='<div class="wxcell" style="grid-column:1/-1"><a href="https://www.google.com/search?q='+encodeURIComponent("Hanoi Ha Long 10月天氣")+'" target="_blank" rel="noopener noreferrer" style="color:var(--green);font-weight:700">無法驗證氣象，開外部頁 ›</a></div>';
     return;
   }
   var h='<div class="wxtr wxth"><span></span><span>河內</span><span>下龍灣</span></div>';
@@ -1600,6 +1757,7 @@ function openTlForm(kind,a,b){
   }else{
     var it=sharedTL.find(function(x){return x.id===a});
     if(!it)return;
+    if(!canMutate(it))return;
     tlEditing={kind:"user",id:a};
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
@@ -1612,8 +1770,8 @@ function openTlForm(kind,a,b){
 }
 function baseKey(day,idx){return "b"+day+"-"+idx}
 function tlPen(kind,a,b){
-  var click=kind==="base"?("openTlForm('base',"+a+","+b+")"):("openTlForm('user','"+jsq(a)+"')");
-  return '<button class="penbtn" onclick="'+click+'" aria-label="修改行程"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.8 6.4l4.8 4.8" stroke="#C99A4B" stroke-width="1.4"/></svg></button>';
+  var ds=kind==="base"?('data-act="tl-edit-base" data-day="'+a+'" data-idx="'+b+'"'):('data-act="tl-edit-user" data-id="'+esc(a)+'"');
+  return '<button class="penbtn" '+ds+' aria-label="修改行程"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.8 6.4l4.8 4.8" stroke="#C99A4B" stroke-width="1.4"/></svg></button>';
 }
 function tlBaseRow(it,idx){
   var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
@@ -1621,16 +1779,16 @@ function tlBaseRow(it,idx){
   return '<div class="card'+(row.flight||it.flight?" flight":"")+'">'+tlPen("base",curDay,idx)+
     '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
-    (row.q||it.q?'<a class="maplink" href="'+gm(row.q||it.q)+'" target="_blank">地圖</a>':"")+
-    (ov?'<div class="meta"><button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" onclick="armDel(this,function(){restoreBase('+curDay+','+idx+')})">恢復原行程</button></div>':"")+
+    (row.q||it.q?'<a class="maplink" href="'+gm(row.q||it.q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
+    (ov?'<div class="meta"><button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button></div>':"")+
     "</div>";
 }
 function tlMineRow(it){
   return '<div class="card" style="border-color:var(--gold)">'+tlPen("user",it.id)+
     '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    '<a class="maplink" href="'+gm(it.q||it.title)+'" target="_blank">地圖</a>'+
-    '<div class="meta"><button class="delbtn" data-label="刪除" data-key="tl:'+jsq(it.id)+'" onclick="armDel(this,function(){delTL(\''+jsq(it.id)+'\')})">刪除</button>'+
+    '<a class="maplink" href="'+gm(it.q||it.title)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
+    '<div class="meta">'+(it.who&&it.who!==ME?"":'<button class="delbtn" data-label="刪除" data-key="tl:'+esc(it.id)+'" data-act="tl-del" data-id="'+esc(it.id)+'">刪除</button>')+
     '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
 }
 function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
@@ -1670,12 +1828,15 @@ function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
 function saveTimeline(){
   if(!requireMe())return;
   formErr("tl-err","");
-  var t=$("f-title").value.trim();if(!t){formErr("tl-err","請填地點／事項");return}
+  var t=VN.clipStr($("f-title").value.trim(),VN.LIMITS.title);if(!t){formErr("tl-err","請填地點／事項");return}
+  if(VN.looksSensitive(t)){formErr("tl-err","請勿填護照／證件號碼");return}
   var time=readTimeFromForm();
-  var note=$("f-note").value.trim();
+  var note=VN.clipStr($("f-note").value.trim(),VN.LIMITS.note);
+  if(VN.looksSensitive(note)){formErr("tl-err","請勿填護照／證件號碼");return}
   if(tlEditing&&tlEditing.kind==="user"){
     var it=sharedTL.find(function(x){return x.id===tlEditing.id});
     if(!it)return;
+    if(!canMutate(it))return;
     it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();
     toggleForm("tl-form",false);
     $("f-title").value="";$("f-note").value="";
@@ -1687,6 +1848,7 @@ function saveTimeline(){
     var src=(BASE_TL[tlEditing.day]||[])[tlEditing.idx]||{};
     var it=sharedTL.find(function(x){return x.id===id});
     var day=tlEditing.day;
+    if(it && !canMutate(it))return;
     if(it){
       it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();it.day=day;
     }else{
@@ -1706,14 +1868,17 @@ function saveTimeline(){
 function addTimeline(){saveTimeline()}
 function delTL(id){
   if(!requireMe())return;
-  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
-  var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("刪除了「"+t+"」")}
+  var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
+  if(!canMutate(sharedTL[i]))return;
+  dels[id]=Date.now();
+  var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("del-tl",id);saveShared("刪除了「"+t+"」")}
 function restoreBase(day,idx){
   if(!requireMe())return;
   var id=baseKey(day,idx);
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
+  if(!canMutate(sharedTL[i]))return;
   dels[id]=Date.now();
-  var t=sharedTL[i].title;sharedTL.splice(i,1);saveShared("恢復了「"+t+"」原行程")}
+  var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("rst-tl",id);saveShared("恢復了「"+t+"」原行程")}
 
 /* ---------- expenses ---------- */
 function renderExpForm(){
@@ -1740,6 +1905,7 @@ function openExpForm(id){
   toggleForm("exp-form",true);
   if(!id){expEditing=null;$("exp-save").textContent="記一筆";return}
   var e=expenses.find(function(x){return x.id===id}); if(!e)return;
+  if(!canMutate(e))return;
   expEditing=id;
   $("e-title").value=e.title||"";
   $("e-amt").value=e.cur==="VND"&&e.vnd!=null?e.vnd:e.twd;
@@ -1756,7 +1922,9 @@ function saveExpense(){
   if(!requireMe())return;
   formErr("exp-err","");
   var t=$("e-title").value.trim(),a=VN.parseAmt($("e-amt").value);
+  t=VN.clipStr(t,VN.LIMITS.title);
   if(!t){formErr("exp-err","請填項目");return}
+  if(VN.looksSensitive(t)){formErr("exp-err","請勿填證件或卡號");return}
   if(!isFinite(a)){formErr("exp-err","請填金額");return}
   if(a<0){formErr("exp-err","金額不能是負的");return}
   var cur=$("e-cur").value;
@@ -1768,6 +1936,7 @@ function saveExpense(){
   if(expEditing){
     var it=expenses.find(function(x){return x.id===expEditing});
     if(!it)return;
+    if(!canMutate(it))return;
     Object.keys(row).forEach(function(k){it[k]=row[k]});
     toggleForm("exp-form",false);expEditing=null;
     $("e-title").value="";$("e-amt").value="";
@@ -1782,8 +1951,10 @@ function saveExpense(){
 }
 function delExp(id){
   if(!requireMe())return;
-  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
-  var t=expenses[i].title;expenses.splice(i,1);saveShared("刪除了帳目「"+t+"」")}
+  var i=expenses.findIndex(function(x){return x.id===id});if(i<0)return;
+  if(!canMutate(expenses[i]))return;
+  dels[id]=Date.now();
+  var t=expenses[i].title;expenses.splice(i,1);pushAudit("del-exp",id);saveShared("刪除了帳目「"+t+"」")}
 function renderExp(){
   var h="";
   expenses.slice().reverse().forEach(function(e){
@@ -1791,8 +1962,8 @@ function renderExp(){
        '<span class="expcat">'+esc(e.cat||"其他")+'</span></div>'+
        '<div class="d">'+esc(e.payer)+" 付・"+e.split.length+"人分・"+esc(e.t)+
        (e.cur==="VND"&&e.vnd!=null?"・"+Number(e.vnd).toLocaleString()+"₫":"")+
-       '　<button class="penbtn" style="position:static;width:36px;height:28px;display:inline-flex" onclick="openExpForm(\''+jsq(e.id)+'\')" aria-label="修改帳目"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>'+
-       '　<button class="delbtn" data-label="刪" data-key="exp:'+jsq(e.id)+'" onclick="armDel(this,function(){delExp(\''+jsq(e.id)+'\')})">刪</button></div></div>'+
+       (e.who&&e.who!==ME?"":'　<button class="penbtn" style="position:static;width:36px;height:28px;display:inline-flex" data-act="exp-edit" data-id="'+esc(e.id)+'" aria-label="修改帳目"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>'+
+       '　<button class="delbtn" data-label="刪" data-key="exp:'+esc(e.id)+'" data-act="exp-del" data-id="'+esc(e.id)+'">刪</button>')+'</div></div>'+
        '<span class="amt">NT$ '+e.twd.toLocaleString()+"</span></div>"});
   $("exp-list").innerHTML=h;
   paintArmed();
@@ -1855,7 +2026,7 @@ function renderCats(){
   allPlaces().forEach(function(p){tagsOf(p).forEach(function(t){if(cats.indexOf(t)<0)cats.push(t)})});
   var h="";cats.forEach(function(c){
     if(c!=="全部"&&!allPlaces().some(function(p){return tagsOf(p).indexOf(c)>=0}))return;
-    h+='<button class="'+(c===curCat?"on":"")+'" onclick="setCat(\''+jsq(c)+'\')">'+esc(c)+"</button>"});
+    h+='<button class="'+(c===curCat?"on":"")+'" data-act="set-cat" data-cat="'+esc(c)+'">'+esc(c)+"</button>"});
   $("catpills").innerHTML=h}
 function setCat(c){curCat=c;renderCats();renderPl()}
 function ensureCatValid(){
@@ -1864,7 +2035,7 @@ function ensureCatValid(){
   if(!live)curCat="全部";
 }
 function placeLink(p){
-  return p.pid?("https://www.google.com/maps/place/?q=place_id:"+p.pid):gm(p.q||p.n)}
+  return p.pid?VN.placeIdUrl(p.pid):gm(p.q||p.n)}
 function stampRow(p){
   var v=setList(visited[p.n]);
   var full=v.length>=MEMBERS.length;
@@ -1893,9 +2064,9 @@ function renderPl(){
     var isUser=i>=BASE_PL.length;
     h+='<div class="card place'+(full?" fullcard":"")+'" data-place="'+esc(p.n)+'"'+(isUser&&!full?' style="border-color:var(--gold)"':'')+'><div class="t"><span>'+esc(p.n)+"</span>"+tagHtml(p)+"</div>"+
        '<div class="d">'+esc(p.note)+"</div>"+stampRow(p)+
-       '<div class="acts"><a href="'+placeLink(p)+'" target="_blank">查看店家 ›</a>'+
-       '<button class="'+(v.indexOf(ME)>=0?"done":"")+'" onclick="toggleVisit(\''+jsq(p.n)+'\')">'+(v.indexOf(ME)>=0?"✓ 已打卡":"打卡")+"</button></div>"+
-       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　<button class=\"delbtn\" data-label=\"刪除\" data-key=\"pl:"+jsq(p.id)+"\" onclick=\"armDel(this,function(){delPlace(\'"+jsq(p.id)+"\')})\">刪除</button></div>":"")+
+       '<div class="acts"><a href="'+placeLink(p)+'" target="_blank" rel="noopener noreferrer">查看店家 ›</a>'+
+       '<button class="'+(v.indexOf(ME)>=0?"done":"")+'" data-act="visit" data-name="'+esc(p.n)+'">'+(v.indexOf(ME)>=0?"✓ 已打卡":"打卡")+"</button></div>"+
+       (isUser?'<div class="meta">'+esc(p.who)+" 推薦　"+(p.who&&p.who!==ME?"":"<button class=\"delbtn\" data-label=\"刪除\" data-key=\"pl:"+esc(p.id)+"\" data-act=\"pl-del\" data-id=\""+esc(p.id)+"\">刪除</button>")+"</div>":"")+
        "</div>"});
   $("pl-list").innerHTML=h;
   checkCelebrations();
@@ -1929,17 +2100,21 @@ function fireConfetti(el){
 function addPlace(){
   if(!requireMe())return;
   formErr("pl-err","");
-  var n=$("p-name").value.trim();if(!n){formErr("pl-err","請填店名");return}
+  var n=VN.clipStr($("p-name").value.trim(),VN.LIMITS.title);if(!n){formErr("pl-err","請填店名");return}
+  if(VN.looksSensitive(n)){formErr("pl-err","請勿填證件資料");return}
   var city=$("p-city")?$("p-city").value:"Hanoi";
-  userPL.push({id:uid(),n:n,tags:[$("p-cat").value.trim()||"其他"],note:$("p-note").value.trim(),q:n+" "+city,who:ME,upd:Date.now()});
+  var note=VN.clipStr($("p-note").value.trim(),VN.LIMITS.note);
+  userPL.push({id:uid(),n:n,tags:[VN.clipStr($("p-cat").value.trim()||"其他",VN.LIMITS.cat)],note:note,q:n+" "+city,who:ME,upd:Date.now()});
   $("p-name").value="";$("p-cat").value="";$("p-note").value="";
   toggleForm("pl-form",false);
   saveShared("推薦了「"+n+"」");
 }
 function delPlace(id){
   if(!requireMe())return;
-  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;dels[id]=Date.now();
-  var n=userPL[i].n;userPL.splice(i,1);saveShared("刪除了推薦「"+n+"」")}
+  var i=userPL.findIndex(function(x){return x.id===id});if(i<0)return;
+  if(!canMutate(userPL[i]))return;
+  dels[id]=Date.now();
+  var n=userPL[i].n;userPL.splice(i,1);pushAudit("del-pl",id);saveShared("刪除了推薦「"+n+"」")}
 function toggleVisit(name){
   if(!ME){showIdPick();return}
   visited[name]=setToggle(visited[name],ME);
@@ -1966,8 +2141,10 @@ function stopLoops(){clearInterval(gTimer);gTimer=null;clearInterval(lanMov);lan
 function stopVeh(){if(vehRaf){cancelAnimationFrame(vehRaf);vehRaf=null}}
 function submitScore(g,sc){
   if(!ME){showIdPick();return}
+  sc=Math.round(+sc);
+  if(!isFinite(sc)||sc<0||sc>1e7)return;
   scores[g]=scores[g]||[];
-  scores[g].push({who:ME||"?",score:sc,t:now()});
+  scores[g].push({who:ME,score:sc,t:now()});
   scores[g].sort(function(a,b){return b.score-a.score});
   scores[g]=scores[g].slice(0,5);
   saveShared(GAME_META[g].n+"得了 "+sc+" 分");
@@ -2228,38 +2405,24 @@ function fishTick(){
 }
 
 async function runDiag(){
-  var box=$("diagbox");
-  box.innerHTML="測試中…（最長約 30 秒，請稍候）";
-  var lines=["後端：<span style=\'font-family:monospace\'>"+(SB_URL?"Supabase":"（未設定）")+"</span>"];
+  var box=$("diagbox"), det=$("diagdetail");
+  box.textContent="測試中…（只讀，不會改雲端）";
+  if(det){det.style.display="none";det.textContent=""}
+  var summary=[];
   try{
     var t0=Date.now();
     var ping=await fetchTO(SB_URL+"/rest/v1/",{headers:sbHeaders(false)},15000);
-    lines.push("伺服器連通：✅ HTTP "+ping.status+"（"+(Date.now()-t0)+"ms）");
+    summary.push("伺服器連通（"+(Date.now()-t0)+"ms）");
   }catch(e){
-    lines.push("伺服器連通：❌ "+(e&&e.message||e));
-    lines.push("<span style=\'color:var(--accent)\'>專案可能處於休眠，請到 Supabase 後台點 Restore/Resume 後再測。</span>");
-    box.innerHTML=lines.join("<br>");return;
+    box.textContent="同步失敗：伺服器沒回應。可能休眠，請稍後再試。";
+    return;
   }
-  lastErr="";
   var c=await cloudLoad();
-  lines.push("讀取："+(c===null?("❌ 失敗（"+(lastErr||"未知")+"）"):("✅ 成功（"+(Object.keys(c).length?"有資料":"空的")+"）")));
-  if(c===null&&(lastErr||"").indexOf("404")>=0)lines.push("<span style=\'color:var(--accent)\'>找不到資料表 → 請到 SQL Editor 執行建表 SQL。</span>");
-  if(c===null&&((lastErr||"").indexOf("401")>=0||(lastErr||"").indexOf("403")>=0))lines.push("<span style=\'color:var(--accent)\'>權限被拒 → 請確認 RLS 政策已建立。</span>");
-  lastErr="";
-  if(c===null){
-    lines.push("寫入：⏭ 讀取失敗，不回寫以免覆蓋雲端");
-    box.innerHTML=lines.join("<br>");return;
-  }
-  if(Object.keys(c).length)mergeCloud(c);
-  var stamp=localPayload();
-  stamp._diag=now();
-  var ok=await cloudSave(stamp);
-  lines.push("寫入："+(ok?"✅ 成功":("❌ 失敗（"+(lastErr||"未知")+"）")));
-  if(ok){
-    var c2=await cloudLoad();
-    lines.push("回讀驗證："+((c2&&c2._diag===stamp._diag)?"✅ 寫入的資料讀得回來，同步鏈路正常":"⚠️ 讀回的不是剛寫的資料"));
-  }
-  box.innerHTML=lines.join("<br>");
+  if(c===null){box.textContent="同步失敗：讀不到雲端。";return}
+  if(c.__needpass||c.__badpass){box.textContent="雲端是密文，請先輸入正確團密。";return}
+  summary.push(VN.ownKeys(c).length?"讀取成功，有資料":"讀取成功，目前是空的");
+  summary.push("診斷為只讀，未寫入");
+  box.textContent=summary.join(" · ");
 }
 
 /* ================= 越南小卡 · PHRASEBOOK ================= */
@@ -2394,6 +2557,23 @@ function renderCards(){
   $("card-list").innerHTML=rows;
 }
 
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest("[data-act]");
+  if(!t)return;
+  var act=t.getAttribute("data-act");
+  if(act==="tl-edit-base")openTlForm("base",+t.getAttribute("data-day"),+t.getAttribute("data-idx"));
+  else if(act==="tl-edit-user")openTlForm("user",t.getAttribute("data-id"));
+  else if(act==="tl-del")armDel(t,function(){delTL(t.getAttribute("data-id"))});
+  else if(act==="tl-restore")armDel(t,function(){restoreBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"))});
+  else if(act==="exp-edit")openExpForm(t.getAttribute("data-id"));
+  else if(act==="exp-del")armDel(t,function(){delExp(t.getAttribute("data-id"))});
+  else if(act==="pl-del")armDel(t,function(){delPlace(t.getAttribute("data-id"))});
+  else if(act==="visit")toggleVisit(t.getAttribute("data-name"));
+  else if(act==="set-cat")setCat(t.getAttribute("data-cat"));
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&e.target&&e.target.id==="lock-in"){e.preventDefault();submitLock()}
+});
 function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI();renderDays();renderTL();renderMap();renderWx();paintArmed();
   if(!$("exp-form").classList.contains("show"))renderExpForm();
   renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();renderCards();if(curGame)renderRank()}
@@ -2401,9 +2581,9 @@ if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pick
 loadAll();
 
 /* ---------- offline: cache the page so it opens with no signal ---------- */
-if("serviceWorker" in navigator){
+if("serviceWorker" in navigator && location.protocol!=="file:"){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){/* file:// or no HTTPS */});
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
   });
 }
 window.addEventListener("online",function(){

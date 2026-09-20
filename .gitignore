@@ -1,5 +1,4 @@
-.playwright-mcp/
-iphone-tl.png
-tl2.png
-fx.png
-cards.png
+grok-image-*.png
+*.local.html
+.DS_Store
+Thumbs.db
