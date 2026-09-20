@@ -377,6 +377,65 @@ main{padding:10px 16px 8px}
   main{padding:10px 12px 8px}
   .fxpanel,.wxpanel{padding:8px 12px 0}
 }
+
+/* ---------- phone: tap targets, keyboard, 6-tab bar, no cramped rows ---------- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  padding-top:env(safe-area-inset-top);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  padding-bottom:calc(78px + env(safe-area-inset-bottom));
+}
+button,a,select,input,label,.checkitem,.maplink{touch-action:manipulation;-webkit-touch-callout:none}
+input,select,textarea{max-width:100%}
+.tabbar{
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  padding-bottom:max(8px, env(safe-area-inset-bottom));
+}
+.tabbar button{
+  min-width:0;min-height:56px;padding:8px 0 6px;
+  font-size:10px;letter-spacing:0;white-space:nowrap;line-height:1.15;
+}
+.tabbar button img{width:20px;height:20px}
+.headtools{max-width:58%}
+.fxpill{max-width:100%;overflow:hidden}
+.fxpill .fxp-rate{max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hdPlace{display:none}
+.fxrow{flex-wrap:wrap}
+.fx-input-wrap{flex:1 1 100%}
+.fxrow .dir{flex:1 1 auto;min-height:44px}
+.fxrow .out{flex:1 1 100%;min-width:0;text-align:left;padding:4px 2px 0;font-size:16px}
+.fxchips button{min-height:40px;padding:8px 12px;font-size:13px}
+.form .row{flex-direction:column;gap:0}
+.timesel{grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto;row-gap:8px}
+.timesel .timesep:nth-of-type(2),
+#f-endlab{grid-column:1 / -1;text-align:center;padding:0}
+#f-hh{grid-column:1;grid-row:1}
+.timesel span:first-of-type{grid-column:2;grid-row:1}
+#f-mm{grid-column:3;grid-row:1}
+#f-hh2{grid-column:1;grid-row:3}
+.timesel span:last-of-type{grid-column:2;grid-row:3}
+#f-mm2{grid-column:3;grid-row:3}
+#f-endlab{grid-row:2;color:var(--accent);font-size:12px;letter-spacing:.2em}
+.netgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.netcard{padding:8px 6px}
+.netcard .v{font-size:13px;word-break:break-word}
+.maplink{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center}
+.notice .nx{min-width:44px;min-height:44px;font-size:22px}
+.checkitem{min-height:48px;padding:12px 0}
+.gback{min-height:44px;display:inline-flex;align-items:center}
+.sayb,.cardrow .sayb{width:44px;height:44px}
+#card-list{grid-template-columns:1fr}
+.daytabs button{min-width:56px}
+.gamebar button{min-height:44px}
+.place .acts a,.place .acts button{min-height:44px}
+@media (min-width:400px){
+  #card-list{grid-template-columns:repeat(2,1fr)}
+  .timesel{display:grid;grid-template-columns:minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr);grid-template-rows:auto}
+  #f-hh,#f-mm,#f-hh2,#f-mm2,.timesel span{grid-column:auto;grid-row:auto}
+  #f-endlab{grid-column:auto;grid-row:auto;font-size:inherit;letter-spacing:inherit}
+}
 </style>
 </head>
 <body>
@@ -406,7 +465,7 @@ main{padding:10px 16px 8px}
   <div class="fxrow">
     <div class="fx-input-wrap">
       <button class="stepbtn minus" id="fx-step-minus" onclick="fxStep(-1)" title="減少金額">−10萬</button>
-      <input id="fxin" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" placeholder="輸入越盾 (₫)">
+      <input id="fxin" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="輸入越盾">
       <button class="stepbtn plus" id="fx-step-plus" onclick="fxStep(1)" title="增加金額">+10萬</button>
     </div>
     <button class="dir" id="fxdir" title="點擊切換換匯方向">₫ → NT$</button>
@@ -452,8 +511,8 @@ main{padding:10px 16px 8px}
       <select id="f-mm2" aria-label="結束分"></select>
     </div>
     <label>地點／事項</label>
-    <input id="f-title" placeholder="例：午餐 Pho 10">
-    <label>備註</label><input id="f-note" placeholder="選填">
+    <input id="f-title" placeholder="例：午餐 Pho 10" enterkeyhint="next" autocomplete="off" autocapitalize="sentences">
+    <label>備註</label><input id="f-note" placeholder="選填" enterkeyhint="done" autocomplete="off">
     <div class="formerr" id="tl-err"></div>
     <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
     <button class="btn ghost" onclick="toggleForm('tl-form',false)">取消</button>
@@ -500,8 +559,8 @@ main{padding:10px 16px 8px}
   <button class="addbtn exp" onclick="openExpForm()"><img src="data:image/png;base64,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" alt="">＋ 記一筆帳</button>
   <div class="form" id="exp-form">
     <div class="row">
-      <div><label>項目</label><input id="e-title" placeholder="例：Day2 一日遊"></div>
-      <div><label>金額</label><input id="e-amt" type="text" inputmode="decimal" placeholder="0"></div>
+      <div><label>項目</label><input id="e-title" placeholder="例：Day2 一日遊" enterkeyhint="next" autocomplete="off"></div>
+      <div><label>金額</label><input id="e-amt" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="0"></div>
     </div>
     <label>類別</label>
     <select id="e-cat"></select>
@@ -1775,7 +1834,9 @@ function dismissNotice(){
 function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
   if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}
   if(id==="tl-form"&&!s)tlEditing=null;
-  if(id==="exp-form"&&!s)expEditing=null}
+  if(id==="exp-form"&&!s)expEditing=null;
+  if(s){var el=$(id);if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},50)}
+}
 function saveTimeline(){
   if(!requireMe())return;
   formErr("tl-err","");
@@ -2525,6 +2586,11 @@ function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI()
   if(!$("exp-form").classList.contains("show"))renderExpForm();
   renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();renderCards();if(curGame)renderRank()}
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+document.addEventListener("focusin",function(e){
+  var t=e.target;
+  if(!t||(t.tagName!=="INPUT"&&t.tagName!=="SELECT"&&t.tagName!=="TEXTAREA"))return;
+  setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(err){}},350);
+});
 loadAll();
 
 /* ---------- offline: cache the page so it opens with no signal ---------- */
