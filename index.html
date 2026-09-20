@@ -633,18 +633,8 @@ main{padding:10px 16px 8px}
     <div class="secwarn" id="me-lock-note">身分選定後會鎖在這台裝置。要換人請輸入對方名字確認。</div>
   </div>
   <div class="card">
-    <div class="t" style="font-size:13px">團密 · 雲端加密</div>
-    <div class="d" style="margin-top:6px;font-size:12px">六人必須用同一句團密。雲端只存密文，沒有團密讀不到帳本。建議：<b>20261007</b></div>
-    <div class="d" id="lock-status" style="margin-top:6px">尚未解鎖</div>
-    <button class="btn ghost" style="margin-top:10px" onclick="showLockPick(true)">重新輸入團密</button>
-  </div>
-  <div class="card">
-    <div class="t" style="font-size:13px">Supabase RLS（需進後台貼一次）</div>
-    <div class="d" style="margin-top:6px;font-size:12px;line-height:1.55">前端鎖不住資料庫。請到 SQL Editor 執行：</div>
-    <pre style="margin-top:8px;font-size:10px;white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px">alter table trip_store enable row level security;
--- 可選：僅允許已知 anon，仍請搭配團密加密
-create policy if not exists trip_anon_rw on trip_store
-  for all to anon using (true) with check (octet_length(data::text) &lt; 1500000);</pre>
+    <div class="t" style="font-size:13px">同步</div>
+    <div class="d" style="margin-top:6px;font-size:12px">repo 已設為隱私，進頁不必再打團密。請不要把 Pages 網址轉給團外。</div>
   </div>
   <div class="card">
     <div class="t" style="font-size:13px">匯率 · LIVE</div>
@@ -669,16 +659,6 @@ create policy if not exists trip_anon_rw on trip_store
     <h2>歡迎來到河內</h2>
     <p>選擇你的名字，開始這趟六天五夜（這台裝置只需選一次）</p>
     <div class="memberchips" id="id-chips"></div>
-  </div>
-</div>
-<div class="idmask" id="lockmask" style="display:none;z-index:220">
-  <div class="idbox">
-    <div style="font-size:10px;letter-spacing:.28em;color:var(--accent);font-weight:700;margin-bottom:6px">ĐOÀN MẬT</div>
-    <h2>輸入團密</h2>
-    <p>六人同一句，用來加密雲端帳本。沒有這句，路人就算拿到網址也讀不懂。</p>
-    <input id="lock-in" type="password" autocomplete="current-password" placeholder="例如 20261007" style="width:100%;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:6px;font-size:16px">
-    <div id="lock-err" class="formerr"></div>
-    <button class="btn" type="button" onclick="submitLock()">解鎖並加密</button>
   </div>
 </div>
 
@@ -866,7 +846,7 @@ var FULL_MSG={"米其林一星":"🏅 摘星成功","必比登":"🏅 必比登�
 
 var curDay=1, curCat="全部";
 var sharedTL=[], expenses=[], visited={}, activity=[], userPL=[], scores={pho:[],lantern:[],memory:[],fish:[]};
-var celeb={}, wxCache={}, dels={}, tripRev=0, ME_LOCKED=false, TRIP_PASS=null, lastSaveAt=0;
+var celeb={}, wxCache={}, dels={}, tripRev=0, ME_LOCKED=false, lastSaveAt=0, migratedEnc=false;
 var armed=null;
 
 function $(id){return document.getElementById(id)}
@@ -999,13 +979,6 @@ async function deriveTripKey(pass,salt){
   var km=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
   return crypto.subtle.deriveKey({name:"PBKDF2",salt:salt,iterations:120000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
 }
-async function encryptPayload(obj,pass){
-  var salt=crypto.getRandomValues(new Uint8Array(16));
-  var iv=crypto.getRandomValues(new Uint8Array(12));
-  var key=await deriveTripKey(pass,salt);
-  var ct=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,new TextEncoder().encode(JSON.stringify(obj)));
-  return {enc:1,v:1,salt:b64enc(salt),iv:b64enc(iv),ct:b64enc(ct),rev:obj.rev||0};
-}
 async function decryptPayload(env,pass){
   if(!env||env.enc!==1||!env.ct)throw new Error("not-enc");
   var key=await deriveTripKey(pass,b64dec(env.salt));
@@ -1013,18 +986,22 @@ async function decryptPayload(env,pass){
   return JSON.parse(new TextDecoder().decode(pt));
 }
 function isEncEnvelope(x){return !!(x&&typeof x==="object"&&x.enc===1&&x.ct)}
+async function tryDecryptLegacy(env){
+  var tries=[];
+  try{var old=await kvGet("trip-pass");if(old)tries.push(old)}catch(e){}
+  tries.push("20261007");
+  for(var i=0;i<tries.length;i++){
+    try{var d=await decryptPayload(env,tries[i]);migratedEnc=true;return d}catch(e){}
+  }
+  return null;
+}
 async function unwrapCloud(raw){
   if(raw==null)return null;
   if(isEncEnvelope(raw)){
-    if(!TRIP_PASS)return {__needpass:1};
-    try{return await decryptPayload(raw,TRIP_PASS)}
-    catch(e){return {__badpass:1}}
+    var d=await tryDecryptLegacy(raw);
+    return d||{};
   }
   return raw;
-}
-async function wrapCloud(obj){
-  if(!TRIP_PASS)return obj;
-  return encryptPayload(obj,TRIP_PASS);
 }
 async function cloudLoad(){
   if(!SB_URL)return null;
@@ -1039,11 +1016,10 @@ async function cloudLoad(){
 async function cloudSave(obj){
   if(!SB_URL)return false;
   try{
-    var body=await wrapCloud(obj);
     var r=await fetchTO(SB_URL+"/rest/v1/trip_store?on_conflict=id",{
       method:"POST",
       headers:Object.assign(sbHeaders(true),{"Prefer":"resolution=merge-duplicates,return=minimal"}),
-      body:JSON.stringify([{id:"main",data:body}])
+      body:JSON.stringify([{id:"main",data:obj}])
     },12000);
     if(!r.ok)lastErr="寫入失敗";
     return r.ok;
@@ -1069,20 +1045,18 @@ function applyLocalTrip(d){
 async function loadAll(){
   if(location.protocol==="file:")toast("請用 https 網址開啟，不要用檔案直接開");
   if(location.protocol==="http:"&&location.hostname!=="localhost"&&location.hostname!=="127.0.0.1")toast("請改用 HTTPS");
-  TRIP_PASS=await kvGet("trip-pass");
   ME_LOCKED=(await kvGet("me-locked"))==="1";
   var raw=await kvGet("trip-data",true);
   if(raw){
     try{
       var parsed=JSON.parse(raw);
       if(isEncEnvelope(parsed)){
-        if(TRIP_PASS){
-          try{applyLocalTrip(await decryptPayload(parsed,TRIP_PASS))}
-          catch(e){showLockPick(true);formErr("lock-err","本機密文與團密不符")}
-        }else showLockPick(true);
+        var d=await tryDecryptLegacy(parsed);
+        if(d)applyLocalTrip(d);
       }else applyLocalTrip(parsed);
     }catch(e){}
   }
+  try{localStorage.removeItem(lsk("trip-pass"))}catch(e){}
   ME=await kvGet("me");
   if(ME&&MEMBERS.indexOf(ME)<0)ME=null;
   var rr=await kvGet("rate");if(rr){var rv=parseFloat(rr);if(VN.rateInBand(rv))RATE=rv}
@@ -1090,15 +1064,12 @@ async function loadAll(){
   var td=tripDayToday(); if(td)curDay=td;
   if(location.hash)showTab(VN.safeTab(location.hash.slice(1)));
   $("syncline").textContent="本機模式 · "+now();
-  if(!TRIP_PASS)showLockPick(false);
   if(!ME)showIdPick();
   initTimeSelects();
   renderAll();
-  renderLockStatus();
   loadWx(false);
   loadLiveRate(false);
   (async function(){
-    if(!TRIP_PASS)return;
     await syncFromCloud();
     startPolling();
   })();
@@ -1109,8 +1080,6 @@ async function syncFromCloud(){
     showCloudFailBanner();
     return;
   }
-  if(cloud&&cloud.__needpass){showLockPick(true);return}
-  if(cloud&&cloud.__badpass){showLockPick(true);formErr("lock-err","團密不對，解不開雲端");return}
   if(cloud){
     var pre=snapshot();
     if(VN.ownKeys(cloud).length)mergeCloud(cloud);
@@ -1130,8 +1099,6 @@ function schedulePoll(immediate){
   var run=async function(){
     if(document.hidden){pollTimer=setTimeout(run,4000);return}
     var c=await cloudLoad();
-    if(c&&c.__needpass){showLockPick(true);return}
-    if(c&&c.__badpass){showLockPick(true);return}
     if(c){
       var pre=snapshot();
       if(VN.ownKeys(c).length)mergeCloud(c);
@@ -1157,11 +1124,7 @@ function pushAudit(op,id){
   auditLog=auditLog.slice(0,VN.LIMITS.audit);
 }
 async function persistLocal(payload){
-  var raw=payload;
-  if(TRIP_PASS){
-    try{raw=await encryptPayload(payload,TRIP_PASS)}catch(e){raw=payload}
-  }
-  await kvSet("trip-data",JSON.stringify(raw),true);
+  await kvSet("trip-data",JSON.stringify(payload),true);
 }
 var saveChain=Promise.resolve();
 async function saveShared(msg){
@@ -1173,13 +1136,11 @@ async function saveShared(msg){
   renderAll();
   bumpSync();
   if(!CLOUD_ID){$("syncline").textContent="本機模式 · "+now();return}
-  if(!TRIP_PASS){showLockPick(true);return}
 
   saveChain=saveChain.then(async function(){
     for(var attempt=0;attempt<3;attempt++){
       var c=await cloudLoad();
-      if(c&&c.__badpass){showLockPick(true);return}
-      if(c&&!c.__needpass&&VN.ownKeys(c).length)mergeCloud(c);
+      if(c&&VN.ownKeys(c).length)mergeCloud(c);
       var payload=localPayload();
       await persistLocal(payload);
       var ok=await cloudSave(payload);
@@ -1212,29 +1173,6 @@ function formErr(id,msg){
   var el=$(id); if(!el){if(msg)alert(msg);return}
   el.textContent=msg||"";
   el.classList.toggle("on",!!msg);
-}
-function showLockPick(bad){
-  var el=$("lockmask"); if(!el)return;
-  el.style.display="flex";
-  if(bad)formErr("lock-err","團密不對");
-  setTimeout(function(){var i=$("lock-in");if(i)i.focus()},40);
-}
-function renderLockStatus(){
-  var el=$("lock-status"); if(!el)return;
-  el.textContent=TRIP_PASS?"這台已解鎖，雲端以 AES-GCM 加密":"尚未解鎖 — 無法安全同步";
-}
-async function submitLock(){
-  formErr("lock-err","");
-  var p=($("lock-in")&&$("lock-in").value||"").trim();
-  if(p.length<6){formErr("lock-err","至少 6 個字");return}
-  TRIP_PASS=p;
-  await kvSet("trip-pass",p);
-  $("lockmask").style.display="none";
-  renderLockStatus();
-  await persistLocal(localPayload());
-  await syncFromCloud();
-  startPolling();
-  toast("團密已套用");
 }
 async function pickMe(m){
   if(MEMBERS.indexOf(m)<0)return;
@@ -2419,7 +2357,6 @@ async function runDiag(){
   }
   var c=await cloudLoad();
   if(c===null){box.textContent="同步失敗：讀不到雲端。";return}
-  if(c.__needpass||c.__badpass){box.textContent="雲端是密文，請先輸入正確團密。";return}
   summary.push(VN.ownKeys(c).length?"讀取成功，有資料":"讀取成功，目前是空的");
   summary.push("診斷為只讀，未寫入");
   box.textContent=summary.join(" · ");
@@ -2570,9 +2507,6 @@ document.addEventListener("click",function(e){
   else if(act==="pl-del")armDel(t,function(){delPlace(t.getAttribute("data-id"))});
   else if(act==="visit")toggleVisit(t.getAttribute("data-name"));
   else if(act==="set-cat")setCat(t.getAttribute("data-cat"));
-});
-document.addEventListener("keydown",function(e){
-  if(e.key==="Enter"&&e.target&&e.target.id==="lock-in"){e.preventDefault();submitLock()}
 });
 function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI();renderDays();renderTL();renderMap();renderWx();paintArmed();
   if(!$("exp-form").classList.contains("show"))renderExpForm();
