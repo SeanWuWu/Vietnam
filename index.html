@@ -356,9 +356,10 @@ main{padding:10px 16px 8px}
 .form{padding:12px;margin:6px 0}
 .form label{margin:6px 0 3px}
 .form input,.form select{padding:9px 10px;font-size:16px}
-.timesel{display:grid;grid-template-columns:minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr);align-items:center;gap:4px;width:100%}
+.timesel{display:flex;align-items:center;gap:6px;width:100%}
+.timepair{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
 .timesel select{
-  width:100%;min-width:0;height:44px;padding:0 22px 0 8px;
+  flex:1;width:100%;min-width:0;height:44px;padding:0 22px 0 8px;
   text-align:center;text-align-last:center;
   font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);
   -webkit-text-fill-color:var(--ink);background-color:var(--bg);
@@ -367,7 +368,8 @@ main{padding:10px 16px 8px}
   background-repeat:no-repeat;background-position:right 7px center;background-size:10px 7px;
 }
 .timesel select:focus{border-color:var(--accent);outline:none}
-.timesep{color:var(--ink2);font-weight:700;padding:0 1px}
+.timesep{flex:0 0 auto;color:var(--ink2);font-weight:700;font-size:18px;line-height:1;padding:0 2px}
+.timearrow{color:var(--accent);font-size:16px;padding:0 2px}
 .formhint{font-size:11px;color:var(--accent);letter-spacing:.06em;font-weight:700;margin-bottom:4px}
 .btn{padding:10px;margin-top:10px}
 .wxrow{display:none}
@@ -408,16 +410,9 @@ input,select,textarea{max-width:100%}
 .fxrow .out{flex:1 1 100%;min-width:0;text-align:left;padding:4px 2px 0;font-size:16px}
 .fxchips button{min-height:40px;padding:8px 12px;font-size:13px}
 .form .row{flex-direction:column;gap:0}
-.timesel{grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto;row-gap:8px}
-.timesel .timesep:nth-of-type(2),
-#f-endlab{grid-column:1 / -1;text-align:center;padding:0}
-#f-hh{grid-column:1;grid-row:1}
-.timesel span:first-of-type{grid-column:2;grid-row:1}
-#f-mm{grid-column:3;grid-row:1}
-#f-hh2{grid-column:1;grid-row:3}
-.timesel span:last-of-type{grid-column:2;grid-row:3}
-#f-mm2{grid-column:3;grid-row:3}
-#f-endlab{grid-row:2;color:var(--accent);font-size:12px;letter-spacing:.2em}
+.timesel{flex-wrap:wrap;row-gap:8px}
+.timepair{flex:1 1 100%}
+.timearrow{flex:1 1 100%;text-align:center;letter-spacing:.2em}
 .netgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .netcard{padding:8px 6px}
 .netcard .v{font-size:13px;word-break:break-word}
@@ -430,11 +425,21 @@ input,select,textarea{max-width:100%}
 .daytabs button{min-width:56px}
 .gamebar button{min-height:44px}
 .place .acts a,.place .acts button{min-height:44px}
+.cardrow{cursor:pointer}
+.cardzoom{position:fixed;inset:0;z-index:180;background:#fff;color:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:72px 22px 36px}
+.cardzoom[hidden]{display:none}
+.cardzoom-vn{font-size:clamp(64px,16vw,96px);font-weight:800;line-height:1.15;letter-spacing:.01em;word-break:break-word}
+.cardzoom-zh{margin-top:16px;font-size:22px;font-weight:650;color:#444}
+.cardzoom-say{margin-top:8px;font-size:16px;color:#777}
+.cardzoom-warn{margin-top:14px;max-width:18em;font-size:16px;font-weight:700;line-height:1.45;color:#B0432E}
+.cardzoom-warn[hidden]{display:none}
+.cardzoom-x{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;min-width:72px;min-height:44px;border:1px solid #ccc;background:#fff;border-radius:8px;font-size:16px}
+.cardzoom-sayb{margin-top:28px;min-height:52px;min-width:180px;border:none;border-radius:10px;background:#1a1a1a;color:#fff;font-size:18px}
 @media (min-width:400px){
   #card-list{grid-template-columns:repeat(2,1fr)}
-  .timesel{display:grid;grid-template-columns:minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr) auto minmax(52px,1fr);grid-template-rows:auto}
-  #f-hh,#f-mm,#f-hh2,#f-mm2,.timesel span{grid-column:auto;grid-row:auto}
-  #f-endlab{grid-column:auto;grid-row:auto;font-size:inherit;letter-spacing:inherit}
+  .timesel{flex-wrap:nowrap}
+  .timepair{flex:1 1 0}
+  .timearrow{flex:0 0 auto;letter-spacing:0}
 }
 </style>
 </head>
@@ -502,13 +507,17 @@ input,select,textarea{max-width:100%}
     <div class="formhint" id="f-dayhint">加入 Day 1</div>
     <label>時間</label>
     <div class="timesel">
-      <select id="f-hh" aria-label="開始時"></select>
-      <span class="timesep">:</span>
-      <select id="f-mm" aria-label="開始分"></select>
-      <span class="timesep" id="f-endlab">→</span>
-      <select id="f-hh2" aria-label="結束時"></select>
-      <span class="timesep">:</span>
-      <select id="f-mm2" aria-label="結束分"></select>
+      <div class="timepair">
+        <select id="f-hh" aria-label="開始時"></select>
+        <span class="timesep">:</span>
+        <select id="f-mm" aria-label="開始分"></select>
+      </div>
+      <span class="timesep timearrow" id="f-endlab">→</span>
+      <div class="timepair">
+        <select id="f-hh2" aria-label="結束時"></select>
+        <span class="timesep">:</span>
+        <select id="f-mm2" aria-label="結束分"></select>
+      </div>
     </div>
     <label>地點／事項</label>
     <input id="f-title" placeholder="例：午餐 Pho 10" enterkeyhint="next" autocomplete="off" autocapitalize="sentences">
@@ -728,6 +737,14 @@ input,select,textarea{max-width:100%}
 </div>
 
 <script src="vn-core.js" integrity="sha384-CBrdyTB7zOSoVgIr/KQh87HMNewPxatJ90nvq5PKJh5cZR8t9bht6HwDG8WzbomL"></script>
+<div id="cardzoom" class="cardzoom" hidden>
+  <button type="button" class="cardzoom-x" id="cardzoom-x">關閉</button>
+  <div class="cardzoom-vn" id="cardzoom-vn"></div>
+  <div class="cardzoom-zh" id="cardzoom-zh"></div>
+  <div class="cardzoom-say" id="cardzoom-say"></div>
+  <div class="cardzoom-warn" id="cardzoom-warn" hidden></div>
+  <button type="button" class="cardzoom-sayb" id="cardzoom-sayb">🔊 念給店員聽</button>
+</div>
 <script>
 var MEMBERS=["Sean","魚丸","姆斯","尼佛","陳皮","阿綸"];
 var RATE=780, ME=null, FX_VND2TWD=true;
@@ -1896,8 +1913,16 @@ function tlBaseRow(it,idx){
     '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
     (q?'<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
-    (ov?'<div class="meta"><button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button></div>':"")+
+    '<div class="meta">'+
+    (ov?'<button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button>':"")+
+    '<button class="delbtn" data-label="刪除" data-key="hb:'+curDay+'-'+idx+'" data-act="tl-hide" data-day="'+curDay+'" data-idx="'+idx+'">刪除</button></div>'+
     "</div>";
+}
+function hideKey(day,idx){return "h"+day+"-"+idx}
+function isHideMark(it){return /^h\d+-\d+$/.test((it&&it.id)||"")}
+function tlHiddenRow(it,idx){
+  return '<div class="card" style="opacity:.72"><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
+    '<div class="meta"><button class="delbtn" data-label="恢復" data-key="uh:'+curDay+'-'+idx+'" data-act="tl-unhide" data-day="'+curDay+'" data-idx="'+idx+'">恢復這筆</button></div></div>';
 }
 function tlMineRow(it){
   var q=tlMapQ(it,null)||it.q||it.title;
@@ -1912,18 +1937,25 @@ function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
 function renderTL(){
   var rows=[];
   (BASE_TL[curDay]||[]).forEach(function(it,idx){
+    if(sharedTL.some(function(x){return x.id===hideKey(curDay,idx)})){
+      rows.push({it:{time:it.time,title:it.title}, src:it, hide:1, idx:idx});
+      return;
+    }
     var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
     rows.push({it:ov||it, src:it, base:1, idx:idx});
   });
   sharedTL.forEach(function(it){
-    if(it.day===curDay && !isBaseOverride(it)) rows.push({it:it, base:0});
+    if(it.day===curDay && !isBaseOverride(it) && !isHideMark(it)) rows.push({it:it, base:0});
   });
   rows.forEach(function(r,i){r.n=i});
   rows.sort(function(a,b){
     var d=timeKey(a.it.time)-timeKey(b.it.time);
     return d?d:a.n-b.n;
   });
-  var h=rows.map(function(r){return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it)}).join("");
+  var h=rows.map(function(r){
+    if(r.hide)return tlHiddenRow(r.src,r.idx);
+    return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it);
+  }).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   paintArmed();
   var n=activity[0], dismissed=null;
@@ -1985,6 +2017,27 @@ function saveTimeline(){
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
 function addTimeline(){saveTimeline()}
+function hideBase(day,idx){
+  if(!requireMe())return;
+  var src=(BASE_TL[day]||[])[idx]; if(!src)return;
+  var ov=sharedTL.find(function(x){return x.id===baseKey(day,idx)});
+  if(ov&&!allowTl(ov))return;
+  var id=hideKey(day,idx);
+  if(!sharedTL.some(function(x){return x.id===id}))
+    sharedTL.push({id:id,day:day,time:"",title:src.title,note:"",who:ME,t:now(),upd:Date.now()});
+  saveShared("拿掉了「"+src.title+"」");
+}
+function unhideBase(day,idx){
+  if(!requireMe())return;
+  if(!confirm("要恢復這筆行程嗎？會同步到大家的手機。"))return;
+  var id=hideKey(day,idx);
+  var i=sharedTL.findIndex(function(x){return x.id===id}); if(i<0)return;
+  var t=sharedTL[i].title;
+  dels[id]=Date.now();
+  sharedTL.splice(i,1);
+  pushAudit("unhide-tl",id);
+  saveShared("恢復了「"+t+"」");
+}
 function delTL(id){
   if(!requireMe())return;
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
@@ -2174,9 +2227,18 @@ function tagHtml(p){
   return tagsOf(p).map(function(t){
     var cls=t==="米其林一星"?"cat mich":(t==="必比登"?"cat bib":"cat");
     return '<span class="'+cls+'">'+esc(t)+"</span>"}).join("")}
+function lastVisitAt(p){
+  var o=setNorm(visited[p.n]), best=0;
+  Object.keys(o).forEach(function(m){
+    if(o[m]&&o[m].v&&(o[m].t||0)>best)best=o[m].t;
+  });
+  return best;
+}
 function renderPl(){
-  var h="",list=allPlaces();
-  list.forEach(function(p,i){
+  var h="",list=allPlaces().map(function(p,i){return {p:p,i:i}});
+  list.sort(function(a,b){return (lastVisitAt(b.p)-lastVisitAt(a.p))||(a.i-b.i)});
+  list.forEach(function(row){
+    var p=row.p,i=row.i;
     if(curCat!=="全部"&&tagsOf(p).indexOf(curCat)<0)return;
     var v=setList(visited[p.n]);
     var full=v.length>=MEMBERS.length;
@@ -2489,11 +2551,11 @@ function memRender(){
 
 /* --- game 4: fishing --- */
 var F={},fishLoop=null;
-function fishLevel(){return 1+Math.floor(F.tick/400)}   // a level roughly every 12s
+function fishLevel(){return 1+Math.floor(F.tick/220)}   // harder: a level roughly every 6.6s
 function fishInit(){
   stopLoops();
   F={hx:150,hdir:1,hy:0,drop:false,items:[],score:0,over:false,tick:0,lvl:1};
-  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICF+'">下龍灣釣魚 <span style="font-size:11px;color:var(--ink2);font-weight:400">點擊放鉤釣魚，鉤到石頭就結束</span></div>'+
+  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICF+'">下龍灣釣魚 <span style="font-size:11px;color:var(--ink2);font-weight:400">鉤要準、石頭很多，鉤到就結束</span></div>'+
     '<div class="gamebar"><span class="stat" id="f-stat">得分 0</span><button onclick="fishInit()">重來</button></div>'+
     '<div class="playarea halong" id="f-area" onclick="fishDrop()"></div>'+
     '<button class="btn ghost" style="margin-top:10px" onclick="fishDrop()">放下釣鉤</button>';
@@ -2512,29 +2574,29 @@ function fishTick(){
   F.tick++;
   var lv=fishLevel();
   if(lv!==F.lvl){F.lvl=lv;toast("LEVEL "+lv+"・魚變快了")}
-  var sweep=2.6+(lv-1)*0.55;
+  var sweep=4.2+(lv-1)*0.85;
   if(!F.drop){F.hx+=F.hdir*sweep;if(F.hx>W-20||F.hx<10)F.hdir*=-1}
-  else{F.hy+=5+(lv-1)*0.6;
+  else{F.hy+=8+(lv-1)*1.1;
     for(var i=0;i<F.items.length;i++){var it=F.items[i];
-      if(Math.abs(it.x+12-F.hx)<20&&Math.abs(it.y-(F.hy+16))<18){
+      if(Math.abs(it.x+12-F.hx)<11&&Math.abs(it.y-(F.hy+16))<11){
         if(it.rock){F.over=true;clearInterval(fishLoop);fishLoop=null;
           $("f-stat").textContent="鉤到石頭 · LV "+fishLevel()+" · 最終得分 "+F.score;
           if(F.score>0)submitScore("fish",F.score);return}
-        F.score+=it.pts*fishLevel();
+        F.score+=it.pts+(lv-1)*8;
         if(it.el&&it.el.parentNode)it.el.parentNode.removeChild(it.el);
         F.items.splice(i,1);F.drop=false;F.hy=0;
         $("f-stat").textContent="得分 "+F.score+"｜LV "+fishLevel();break}}
     if(F.hy>H-30){F.drop=false;F.hy=0}}
-  var spawnEvery=Math.max(46-(lv-1)*6,16);
+  var spawnEvery=Math.max(28-(lv-1)*4,10);
   if(F.tick%spawnEvery===0){
-    var rock=Math.random()<Math.min(0.3+(lv-1)*0.05,0.55);
-    var small=Math.random()<Math.min(0.4+(lv-1)*0.05,0.7);
-    var spd=(1.4+Math.random()*1.8)+(lv-1)*0.5;
+    var rock=Math.random()<Math.min(0.62+(lv-1)*0.05,0.88);
+    var small=Math.random()<0.45;
+    var spd=(2.4+Math.random()*2.2)+(lv-1)*0.75;
     var it={x:-30,y:70+Math.random()*(H-130),sp:spd,rock:rock,
-      pts:rock?0:(small?150:100),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)};
+      pts:rock?0:(small?40:70),em:rock?SVG_ROCK:(small?SVG_FISHS:SVG_FISH)};
     it.el=document.createElement("img");
     it.el.src=it.em;
-    it.el.style.cssText="position:absolute;width:"+(it.rock?24:(it.pts===150?22:30))+"px";
+    it.el.style.cssText="position:absolute;width:"+(it.rock?24:(it.pts===40?22:30))+"px";
     a.appendChild(it.el);
     F.items.push(it);
   }
@@ -2692,14 +2754,29 @@ function pickVoice(){
   vnVoice=vs.filter(function(v){return /^vi/i.test(v.lang)})[0]||null;
   if($("cardpills"))renderCards();
 }
+function unlockLoud(){
+  try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}
+  try{
+    var Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx)return;
+    if(!window._actx)window._actx=new Ctx();
+    if(window._actx.state==="suspended")window._actx.resume();
+    var o=window._actx.createOscillator(), g=window._actx.createGain();
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(window._actx.destination);
+    o.start(); o.stop(window._actx.currentTime+0.04);
+  }catch(e){}
+}
 function sayVN(i){
   var card=CARDS[i]; if(!card)return;
-  if(!("speechSynthesis" in window)||(voicesReady&&!vnVoice)){toast("這台裝置沒有越南語語音，請看近似音");return}
+  if(!("speechSynthesis" in window)){toast("這台裝置沒有語音，請看放大的越南文");return}
+  unlockLoud();
+  if(voicesReady&&!vnVoice){toast("這台沒有越南語語音，請把放大的字給店員看");return}
   speechSynthesis.cancel();
   var u=new SpeechSynthesisUtterance(card.vn);
   u.lang="vi-VN";
   if(vnVoice)u.voice=vnVoice;
-  u.rate=0.8;                        // slow enough to copy out loud
+  u.rate=0.8;
   speechSynthesis.speak(u);
   var btn=document.querySelector('.cardrow[data-i="'+i+'"] .sayb');
   if(btn){btn.classList.add("playing");
@@ -2721,12 +2798,12 @@ function renderCards(){
     ? "這台裝置不支援語音，直接把越南文拿給對方看即可。"
     : (voicesReady&&!vnVoice
        ? "這台裝置沒有越南語語音，發音鈕可能不準——照「近似音」念，或直接給對方看。"
-       : "點 🔊 聽發音，念不出來就把卡片拿給對方看。");
+       : "點卡片可以放大給店員看。喇叭在靜音時也會盡量出聲。");
 
   var rows="";
   CARDS.forEach(function(card,i){
     if(card.c!==curCard)return;
-    rows+='<div class="cardrow" data-i="'+i+'">'+
+    rows+='<div class="cardrow" data-act="card-open" data-i="'+i+'">'+
       '<div class="cw">'+
         '<div class="top-row">'+
           '<div class="vn">'+esc(card.vn)+'</div>'+
@@ -2753,7 +2830,32 @@ document.addEventListener("click",function(e){
   else if(act==="pl-del")armDel(t,function(){delPlace(t.getAttribute("data-id"))});
   else if(act==="visit")toggleVisit(t.getAttribute("data-name"));
   else if(act==="set-cat")setCat(t.getAttribute("data-cat"));
+  else if(act==="tl-hide")armDel(t,function(){hideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"))});
+  else if(act==="tl-unhide")unhideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"));
+  else if(act==="card-open"){ if(e.target.closest&&e.target.closest(".sayb"))return; openCardZoom(+t.getAttribute("data-i")); }
 });
+var cardZoomI=-1;
+function openCardZoom(i){
+  var card=CARDS[i]; if(!card)return;
+  cardZoomI=i;
+  $("cardzoom-vn").textContent=card.vn;
+  $("cardzoom-zh").textContent=card.zh;
+  $("cardzoom-say").textContent="近似音："+card.say;
+  var warn=$("cardzoom-warn");
+  if(card.c==="髒話"){
+    warn.hidden=false;
+    warn.textContent="這是用來聽懂的粗話，不要對店員、司機或路人講。";
+    $("cardzoom-sayb").textContent="🔊 試聽（不要對人講）";
+  }else{
+    warn.hidden=true;
+    warn.textContent="";
+    $("cardzoom-sayb").textContent="🔊 念給店員聽";
+  }
+  $("cardzoom").hidden=false;
+}
+function closeCardZoom(){ $("cardzoom").hidden=true; cardZoomI=-1; }
+$("cardzoom-x").onclick=closeCardZoom;
+$("cardzoom-sayb").onclick=function(){ if(cardZoomI>=0)sayVN(cardZoomI); };
 function renderAll(){renderHeader();renderFxPill();renderRateLive();renderFxUI();renderDays();renderTL();renderMap();renderWx();paintArmed();
   if(!$("exp-form").classList.contains("show"))renderExpForm();
   renderExp();renderCats();renderPl();renderMe();renderKings();renderBests();renderChecklist();renderCards();if(curGame)renderRank()}
