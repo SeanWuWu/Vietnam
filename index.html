@@ -751,31 +751,33 @@ var SVG_FISHS=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20">
 var SVG_ROCK=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M4 14c-2-5 3-10 8-10s10 4 8 9c-1 3-14 4-16 1z" fill="#E3E0D8" stroke="#6B6258" stroke-width="1.2"/></svg>');
 var SVG_HOOK=svgu('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 26"><path d="M8 1v14c0 4 6 5 7 1" fill="none" stroke="#6B6258" stroke-width="1.6" stroke-linecap="round"/><path d="M13.2 18.5l1.8-2.2" stroke="#6B6258" stroke-width="1.4" stroke-linecap="round"/></svg>');
 function gm(q){return VN.mapsQueryUrl(q)}
+/* 航班地圖一律指河內內排機場，不要指到航空公司辦公室。 */
+var HAN_Q="Sân bay quốc tế Nội Bài, Sóc Sơn, Hà Nội";
 
 var BASE_TL={
- 1:[{time:"08:20→10:30",title:"CI791 華航｜Sean・魚丸",note:"桃園 T1 → 河內 T2。早班先落地，可先寄放行李、逛老城區（航廈以登機證為準）",flight:1,q:"Noi Bai International Airport"},
-    {time:"14:40→16:50",title:"JX717 星宇｜姆斯・尼佛・陳皮・阿綸",note:"桃園 T1 → 河內 T2（A321neo）",flight:1,q:"Noi Bai International Airport"},
-    {time:"接機",title:"包車 機場→飯店",note:"Klook 機場接送。兩組抵達差約6小時，接送分批或後到組自行 Grab。出發前向領隊確認車行、司機與車牌。"},
-    {time:"傍晚",title:"全員飯店會合",note:"晚餐 Option：The Rhythms Restaurant"},
-    {time:"入住",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonía Majesty Hotel and Spa Hanoi"}],
- 2:[{time:"07:00–19:30",title:"陸龍灣一日遊",note:"華閭・三谷/長安・舞洞，含晚餐（姆斯先墊 12,684NT）",q:"Trang An Ninh Binh"},
-    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"",q:"La Sinfonía Majesty Hotel and Spa Hanoi"}],
- 3:[{time:"上午",title:"河內市區逛逛",note:"",q:"Hoan Kiem Lake"},
-    {time:"11:30 午餐",title:"La Badiane 法式料理",note:"殖民老宅米其林推薦，午餐供應至13:30，建議訂位",q:"La Badiane Hanoi"},
+ 1:[{time:"08:20→10:30",title:"CI791 華航｜Sean・魚丸",note:"桃園 T1 → 河內內排 T2。早班先落地，可先寄放行李、逛老城區（航廈以登機證為準）",flight:1,q:HAN_Q},
+    {time:"14:40→16:50",title:"JX717 星宇｜姆斯・尼佛・陳皮・阿綸",note:"桃園 T1 → 河內內排 T2。地圖是機場，不是星宇辦公室",flight:1,q:HAN_Q},
+    {time:"接機",title:"包車 機場→飯店",note:"Klook 機場接送。兩組抵達差約6小時，接送分批或後到組自行 Grab。出發前向領隊確認車行、司機與車牌。",q:HAN_Q},
+    {time:"傍晚",title:"全員飯店會合",note:"晚餐 Option：The Rhythms Restaurant（飯店內）",q:"The Rhythms Restaurant, La Sinfonía Majesty, 1B P. Cầu Gỗ, Hoàn Kiếm, Hà Nội"},
+    {time:"入住",title:"La Sinfonía Majesty Hotel and Spa",note:"1B P. Cầu Gỗ，還劍湖旁",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"}],
+ 2:[{time:"07:00–19:30",title:"陸龍灣一日遊",note:"華閭・三谷/長安・舞洞，含晚餐（姆斯先墊 12,684NT）",q:"Khu du lịch Tràng An, Ninh Bình"},
+    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"1B P. Cầu Gỗ",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"}],
+ 3:[{time:"上午",title:"河內市區逛逛",note:"",q:"Hồ Hoàn Kiếm, Hoàn Kiếm, Hà Nội"},
+    {time:"11:30 午餐",title:"La Badiane 法式料理",note:"10 P. Nam Ngư。週日公休，午餐至13:30，建議訂位",q:"La Badiane, 10 P. Nam Ngư, Cửa Nam, Hoàn Kiếm, Hà Nội"},
     {time:"午後",title:"車程前往下龍灣",note:"約 2.5–3 小時，預計傍晚抵達"},
-    {time:"傍晚",title:"Vinpearl Resort & Spa Ha Long 入住",note:"",q:"Vinpearl Resort Spa Ha Long"},
-    {time:"晚餐",title:"Pavilion Restaurant",note:"島上西餐，已預訂・低消5000NT",q:"Pavilion Restaurant Bai Chay"}],
- 4:[{time:"11:00",title:"Tuan Chau 碼頭報到・登郵輪",note:"Elite of The Seas 兩天一夜（姆斯已訂）。行李寄放提醒見「更多」",q:"Tuan Chau International Marina"},
-    {time:"午後",title:"蘭哈灣巡航・皮划艇 / 泳池",note:"日落派對・8道菜晚餐"}],
- 5:[{time:"11:00",title:"郵輪下船",note:"巴士返河內，預計 15:30 抵達",q:"Tuan Chau International Marina"},
-    {time:"下午",title:"還劍湖・電瓶車遊三十六古街",note:"",q:"Hoan Kiem Lake"},
-    {time:"傍晚",title:"聖約瑟夫大教堂",note:"",q:"St Joseph Cathedral Hanoi"},
-    {time:"晚餐",title:"Tầm vị（米其林一星）",note:"傳統北越家常菜，營業至21:30，建議提前訂位",q:"Tam Vi Hanoi"},
-    {time:"晚上",title:"河內週末夜市散步",note:"週末封街，飯後步行可達",q:"Hanoi Weekend Night Market"},
-    {time:"入住",title:"May De Ville Lakeside Hotel",note:"43 Gia Ngu St，走還劍湖約2分鐘",q:"May De Ville Lakeside Hotel Hanoi"}],
- 6:[{time:"~08:15",title:"全員同車 Grab 到機場",note:"兩班起飛只差20分鐘，建議 08:15 前出發、同車前往",q:"Noi Bai International Airport"},
-    {time:"11:10起飛",title:"JX716 星宇｜姆斯・尼佛・陳皮・阿綸",note:"河內 T2 → 桃園 T1，15:00 抵",flight:1},
-    {time:"11:30起飛",title:"CI792 華航｜Sean・魚丸",note:"河內 T2 → 桃園 T1，15:20 抵",flight:1}]
+    {time:"傍晚",title:"Vinpearl Resort & Spa Ha Long 入住",note:"在 Rều 島，從白寨碼頭乘船，不是白寨街上的飯店",q:"Vinpearl Resort & Spa Ha Long, Đảo Rều, Bãi Cháy, Quảng Ninh"},
+    {time:"晚餐",title:"Pavilion Restaurant",note:"Rều 島上西餐，已預訂・低消5000NT。不是白寨街上的餐廳",q:"Pavilion Restaurant, Vinpearl Resort & Spa Ha Long, Đảo Rều, Quảng Ninh"}],
+ 4:[{time:"11:00",title:"Tuan Chau 碼頭報到・登郵輪",note:"Elite of The Seas 兩天一夜（姆斯已訂）。行李寄放提醒見「更多」",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
+    {time:"午後",title:"蘭哈灣巡航・皮划艇 / 泳池",note:"日落派對・8道菜晚餐",q:"Vịnh Lan Hạ, Cát Bà, Hải Phòng"}],
+ 5:[{time:"11:00",title:"郵輪下船",note:"巴士返河內，預計 15:30 抵達",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
+    {time:"下午",title:"還劍湖・電瓶車遊三十六古街",note:"",q:"Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội"},
+    {time:"傍晚",title:"聖約瑟夫大教堂",note:"40 Nhà Chung",q:"Nhà thờ Lớn Hà Nội, 40 Nhà Chung, Hoàn Kiếm, Hà Nội"},
+    {time:"晚餐",title:"Tầm vị（米其林一星）",note:"4B P. Yên Thế，傳統北越家常菜，營業至21:30，建議提前訂位",q:"Tầm Vị, 4B P. Yên Thế, Ba Đình, Hà Nội"},
+    {time:"晚上",title:"河內週末夜市散步",note:"週五到週日傍晚還劍湖步行街封街",q:"Phố đi bộ hồ Hoàn Kiếm, Hàng Đào, Hoàn Kiếm, Hà Nội"},
+    {time:"入住",title:"May De Ville Lakeside Hotel",note:"43 Gia Ngư，走還劍湖約2分鐘",q:"May De Ville Lakeside Hotel, 43 P. Gia Ngư, Hoàn Kiếm, Hà Nội"}],
+ 6:[{time:"~08:15",title:"全員同車 Grab 到機場",note:"兩班都從河內內排起飛，只差20分鐘。建議 08:15 前出發、同車前往",q:HAN_Q},
+    {time:"11:10起飛",title:"JX716 星宇｜姆斯・尼佛・陳皮・阿綸",note:"河內內排 T2 → 桃園 T1，15:00 抵。地圖是機場，不是星宇辦公室",flight:1,q:HAN_Q},
+    {time:"11:30起飛",title:"CI792 華航｜Sean・魚丸",note:"河內內排 T2 → 桃園 T1，15:20 抵",flight:1,q:HAN_Q}]
 };
 var DAY_INFO={
  1:{m:10,d:7,w:"三",dateStr:"10/7",fullDate:"10/7 (三)"},
@@ -798,28 +800,29 @@ var DAY_CITY={
  3:{n:"下龍灣",lat:20.95,lon:107.02},4:{n:"下龍灣",lat:20.95,lon:107.02},
  5:{n:"河內",lat:21.03,lon:105.85},6:{n:"河內",lat:21.03,lon:105.85}};
 var BASE_PL=[
- {n:"La Badiane",tags:["法餐","米其林推薦"],note:"殖民老宅法式料理，米其林推薦（週日公休，午餐至13:30）",pid:"ChIJ5TdcJJerNTERUplhitZYbdk",q:"La Badiane Hanoi"},
- {n:"Pavilion Restaurant",tags:["下龍灣"],note:"Vinpearl 島上西餐，Day3 晚餐已預訂・低消5000NT",pid:"ChIJjX5HYpNZSjER9gBJJyZutGM",q:"Pavilion Restaurant Bai Chay"},
- {n:"Nhà hàng Gia",tags:["米其林一星"],note:"文廟旁當代越南套餐，女主廚米其林一星，預約制（週日一公休）",pid:"ChIJd-kmys-rNTER_J9m_DM-oAY",q:"Gia Restaurant Hanoi"},
- {n:"Tầm vị",tags:["米其林一星"],note:"古宅裡的傳統北越家常菜，焦糖滷肉必點",pid:"ChIJq43P62mrNTERNsxL8Wjpvjs",q:"Tam Vi Hanoi"},
- {n:"KOKI - Hibana",tags:["米其林一星"],note:"Capella 飯店頂級鐵板燒（週日一公休）",pid:"ChIJy_ZMBPerNTERliJFmPbKHOU",q:"KOKI Capella Hanoi"},
- {n:"Pho 10 Ly Quoc Su",tags:["必比登","河粉"],note:"還劍郡本店，湯頭醇厚排隊名店",pid:"ChIJAQWxiJWrNTER69Gq01PMo_g",q:"Pho 10 Ly Quoc Su Hanoi"},
- {n:"Bun Cha Dac Kim",tags:["必比登","烤肉飯"],note:"Hàng Mành 老店烤肉米線，炭香份量足",pid:"ChIJF5qJQL6rNTER5PCg1SoKopo",q:"Bun Cha Dac Kim Hanoi"},
- {n:"Phở Gà Nguyệt",tags:["必比登","河粉"],note:"米其林推薦雞肉河粉，乾拌河粉是隱藏吃法",pid:"ChIJv54u7pWrNTERst-ohKAJY1I",q:"Pho Ga Nguyet Hanoi"},
- {n:"Phở Thìn Bờ Hồ",tags:["河粉"],note:"還劍湖畔老字號牛肉河粉",pid:"ChIJa_MwoOqrNTERc-PBXqsqJL4",q:"Pho Thin Bo Ho Hanoi"},
- {n:"Cafe Giảng",tags:["咖啡"],note:"蛋咖啡創始店（1946）",pid:"ChIJXTOF7sCrNTERY3MOxYpAo_w",q:"Cafe Giang Hanoi"},
- {n:"Eggyolk Coffee",tags:["咖啡"],note:"新派蛋咖啡，還劍湖景",pid:"ChIJTZtQ3amrNTERKNK_fZIACYQ",q:"Eggyolk Coffee Hanoi"},
- {n:"Hidden Gem Cafe",tags:["咖啡"],note:"回收材料打造的隱藏小店",pid:"ChIJjcSe2iKrNTERdmx-UM8RZIw",q:"Hidden Gem Cafe Hanoi"},
- {n:"Bun Cha Ta Hanoi",tags:["烤肉飯"],note:"歐巴馬同款烤肉米線",pid:"ChIJY89m6cCrNTERG-N0Fy4dWBw",q:"Bun Cha Ta Hanoi"},
- {n:"Maison Sen Buffet",tags:["自助"],note:"海鮮自助，適合聚餐（建議先訂位）",pid:"ChIJ2W3O_pKrNTERfLxHYcjWQv4",q:"Maison Sen Buffet Hanoi"},
- {n:"Bay Seafood Buffet Hồ Tây",tags:["自助"],note:"西湖海鮮自助，螃蟹吃到飽",pid:"ChIJ3_Z8HgCrNTER0Z8WQI0Ckks",q:"Bay Seafood Buffet Ho Tay Hanoi"},
- {n:"Loc Tai House – Chè Lộc Tài",tags:["甜品"],note:"在地越式甜湯老店",pid:"ChIJE0-hC76rNTERVbzlqYbfDG4",q:"Che Loc Tai Hanoi"},
- {n:"Artemis Pastry",tags:["甜品"],note:"法式甜點，下午茶選擇",pid:"ChIJxTYbIketNTERPLYCezRsmIE",q:"Artemis Pastry Hanoi"},
- {n:"OAK Wine Boutique",tags:["法餐"],note:"法式餐酒館，慶祝晚餐用",pid:"ChIJZQ5S716rNTERx4zxtjXFY0M",q:"OAK Wine Boutique Hanoi"},
- {n:"還劍湖",tags:["景點"],note:"河內心臟，清晨傍晚最美",q:"Hoan Kiem Lake"},
- {n:"聖約瑟夫大教堂",tags:["景點"],note:"河內版巴黎聖母院，晚上點燈",q:"St Joseph Cathedral Hanoi"},
- {n:"三十六古街",tags:["景點"],note:"Day5 電瓶車遊，週末封街",q:"Hanoi Old Quarter 36 streets"},
- {n:"河內週末夜市",tags:["景點"],note:"週五~日晚上，Day5 剛好遇到",q:"Hanoi Weekend Night Market"}
+ {n:"La Badiane",tags:["法餐","米其林推薦"],note:"10 P. Nam Ngư。殖民老宅法式料理（週日公休，午餐至13:30）",q:"La Badiane, 10 P. Nam Ngư, Cửa Nam, Hoàn Kiếm, Hà Nội"},
+ {n:"Pavilion Restaurant",tags:["下龍灣"],note:"在 Vinpearl 的 Rều 島上，不是白寨街上。Day3 晚餐已預訂・低消5000NT",q:"Pavilion Restaurant, Vinpearl Resort & Spa Ha Long, Đảo Rều, Quảng Ninh"},
+ {n:"Nhà hàng Gia",tags:["米其林一星"],note:"61 P. Văn Miếu，文廟對面。預約制（週日一公休）",q:"Nhà hàng Gia, 61 P. Văn Miếu, Đống Đa, Hà Nội"},
+ {n:"Tầm vị",tags:["米其林一星"],note:"4B P. Yên Thế。古宅裡的傳統北越家常菜，焦糖滷肉必點",q:"Tầm Vị, 4B P. Yên Thế, Ba Đình, Hà Nội"},
+ {n:"KOKI - Hibana",tags:["米其林一星"],note:"Capella Hanoi，11 P. Lê Phụng Hiểu。頂級鐵板燒（週日一公休）",q:"Hibana by Koki, Capella Hanoi, 11 P. Lê Phụng Hiểu, Hoàn Kiếm, Hà Nội"},
+ {n:"Pho 10 Ly Quoc Su",tags:["必比登","河粉"],note:"10 Lý Quốc Sư，還劍郡本店",q:"Phở 10 Lý Quốc Sư, 10 Lý Quốc Sư, Hoàn Kiếm, Hà Nội"},
+ {n:"Bun Cha Dac Kim",tags:["必比登","烤肉飯"],note:"1 Hàng Mành 老店烤肉米線",q:"Bún chả Đắc Kim, 1 Hàng Mành, Hoàn Kiếm, Hà Nội"},
+ {n:"Phở Gà Nguyệt",tags:["必比登","河粉"],note:"5B Phủ Doãn。雞肉河粉，乾拌是隱藏吃法",q:"Phở Gà Nguyệt, 5B Phủ Doãn, Hoàn Kiếm, Hà Nội"},
+ {n:"Phở Thìn Bờ Hồ",tags:["河粉"],note:"原在 ngõ 61 Đinh Tiên Hoàng。2026 還劍湖東岸工程可能已搬，出發前再確認",q:"Phở Thìn Bờ Hồ, Hoàn Kiếm, Hà Nội"},
+ {n:"Cafe Giảng",tags:["咖啡"],note:"蛋咖啡創始店。39 Nguyễn Hữu Huân，巷子裡",q:"Cafe Giảng, 39 Nguyễn Hữu Huân, Hoàn Kiếm, Hà Nội"},
+ {n:"Eggyolk Coffee",tags:["咖啡"],note:"新派蛋咖啡。還劍湖這間在 58 Ấu Triệu",q:"Eggyolk Coffee, 58 P. Ấu Triệu, Hoàn Kiếm, Hà Nội"},
+ {n:"Hidden Gem Cafe",tags:["咖啡"],note:"3B Hàng Tre 巷內，回收材料小店",q:"Hidden Gem Cafe, 3B Hàng Tre, Hoàn Kiếm, Hà Nội"},
+ {n:"Bun Cha Ta Hanoi",tags:["必比登","烤肉飯"],note:"21 Nguyễn Hữu Huân。必比登，不是歐巴馬那間",q:"Bún Chả Tả, 21 Nguyễn Hữu Huân, Hoàn Kiếm, Hà Nội"},
+ {n:"Bún chả Hương Liên",tags:["烤肉飯"],note:"歐巴馬與波登吃的那間。24 Lê Văn Hưu",q:"Bún chả Hương Liên, 24 Lê Văn Hưu, Hai Bà Trưng, Hà Nội"},
+ {n:"Maison Sen Buffet",tags:["自助"],note:"海鮮自助。老城區這間是 61 Trần Hưng Đạo，建議先訂位",q:"Maison Sen Buffet, 61 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội"},
+ {n:"Bay Seafood Buffet Hồ Tây",tags:["自助"],note:"海鮮自助連鎖。已確認的老城近點是 14 Tống Duy Tân；西湖分店請出發前再對一次",q:"Bay Seafood Buffet, 14 Tống Duy Tân, Hoàn Kiếm, Hà Nội"},
+ {n:"Loc Tai House – Chè Lộc Tài",tags:["甜品"],note:"76 Hàng Điếu，越式甜湯老店",q:"Chè Lộc Tài, 76 Hàng Điếu, Hoàn Kiếm, Hà Nội"},
+ {n:"Artemis Pastry",tags:["甜品"],note:"法式甜點。老城區這間是 20 Ngô Quyền",q:"Artemis Pastry, 20 Ngô Quyền, Hoàn Kiếm, Hà Nội"},
+ {n:"OAK Wine Boutique",tags:["法餐"],note:"法式餐酒館。用店名搜尋，沒有把握的門牌不硬填",q:"OAK Wine Boutique, Hoàn Kiếm, Hà Nội"},
+ {n:"還劍湖",tags:["景點"],note:"河內心臟，清晨傍晚最美",q:"Hồ Hoàn Kiếm, Hoàn Kiếm, Hà Nội"},
+ {n:"聖約瑟夫大教堂",tags:["景點"],note:"40 Nhà Chung。晚上點燈",q:"Nhà thờ Lớn Hà Nội, 40 Nhà Chung, Hoàn Kiếm, Hà Nội"},
+ {n:"三十六古街",tags:["景點"],note:"Day5 電瓶車遊",q:"Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội"},
+ {n:"河內週末夜市",tags:["景點"],note:"週五到週日傍晚，還劍湖步行街",q:"Phố đi bộ hồ Hoàn Kiếm, Hàng Đào, Hoàn Kiếm, Hà Nội"}
 ];
 var EXP_CATS=["美食","機票","住宿","景點/活動","交通","購物/伴手禮","網卡/雜支","其他"];
 var CAT_COLOR={"美食":"#B0432E","機票":"#3A6E96","住宿":"#C99A4B","景點/活動":"#4A7C63","交通":"#8E4B5E","購物/伴手禮":"#8A6A4B","網卡/雜支":"#6B6258","其他":"#B3AA9E"};
@@ -1107,6 +1110,91 @@ function applyLocalTrip(d){
   dels=d.del||{};checklist=d.chk||{};celeb=d.celeb||{};scores=d.sc;auditLog=d.audit||[];
   tripRev=d.rev||0;
 }
+/* 每天開一次：向公開航路庫核對四班是否仍是桃園↔內排。
+   只有回應裡真的帶了不同的起飛／抵達時刻，才寫進行程。查不到就不改時間。 */
+var FLIGHTS=[
+  {day:1,idx:0,iata:"CI791",icao:"CAL791",from:"TPE",to:"HAN",arr:"10:30"},
+  {day:1,idx:1,iata:"JX717",icao:"SJX717",from:"TPE",to:"HAN",arr:"16:50"},
+  {day:6,idx:1,iata:"JX716",icao:"SJX716",from:"HAN",to:"TPE",arr:"15:00"},
+  {day:6,idx:2,iata:"CI792",icao:"CAL792",from:"HAN",to:"TPE",arr:"15:20"}
+];
+function localDayKey(){
+  var d=new Date();
+  return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+}
+function digClock(obj){
+  if(!obj||typeof obj!=="object")return "";
+  var keys=["dep","arr","departure","arrival","scheduled_departure","scheduled_arrival","time","scheduled"];
+  for(var i=0;i<keys.length;i++){
+    var v=obj[keys[i]];
+    if(typeof v==="string"){
+      var m=v.match(/(\d{1,2}):(\d{2})/);
+      if(m)return pad2(+m[1])+":"+m[2];
+    }
+  }
+  return "";
+}
+function flightRow(f){
+  var it=sharedTL.find(function(x){return x.id===baseKey(f.day,f.idx)});
+  return it||(BASE_TL[f.day]&&BASE_TL[f.day][f.idx])||{};
+}
+function clocksDiffer(f,dep,arr){
+  var clocks=String(flightRow(f).time||"").match(/\d{1,2}:\d{2}/g)||[];
+  if(!clocks.length||clocks[0]!==dep)return true;
+  if(clocks[1])return clocks[1]!==arr;
+  return !!(f.arr&&f.arr!==arr);
+}
+function applyFlightClocks(f,dep,arr){
+  var src=BASE_TL[f.day]&&BASE_TL[f.day][f.idx];
+  if(!src)return false;
+  var time=dep+"→"+arr;
+  var id=baseKey(f.day,f.idx);
+  var it=sharedTL.find(function(x){return x.id===id});
+  if(it){
+    if(it.time===time)return false;
+    it.time=time;it.q=HAN_Q;it.flight=1;it.upd=Date.now();
+  }else{
+    sharedTL.push({id:id,day:f.day,time:time,title:src.title,note:src.note,q:HAN_Q,flight:1,who:"航班",t:now(),upd:Date.now()});
+  }
+  src.time=time;src.q=HAN_Q;
+  return true;
+}
+async function checkFlightsDaily(){
+  try{
+    var key=localDayKey();
+    if((await kvGet("flight-day"))===key)return;
+    var changed=[],bad=[],ok=0;
+    for(var i=0;i<FLIGHTS.length;i++){
+      var f=FLIGHTS[i];
+      try{
+        var r=await fetchTO("https://api.adsbdb.com/v0/callsign/"+f.icao,{},9000);
+        if(!r.ok)continue;
+        var j=await r.json();
+        var fr=j&&j.response&&j.response.flightroute;
+        if(!fr||!fr.origin)continue;
+        ok++;
+        var o=fr.origin.iata_code, dest=fr.destination&&fr.destination.iata_code;
+        if(o!==f.from||dest!==f.to){bad.push(f.iata);continue}
+        var dep=digClock(fr)||digClock(fr.origin);
+        var arr=digClock(fr.destination)||digClock(fr);
+        if(dep&&arr&&dep!==arr&&clocksDiffer(f,dep,arr)){
+          if(applyFlightClocks(f,dep,arr))changed.push(f.iata+" "+dep+"→"+arr);
+        }
+      }catch(e){}
+    }
+    var msg=!ok?"航班核對：今天查不到，沿用行程時刻"
+      :(changed.length?("航班已改："+changed.join("、"))
+      :(bad.length?("航班核對："+bad.join("、")+"航線有變，時刻先不改")
+      :"航班核對：四班仍是內排，時刻沒變"));
+    toast(msg);
+    if(!ME)return;
+    await kvSet("flight-day",key);
+    var start=new Date();start.setHours(0,0,0,0);
+    if(auditLog.some(function(a){return a.op==="flight"&&a.t>=start.getTime()}))return;
+    pushAudit("flight",key);
+    saveShared(VN.clipStr(msg,VN.LIMITS.msg));
+  }catch(e){}
+}
 async function loadAll(){
   if(location.protocol==="file:")toast("請用 https 網址開啟，不要用檔案直接開");
   if(location.protocol==="http:"&&location.hostname!=="localhost"&&location.hostname!=="127.0.0.1")toast("請改用 HTTPS");
@@ -1138,6 +1226,7 @@ async function loadAll(){
     await syncFromCloud();
     if(migratedEnc)await saveShared(null);
     startPolling();
+    checkFlightsDaily();
   })();
 }
 async function syncFromCloud(){
@@ -1437,6 +1526,14 @@ async function loadLiveRate(force){
 function canMutate(row){
   if(!requireMe())return false;
   if(row&&row.who&&row.who!==ME){toast("只能改自己新增的項目");return false}
+  return true;
+}
+/* 行程可以改別人的，但先講清楚會影響大家。帳目和美食名單仍只能改自己的。 */
+function allowTl(row){
+  if(!requireMe())return false;
+  if(row&&row.who&&row.who!==ME){
+    return confirm("這是「"+row.who+"」的行程。改了會影響大家看到的行程，仍要繼續？");
+  }
   return true;
 }
 function armDel(btn,fn){
@@ -1760,6 +1857,7 @@ function openTlForm(kind,a,b){
     var ov=sharedTL.find(function(x){return x.id===baseKey(a,b)});
     var it=ov||src;
     tlEditing={kind:"base",day:a,idx:b};
+    if(ov&&ov.who&&ov.who!==ME)toast("這是「"+ov.who+"」改過的行程，再存會影響大家");
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
     tlOrigTime=it.time||"";
@@ -1767,7 +1865,8 @@ function openTlForm(kind,a,b){
   }else{
     var it=sharedTL.find(function(x){return x.id===a});
     if(!it)return;
-    if(!canMutate(it))return;
+    if(!requireMe())return;
+    if(it.who&&it.who!==ME)toast("這是「"+it.who+"」的行程，存檔會改到大家的行程");
     tlEditing={kind:"user",id:a};
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
@@ -1783,22 +1882,30 @@ function tlPen(kind,a,b){
   var ds=kind==="base"?('data-act="tl-edit-base" data-day="'+a+'" data-idx="'+b+'"'):('data-act="tl-edit-user" data-id="'+esc(a)+'"');
   return '<button class="penbtn" '+ds+' aria-label="修改行程"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.8 6.4l4.8 4.8" stroke="#C99A4B" stroke-width="1.4"/></svg></button>';
 }
+function tlMapQ(row, base){
+  if((row&&row.flight)||(base&&base.flight))return HAN_Q;
+  var title=((row&&row.title)||"")+" "+((base&&base.title)||"");
+  if(/\b(JX|CI)\d{3}\b/.test(title))return HAN_Q;
+  return (row&&row.q)||(base&&base.q)||"";
+}
 function tlBaseRow(it,idx){
   var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
   var row=ov||it;
+  var q=tlMapQ(row,it);
   return '<div class="card'+(row.flight||it.flight?" flight":"")+'">'+tlPen("base",curDay,idx)+
     '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
-    (row.q||it.q?'<a class="maplink" href="'+gm(row.q||it.q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
+    (q?'<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
     (ov?'<div class="meta"><button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button></div>':"")+
     "</div>";
 }
 function tlMineRow(it){
+  var q=tlMapQ(it,null)||it.q||it.title;
   return '<div class="card" style="border-color:var(--gold)">'+tlPen("user",it.id)+
     '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    '<a class="maplink" href="'+gm(it.q||it.title)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
-    '<div class="meta">'+(it.who&&it.who!==ME?"":'<button class="delbtn" data-label="刪除" data-key="tl:'+esc(it.id)+'" data-act="tl-del" data-id="'+esc(it.id)+'">刪除</button>')+
+    '<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
+    '<div class="meta"><button class="delbtn" data-label="刪除" data-key="tl:'+esc(it.id)+'" data-act="tl-del" data-id="'+esc(it.id)+'">刪除</button>'+
     '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
 }
 function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
@@ -1848,7 +1955,7 @@ function saveTimeline(){
   if(tlEditing&&tlEditing.kind==="user"){
     var it=sharedTL.find(function(x){return x.id===tlEditing.id});
     if(!it)return;
-    if(!canMutate(it))return;
+    if(!allowTl(it))return;
     it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();
     toggleForm("tl-form",false);
     $("f-title").value="";$("f-note").value="";
@@ -1860,7 +1967,7 @@ function saveTimeline(){
     var src=(BASE_TL[tlEditing.day]||[])[tlEditing.idx]||{};
     var it=sharedTL.find(function(x){return x.id===id});
     var day=tlEditing.day;
-    if(it && !canMutate(it))return;
+    if(it && !allowTl(it))return;
     if(it){
       it.time=time;it.title=t;it.note=note;it.upd=Date.now();it.who=ME;it.t=now();it.day=day;
     }else{
@@ -1881,14 +1988,14 @@ function addTimeline(){saveTimeline()}
 function delTL(id){
   if(!requireMe())return;
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
-  if(!canMutate(sharedTL[i]))return;
+  if(!allowTl(sharedTL[i]))return;
   dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("del-tl",id);saveShared("刪除了「"+t+"」")}
 function restoreBase(day,idx){
   if(!requireMe())return;
   var id=baseKey(day,idx);
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
-  if(!canMutate(sharedTL[i]))return;
+  if(!allowTl(sharedTL[i]))return;
   dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("rst-tl",id);saveShared("恢復了「"+t+"」原行程")}
 
@@ -2047,7 +2154,7 @@ function ensureCatValid(){
   if(!live)curCat="全部";
 }
 function placeLink(p){
-  return p.pid?VN.placeIdUrl(p.pid):gm(p.q||p.n)}
+  return gm(p.q||p.n)}
 function stampRow(p){
   var v=setList(visited[p.n]);
   var full=v.length>=MEMBERS.length;
@@ -2144,11 +2251,15 @@ function renderKings(){
 /* ================= GAMES ================= */
 var curGame=null, gTimer=null;
 var GAME_META={pho:{n:"河粉掃雷"},lantern:{n:"燈籠疊疊樂"},memory:{n:"河粉記憶翻牌"},fish:{n:"下龍灣釣魚"}};
-function openGame(g){curGame=g;$("g-menu").style.display="none";$("g-view").style.display="block";
+function openGame(g){
+  if(curGame==="memory"&&g!=="memory")memFlush();
+  curGame=g;$("g-menu").style.display="none";$("g-view").style.display="block";
   // entering from the menu always starts the ladder at level 1
   if(g==="pho")phoInit(1);else if(g==="lantern")lanInit();else if(g==="memory")memInit(1);else fishInit();
   renderRank();}
-function closeGame(){stopLoops();curGame=null;$("g-view").style.display="none";$("g-menu").style.display="block";renderBests()}
+function closeGame(){
+  if(curGame==="memory")memFlush();
+  stopLoops();curGame=null;$("g-view").style.display="none";$("g-menu").style.display="block";renderBests()}
 function stopLoops(){clearInterval(gTimer);gTimer=null;clearInterval(lanMov);lanMov=null;clearInterval(fishLoop);fishLoop=null}
 function stopVeh(){if(vehRaf){cancelAnimationFrame(vehRaf);vehRaf=null}}
 function submitScore(g,sc){
@@ -2180,7 +2291,7 @@ function renderBests(){
 
 /* --- game 1: pho minesweeper --- */
 var P={}, phoLevel=1;
-function phoMines(){return Math.min(8+phoLevel*2,26)}          // 10, 12, 14 ... capped
+function phoMines(){return Math.min(20+phoLevel*2,34)}       // LV1 = 22, still leaves a first-click safe cell
 function phoLimit(){return Math.max(120-(phoLevel-1)*12,40)}   // shrinking clock
 function phoInit(reset){
   stopLoops();
@@ -2254,8 +2365,8 @@ function phoStat(){
 var L={},lanMov=null;
 function lanInit(){
   stopLoops();
-  L={x:0.18,dir:1,speed:0.012,stack:[0.42],playing:true,score:0};
-  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICL+'">燈籠疊疊樂 <span style="font-size:11px;color:var(--ink2);font-weight:400">對準下方燈籠時放下，疊越高分越高</span></div>'+
+  L={x:0.18,dir:1,speed:0.012,stack:[0.42],playing:true,score:0,aim:0,aimN:0};
+  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICL+'">燈籠疊疊樂 <span style="font-size:11px;color:var(--ink2);font-weight:400">對準準心放下。高度與準心都算分</span></div>'+
     '<div class="gamebar"><span class="stat" id="l-stat">高度 0</span><button onclick="lanInit()">重來</button></div>'+
     '<div class="playarea hanoi" id="l-area" onclick="lanDrop()"></div>'+
     '<button class="btn ghost" style="margin-top:10px" onclick="lanDrop()">放下燈籠</button>';
@@ -2269,21 +2380,30 @@ function lanTick(){
   lanRender();
 }
 function lanWindow(){return Math.max(26-L.score*1.5,9)}  // the target narrows fast
+function lanAimPct(){return L.aimN?Math.round(100*L.aim/L.aimN):0}
+function lanScore(){
+  /* height still matters; aim is the average closeness of drops that landed, 0–1 */
+  var aim=L.aimN?L.aim/L.aimN:0;
+  return Math.round(L.score*100+L.score*L.score*20+aim*L.score*80);
+}
 function lanDrop(){
   if(!L.playing)return;
   var top=L.stack[L.stack.length-1];
   var w=$("l-area")?$("l-area").clientWidth:300;
-  if(Math.abs(L.x-top)*w>lanWindow()){
+  var err=Math.abs(L.x-top)*w;
+  var win=lanWindow();
+  if(err>win){
     L.playing=false;clearInterval(lanMov);lanMov=null;
-    $("l-stat").textContent="沒接住 · 最終高度 "+L.score;
-    // quadratic-ish payoff, so a tall stack is worth chasing
-    if(L.score>0)submitScore("lantern",L.score*100+L.score*L.score*20);
+    var sc=lanScore();
+    $("l-stat").textContent="沒接住 · 高度 "+L.score+" · 準心 "+lanAimPct()+"% · 得分 "+sc;
+    if(L.score>0)submitScore("lantern",sc);
     lanRender();return;
   }
+  L.aim+=1-err/win;L.aimN++;
   L.stack.push(L.x);L.score++;
   L.speed+=0.002;
   if(L.score%5===0)toast("LEVEL "+(L.score/5+1)+"・準心變窄了");
-  $("l-stat").textContent="高度 "+L.score+"｜準心 "+Math.round(lanWindow())+"px";
+  $("l-stat").textContent="高度 "+L.score+"｜這次準心 "+Math.round(100*(1-err/win))+"%｜平均 "+lanAimPct()+"%";
   lanRender();
 }
 function lanRender(){
@@ -2295,22 +2415,33 @@ function lanRender(){
     h+='<img src="'+ICL+'" style="position:absolute;left:'+(x*(W-26))+'px;top:'+y+'px;width:26px;height:30px;object-fit:contain">'});
   if(L.playing){
     var my=H-34-(Math.min(L.stack.length,7)*30);
+    var tx=L.stack[L.stack.length-1];
+    var win=lanWindow();
+    var cx=tx*(W-26)+13;
+    var ty=H-34-((Math.min(L.stack.length,7)-1)*30);
+    h+='<div style="position:absolute;left:'+(cx-win)+'px;width:'+(win*2)+'px;top:'+(ty+27)+'px;height:3px;background:#C99A4B;border-radius:2px"></div>';
     h+='<img src="'+ICL+'" style="position:absolute;left:'+(L.x*(W-26))+'px;top:'+my+'px;width:26px;height:30px;object-fit:contain">';
   }
   a.innerHTML=h;
 }
 
 /* --- game 3: memory --- */
-var M={}, memLevel=1;
+var M={}, memLevel=1, memBank=0, memPosted=false;
 function memLimit(){return Math.max(75-(memLevel-1)*8,30)}  // seconds, tightening
 function memPeek(){return Math.max(700-(memLevel-1)*120,220)}  // flip-back delay
+function memFlush(){
+  if(memPosted||memBank<=0)return;
+  if(!ME){showIdPick();return}
+  memPosted=true;
+  submitScore("memory",memBank);
+}
 function memInit(reset){
   stopLoops();
-  if(reset)memLevel=1;
+  if(reset){memFlush();memLevel=1;memBank=0;memPosted=false}
   var em=[0,1,2,3,4,5,6,7];
   var deck=VN.shuffle(em.concat(em));
   M={deck:deck,flip:[],got:{},moves:0,sec:0,done:false,dead:false};
-  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">LV '+memLevel+'・限時 '+memLimit()+'s・記憶時間 '+memPeek()+'ms</span></div>'+
+  $("g-body").innerHTML='<div class="t"><img class="gtico" src="'+ICC+'">河粉記憶翻牌 <span style="font-size:11px;color:var(--ink2);font-weight:400">LV '+memLevel+'・累計 '+memBank+'・這局結束才記一次</span></div>'+
     '<div class="gamebar"><span class="stat" id="m-stat">步數 0｜⏱ 0/'+memLimit()+'s</span><button onclick="memInit(1)">重來</button></div>'+
     '<div class="mem-grid" id="m-grid"></div>';
   memRender();
@@ -2320,9 +2451,11 @@ function memTap(i){
   if(!gTimer)gTimer=setInterval(function(){
     if(M.done||M.dead)return;
     M.sec++;
-    if(M.sec>=memLimit()){                    // out of time: back to level 1
-      M.dead=true;memLevel=1;clearInterval(gTimer);gTimer=null;
-      $("m-stat").textContent="時間到 — LV 歸 1，按重來";return}
+    if(M.sec>=memLimit()){
+      M.dead=true;clearInterval(gTimer);gTimer=null;
+      var finalSc=memBank;
+      memFlush();memLevel=1;
+      $("m-stat").textContent=finalSc?("時間到 · 最終得分 "+finalSc):"時間到 — 這局還沒過關，不記分";return}
     $("m-stat").textContent="步數 "+M.moves+"｜⏱ "+M.sec+"/"+memLimit()+"s｜LV "+memLevel},1000);
   M.flip.push(i);memRender();
   if(M.flip.length===2){
@@ -2333,10 +2466,10 @@ function memTap(i){
       if(Object.keys(M.got).length===16){
         M.done=true;clearInterval(gTimer);gTimer=null;
         var sc=Math.max(1200-M.sec*8-M.moves*10,100)*memLevel;
-        $("m-stat").textContent="完成 · LV "+memLevel+" · 得分 "+sc;
-        submitScore("memory",sc);
+        memBank+=sc;
+        $("m-stat").textContent="過關 · 本關 "+sc+" · 累計 "+memBank+"（這局結束才上榜）";
         memLevel++;
-        toast("過關！下一關限時 "+memLimit()+"s");
+        toast("過關！分數先累計，這局結束才記一次");
         setTimeout(function(){if(curGame==="memory")memInit()},1500);
       }
     }else{
@@ -2438,7 +2571,7 @@ async function runDiag(){
 
 /* ================= 越南小卡 · PHRASEBOOK ================= */
 /* vn: 越南文（河內北部腔） zh: 中文 say: 拼給台灣人念的近似音 */
-var CARD_CATS=["問候","點餐","購物殺價","交通","住宿","急難","數字"];
+var CARD_CATS=["問候","點餐","購物殺價","交通","住宿","急難","數字","髒話"];
 var CARDS=[
  {c:"問候",vn:"Xin chào",zh:"你好",say:"辛 早"},
  {c:"問候",vn:"Cảm ơn",zh:"謝謝",say:"感 恩"},
@@ -2508,7 +2641,43 @@ var CARDS=[
  {c:"數字",vn:"Một trăm",zh:"100",say:"莫 沾"},
  {c:"數字",vn:"Một nghìn",zh:"1,000（1k）",say:"莫 引"},
  {c:"數字",vn:"Mười nghìn",zh:"10,000（10k）",say:"妹 引"},
- {c:"數字",vn:"Một trăm nghìn",zh:"100,000（100k）",say:"莫 沾 引"}
+ {c:"數字",vn:"Một trăm nghìn",zh:"100,000（100k）",say:"莫 沾 引"},
+
+ {c:"問候",vn:"Bạn khỏe không?",zh:"你好嗎？",say:"辦 虧 空"},
+ {c:"問候",vn:"Không sao",zh:"沒關係",say:"空 燒"},
+ {c:"問候",vn:"Làm ơn",zh:"拜託／請",say:"藍 恩"},
+ {c:"問候",vn:"Từ từ thôi",zh:"慢慢來",say:"子 子 拖伊"},
+ {c:"點餐",vn:"Cho tôi một bát phở bò",zh:"一碗牛肉河粉",say:"左 多伊 莫 拔 佛 波"},
+ {c:"點餐",vn:"Cho tôi nước lọc",zh:"請給我一瓶水",say:"左 多伊 呢 落"},
+ {c:"點餐",vn:"Ít đường",zh:"少糖",say:"一 當"},
+ {c:"點餐",vn:"Mang về",zh:"外帶",say:"忙 未"},
+ {c:"點餐",vn:"Còn chỗ không?",zh:"還有位子嗎？",say:"共 左 空"},
+ {c:"點餐",vn:"Có wifi không?",zh:"有 Wi-Fi 嗎？",say:"過 wifi 空"},
+ {c:"點餐",vn:"Cho tôi hóa đơn",zh:"請給收據",say:"左 多伊 化 敦"},
+ {c:"購物殺價",vn:"Quẹt thẻ được không?",zh:"可以刷卡嗎？",say:"快 忒 得 空"},
+ {c:"購物殺價",vn:"Chỉ nhận tiền mặt à?",zh:"只收現金嗎？",say:"幾 染 店 麼 啊"},
+ {c:"購物殺價",vn:"Không cần túi",zh:"不用袋子",say:"空 根 堆"},
+ {c:"交通",vn:"Mất bao lâu?",zh:"要多久？",say:"麼 包 樓"},
+ {c:"交通",vn:"Đừng đi đường vòng",zh:"不要繞路",say:"用 低 當 翁"},
+ {c:"交通",vn:"Rẽ trái / rẽ phải",zh:"左轉／右轉",say:"熱 摘／熱 法"},
+ {c:"交通",vn:"Tôi bị lạc",zh:"我迷路了",say:"多伊 逼 樂"},
+ {c:"交通",vn:"Đưa tôi đến sân bay Nội Bài",zh:"載我去內排機場",say:"肚 多伊 頂 孫 掰 內 掰"},
+ {c:"住宿",vn:"Máy lạnh không chạy",zh:"冷氣不涼／沒在運轉",say:"買 冷 空 摘"},
+ {c:"住宿",vn:"Cho tôi thêm khăn",zh:"再給我毛巾",say:"左 多伊 添 勘"},
+ {c:"住宿",vn:"Mấy giờ ăn sáng?",zh:"早餐幾點？",say:"美 這 安 桑"},
+ {c:"急難",vn:"Nhà thuốc ở đâu?",zh:"藥局在哪？",say:"那 拓 兒 都"},
+ {c:"急難",vn:"Tôi bị đau bụng",zh:"我肚子痛",say:"多伊 逼 倒 崩"},
+ {c:"急難",vn:"Tôi bị mất ví",zh:"我錢包掉了",say:"多伊 逼 麼 維"},
+ {c:"急難",vn:"Gần đây có cây ATM không?",zh:"附近有提款機嗎？",say:"跟 這 過 該 ATM 空"},
+
+ {c:"髒話",vn:"Vãi",zh:"靠／哇靠。很常聽到的驚呼，自己少講",say:"外"},
+ {c:"髒話",vn:"Vãi cả",zh:"誇張到爆。口頭粗話，聽到就好",say:"外 嘎"},
+ {c:"髒話",vn:"Chết tiệt",zh:"該死。發牢騷用，不要對人吼",say:"切 鐵"},
+ {c:"髒話",vn:"Cút đi",zh:"滾開。這是趕人，不要對店員或路人說",say:"骨 低"},
+ {c:"髒話",vn:"Đồ khốn",zh:"混帳。罵人的，不要對人說",say:"都 困"},
+ {c:"髒話",vn:"Khốn nạn",zh:"混蛋。罵人的，不要對人說",say:"困 難"},
+ {c:"髒話",vn:"Địt mẹ",zh:"很重的髒話。只用來聽懂別人在爆氣，絕對不要對人講",say:"地 妹"},
+ {c:"髒話",vn:"Đụ má",zh:"跟上一句同一級（南部更常聽到）。不要對人講",say:"杜 馬"}
 ];
 var curCard="問候";
 var vnVoice=null, voicesReady=false;
@@ -2545,6 +2714,9 @@ function renderCards(){
   $("cardpills").innerHTML=h;
 
   var hasTTS=("speechSynthesis" in window);
+  if(curCard==="髒話"){
+    $("cardnote").textContent="這些是路上會聽到的粗話，用來聽懂就好。不要對著店員、司機或路人講。";
+  }else
   $("cardnote").textContent = !hasTTS
     ? "這台裝置不支援語音，直接把越南文拿給對方看即可。"
     : (voicesReady&&!vnVoice
