@@ -1127,8 +1127,8 @@ function applyLocalTrip(d){
   dels=d.del||{};checklist=d.chk||{};celeb=d.celeb||{};scores=d.sc;auditLog=d.audit||[];
   tripRev=d.rev||0;
 }
-/* 每天開一次：向公開航路庫核對四班是否仍是桃園↔內排。
-   只有回應裡真的帶了不同的起飛／抵達時刻，才寫進行程。查不到就不改時間。 */
+/* 每天第一位上線的人在背景核對四班。不顯示、不寫進更新列。
+   只有回應裡真的帶了不同的起飛／抵達時刻，才改行程。查不到就不改時間，下次再試。 */
 var FLIGHTS=[
   {day:1,idx:0,iata:"CI791",icao:"CAL791",from:"TPE",to:"HAN",arr:"10:30"},
   {day:1,idx:1,iata:"JX717",icao:"SJX717",from:"TPE",to:"HAN",arr:"16:50"},
@@ -1176,10 +1176,19 @@ function applyFlightClocks(f,dep,arr){
   src.time=time;src.q=HAN_Q;
   return true;
 }
+var flightChecking=false;
+function flightCheckedToday(){
+  var start=new Date();start.setHours(0,0,0,0);
+  return auditLog.some(function(a){return a.op==="flight"&&a.t>=start.getTime()});
+}
 async function checkFlightsDaily(){
+  if(!ME||flightChecking)return;
   try{
     var key=localDayKey();
     if((await kvGet("flight-day"))===key)return;
+    var start=new Date();start.setHours(0,0,0,0);
+    if(flightCheckedToday()){await kvSet("flight-day",key);return}
+    flightChecking=true;
     var changed=[],bad=[],ok=0;
     for(var i=0;i<FLIGHTS.length;i++){
       var f=FLIGHTS[i];
@@ -1199,18 +1208,13 @@ async function checkFlightsDaily(){
         }
       }catch(e){}
     }
-    var msg=!ok?"航班核對：今天查不到，沿用行程時刻"
-      :(changed.length?("航班已改："+changed.join("、"))
-      :(bad.length?("航班核對："+bad.join("、")+"航線有變，時刻先不改")
-      :"航班核對：四班仍是內排，時刻沒變"));
-    toast(msg);
-    if(!ME)return;
+    if(!ok)return;
     await kvSet("flight-day",key);
-    var start=new Date();start.setHours(0,0,0,0);
-    if(auditLog.some(function(a){return a.op==="flight"&&a.t>=start.getTime()}))return;
-    pushAudit("flight",key);
-    saveShared(VN.clipStr(msg,VN.LIMITS.msg));
+    var already=auditLog.some(function(a){return a.op==="flight"&&a.t>=start.getTime()});
+    if(!already)pushAudit("flight",key);
+    if(!already||changed.length)saveShared(null);
   }catch(e){}
+  finally{flightChecking=false}
 }
 async function loadAll(){
   if(location.protocol==="file:")toast("請用 https 網址開啟，不要用檔案直接開");
@@ -1356,7 +1360,9 @@ async function pickMe(m){
   await kvSet("me",m);await kvSet("me-locked","1");
   $("idmask").style.display="none";
   renderAll();
-  toast("Xin ch\u00e0o, "+m+" \ud83c\udf3f")}
+  toast("Xin ch\u00e0o, "+m+" \ud83c\udf3f");
+  checkFlightsDaily();
+}
 function renderMe(){var h="";MEMBERS.forEach(function(m){
   h+='<button class="'+(m===ME?"on":"")+'" onclick="pickMe(\''+jsq(m)+'\')">'+m+'</button>'});
   $("me-chips").innerHTML=h}
@@ -1958,15 +1964,23 @@ function renderTL(){
   }).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   paintArmed();
-  var n=activity[0], dismissed=null;
+  var n=noticeItem(), dismissed=null;
   try{dismissed=sessionStorage.getItem("vn-notice")}catch(e){}
   if(n && dismissed!==n.who+"|"+n.msg+"|"+n.t){
     $("notice").style.display="flex";
     $("notice").innerHTML='<span><b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+'）</span><button class="nx" aria-label="關閉" onclick="dismissNotice()">×</button>';
   }else $("notice").style.display="none";
 }
+function noticeItem(){
+  for(var i=0;i<activity.length;i++){
+    var a=activity[i];
+    if(a&&/^航班(核對|已改)/.test(a.msg||""))continue;
+    return a||null;
+  }
+  return null;
+}
 function dismissNotice(){
-  var n=activity[0];
+  var n=noticeItem();
   try{if(n)sessionStorage.setItem("vn-notice",n.who+"|"+n.msg+"|"+n.t)}catch(e){}
   $("notice").style.display="none";
 }
@@ -2353,7 +2367,7 @@ function renderBests(){
 
 /* --- game 1: pho minesweeper --- */
 var P={}, phoLevel=1;
-function phoMines(){return Math.min(20+phoLevel*2,34)}       // LV1 = 22, still leaves a first-click safe cell
+function phoMines(){return Math.min(14+phoLevel*2,30)}       // midway: LV1 = 16 (was 10, then 22)
 function phoLimit(){return Math.max(120-(phoLevel-1)*12,40)}   // shrinking clock
 function phoInit(reset){
   stopLoops();
