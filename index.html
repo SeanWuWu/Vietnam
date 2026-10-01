@@ -347,6 +347,7 @@ main{padding:10px 16px 8px}
 .maplink{margin-top:6px;padding:1px 8px}
 .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #tl-list .card{padding-right:40px}
+#tl-list .card.tl-dragging{opacity:.55}
 .penbtn{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;background:transparent;
   color:var(--ink2);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}
 .penbtn svg{width:16px;height:16px;display:block}
@@ -778,21 +779,31 @@ var BASE_TL={
     {time:"接機",title:"包車 機場→飯店",note:"Klook 機場接送。兩組抵達差約6小時，接送分批或後到組自行 Grab。出發前向領隊確認車行、司機與車牌。",q:HAN_Q},
     {time:"傍晚",title:"全員飯店會合",note:"晚餐 Option：The Rhythms Restaurant（飯店內）",q:"The Rhythms Restaurant, La Sinfonía Majesty, 1B P. Cầu Gỗ, Hoàn Kiếm, Hà Nội"},
     {time:"入住",title:"La Sinfonía Majesty Hotel and Spa",note:"1B P. Cầu Gỗ，還劍湖旁",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"}],
- 2:[{time:"07:00–19:30",title:"陸龍灣一日遊",note:"華閭・三谷/長安・舞洞，含晚餐（姆斯先墊 12,684NT）",q:"Khu du lịch Tràng An, Ninh Bình"},
-    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"1B P. Cầu Gỗ",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"}],
+ 2:[{time:"07:00",title:"坐車出發",note:"河內到寧平，約 2 小時",q:"Ninh Bình, Việt Nam"},
+    {time:"住宿",title:"La Sinfonía Majesty Hotel and Spa",note:"1B P. Cầu Gỗ",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"},
+    {time:"上午",title:"華閭古都",note:"導覽。十世紀古都，丁朝和前黎朝的寺廟",q:"Cố đô Hoa Lư, Ninh Bình, Việt Nam"},
+    {time:"上午",title:"臥龍山",note:"木阿洞穴。爬階梯，看三谷和寧平",q:"Hang Múa, Hoa Lư, Ninh Bình, Việt Nam"},
+    {time:"中午",title:"三谷午餐",note:"附近餐廳自助",q:"Tam Cốc, Ninh Bình, Việt Nam"},
+    {time:"下午",title:"手搖竹船",note:"三谷碧洞、長安名勝群。人數或天氣不夠時可能少停",q:"Tam Cốc, Ninh Bình, Việt Nam"},
+    {time:"16:30",title:"坐車回河內",note:"車程約 2 小時，晚上回到飯店",q:"La Sinfonía Majesty Hotel and Spa, 1B P. Cầu Gỗ, Hàng Bạc, Hoàn Kiếm, Hà Nội"}],
  3:[{time:"上午",title:"河內市區逛逛",note:"",q:"Hồ Hoàn Kiếm, Hoàn Kiếm, Hà Nội"},
     {time:"11:30 午餐",title:"La Badiane 法式料理",note:"10 P. Nam Ngư。週日公休，午餐至13:30，建議訂位",q:"La Badiane, 10 P. Nam Ngư, Cửa Nam, Hoàn Kiếm, Hà Nội"},
     {time:"午後",title:"車程前往下龍灣",note:"約 2.5–3 小時，預計傍晚抵達"},
     {time:"傍晚",title:"Vinpearl Resort & Spa Ha Long 入住",note:"在 Rều 島，從白寨碼頭乘船，不是白寨街上的飯店",q:"Vinpearl Resort & Spa Ha Long, Đảo Rều, Bãi Cháy, Quảng Ninh"},
     {time:"晚餐",title:"Pavilion Restaurant",note:"Rều 島上西餐，已預訂・低消5000NT。不是白寨街上的餐廳",q:"Pavilion Restaurant, Vinpearl Resort & Spa Ha Long, Đảo Rều, Quảng Ninh"}],
- 4:[{time:"11:00",title:"Tuan Chau 碼頭報到・登郵輪",note:"Elite of The Seas 兩天一夜（姆斯已訂）。行李寄放提醒見「更多」",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
-    {time:"午後",title:"蘭哈灣巡航・皮划艇 / 泳池",note:"日落派對・8道菜晚餐",q:"Vịnh Lan Hạ, Cát Bà, Hải Phòng"}],
- 5:[{time:"11:00",title:"郵輪下船",note:"巴士返河內，預計 15:30 抵達",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
+ 4:[{time:"11:00",title:"團洲碼頭登船",note:"海洋精英號（Elite of the Seas），姆斯已訂。大行李寄放見「更多」",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
+    {time:"14:30–16:00",title:"明暗洞",note:"獨木舟或當地小船",q:"Vịnh Lan Hạ, Cát Bà, Hải Phòng"},
+    {time:"12:45",title:"船上午餐",note:"船上餐廳。14:00 進房間"},
+    {time:"16:30–18:00",title:"游泳與日落",note:"可下海或泳池。酒吧有日落派對，也有烹飪示範"},
+    {time:"19:00",title:"晚餐",note:"看天氣，可能在泳池邊烤肉，或改在餐廳。20:30 可釣小卷、打迷你高爾夫、游泳，或回房間"}],
+ 5:[{time:"10:00–11:00",title:"早午餐、下船",note:"10:00 餐廳早午餐，10:45 結清飲料和 SPA，11:00 下船。貴重物品放房間保險箱，或交一樓櫃檯。巴士回河內，預計 15:30 到",q:"Cảng tàu khách quốc tế Tuần Châu, Hạ Long, Quảng Ninh"},
     {time:"下午",title:"還劍湖・電瓶車遊三十六古街",note:"",q:"Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội"},
     {time:"傍晚",title:"聖約瑟夫大教堂",note:"40 Nhà Chung",q:"Nhà thờ Lớn Hà Nội, 40 Nhà Chung, Hoàn Kiếm, Hà Nội"},
     {time:"晚餐",title:"Tầm vị（米其林一星）",note:"4B P. Yên Thế，傳統北越家常菜，營業至21:30，建議提前訂位",q:"Tầm Vị, 4B P. Yên Thế, Ba Đình, Hà Nội"},
     {time:"晚上",title:"河內週末夜市散步",note:"週五到週日傍晚還劍湖步行街封街",q:"Phố đi bộ hồ Hoàn Kiếm, Hàng Đào, Hoàn Kiếm, Hà Nội"},
-    {time:"入住",title:"May De Ville Lakeside Hotel",note:"43 Gia Ngư，走還劍湖約2分鐘",q:"May De Ville Lakeside Hotel, 43 P. Gia Ngư, Hoàn Kiếm, Hà Nội"}],
+    {time:"入住",title:"May De Ville Lakeside Hotel",note:"43 Gia Ngư，走還劍湖約2分鐘",q:"May De Ville Lakeside Hotel, 43 P. Gia Ngư, Hoàn Kiếm, Hà Nội"},
+    {time:"06:10",title:"太極與早餐",note:"可參加太極。06:45–08:15 早餐。想划船的人這段改去青蛙灣（Ao Éch）07:00–08:30，08:30 回船。早餐和划船擇一"},
+    {time:"09:30",title:"收拾行李",note:"行李放房外，鑰匙交一樓船尾櫃檯"}],
  6:[{time:"~08:15",title:"全員同車 Grab 到機場",note:"兩班都從河內內排起飛，只差20分鐘。建議 08:15 前出發、同車前往",q:HAN_Q},
     {time:"11:10起飛",title:"JX716 星宇｜姆斯・尼佛・陳皮・阿綸",note:"河內內排 T2 → 桃園 T1，15:00 抵。地圖是機場，不是星宇辦公室",flight:1,q:HAN_Q},
     {time:"11:30起飛",title:"CI792 華航｜Sean・魚丸",note:"河內內排 T2 → 桃園 T1，15:20 抵",flight:1,q:HAN_Q}]
@@ -1016,6 +1027,7 @@ function mergeCloud(c){
   checklist=ck;
   var seenU={},aud=(auditLog||[]).concat(c.audit||[]);
   auditLog=aud.filter(function(a){var k=a.who+"|"+a.op+"|"+a.id+"|"+a.t;if(seenU[k])return false;seenU[k]=1;return true}).slice(0,VN.LIMITS.audit);
+  return retireOldPresets();
 }
 
 /* ---------- 雲端共用層：Supabase（穩定、瀏覽器直連正規支援）---------- */
@@ -1237,6 +1249,7 @@ async function loadAll(){
   var rr=await kvGet("rate");if(rr){var rv=parseFloat(rr);if(VN.rateInBand(rv))RATE=rv}
   var cb=await kvGet("celeb");if(cb){try{var co=JSON.parse(cb);VN.ownKeys(co).forEach(function(k){if(co[k])celeb[k]=1})}catch(e){}}
   var td=tripDayToday(); if(td)curDay=td;
+  var retiredLocal=retireOldPresets();
   if(location.hash)showTab(VN.safeTab(location.hash.slice(1)));
   $("syncline").textContent="本機模式 · "+now();
   if(!ME)showIdPick();
@@ -1246,7 +1259,7 @@ async function loadAll(){
   loadLiveRate(false);
   (async function(){
     await syncFromCloud();
-    if(migratedEnc)await saveShared(null);
+    if(retiredLocal||migratedEnc)await saveShared(null);
     startPolling();
     checkFlightsDaily();
   })();
@@ -1259,10 +1272,11 @@ async function syncFromCloud(){
   }
   if(cloud){
     var pre=snapshot();
-    if(VN.ownKeys(cloud).length)mergeCloud(cloud);
+    var retired=VN.ownKeys(cloud).length?mergeCloud(cloud):0;
     cloudOK=true;
     $("syncline").textContent="雲端同步 · "+now();
     if(snapshot()!==pre)renderAll();
+    if(retired)await saveShared(null);
   }
 }
 var pollTimer=null, activeUntil=0;
@@ -1278,9 +1292,10 @@ function schedulePoll(immediate){
     var c=await cloudLoad();
     if(c){
       var pre=snapshot();
-      if(VN.ownKeys(c).length)mergeCloud(c);
+      var retired=VN.ownKeys(c).length?mergeCloud(c):0;
       $("syncline").textContent="雲端同步"+(Date.now()<activeUntil?" ⚡":"")+" · "+now();
       if(snapshot()!==pre)renderAll();
+      if(retired)saveShared(null);
     }
     var interval=Date.now()<activeUntil?2000:15000;
     pollTimer=setTimeout(run,interval);
@@ -1795,9 +1810,18 @@ function startVeh(){
   }
   vehRaf=requestAnimationFrame(step);
 }
-/* "14:30" / "08:20→10:30" / "11:00" -> minutes, for ordering. Rows with no
-   clock time (「傍晚」「入住」) sort last and keep their authored order. */
+/* "14:30" / "08:20→10:30" / "11:00" -> minutes. 上午、中午、下午插在對應時段，
+   傍晚、晚餐、入住仍排最後，並維持原來的先後。 */
 function timeKey(t){return VN.timeKey(t)}
+function tlSortKey(t){
+  var k=timeKey(t);
+  if(k<1e9)return k;
+  var s=String(t||"");
+  if(s.indexOf("上午")>=0)return 9*60;
+  if(s.indexOf("中午")>=0)return 12*60;
+  if(s.indexOf("午後")>=0||s.indexOf("下午")>=0)return 14*60;
+  return 1e9;
+}
 function pad2(n){return VN.pad2(n)}
 function fillSelectPair(hh,mm){
   if(!hh||hh.options.length)return;
@@ -1912,11 +1936,14 @@ function tlMapQ(row, base){
   if(/\b(JX|CI)\d{3}\b/.test(title))return HAN_Q;
   return (row&&row.q)||(base&&base.q)||"";
 }
+function tlAttrs(kind,id,time,title,idx){
+  return ' data-kind="'+kind+'" data-tlid="'+esc(id)+'" data-day="'+curDay+'" data-time="'+esc(time)+'" data-title="'+esc(title)+'"'+(idx==null?"":' data-idx="'+idx+'"');
+}
 function tlBaseRow(it,idx){
   var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
   var row=ov||it;
   var q=tlMapQ(row,it);
-  return '<div class="card'+(row.flight||it.flight?" flight":"")+'">'+tlPen("base",curDay,idx)+
+  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"'+tlAttrs("base",baseKey(curDay,idx),row.time,row.title,idx)+'>'+tlPen("base",curDay,idx)+
     '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
     (q?'<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
@@ -1928,12 +1955,12 @@ function tlBaseRow(it,idx){
 function hideKey(day,idx){return "h"+day+"-"+idx}
 function isHideMark(it){return /^h\d+-\d+$/.test((it&&it.id)||"")}
 function tlHiddenRow(it,idx){
-  return '<div class="card" style="opacity:.72"><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
+  return '<div class="card" style="opacity:.72"'+tlAttrs("hide",baseKey(curDay,idx),it.time,it.title,idx)+'><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
     '<div class="meta"><button class="delbtn" data-label="恢復" data-key="uh:'+curDay+'-'+idx+'" data-act="tl-unhide" data-day="'+curDay+'" data-idx="'+idx+'">恢復這筆</button></div></div>';
 }
 function tlMineRow(it){
   var q=tlMapQ(it,null)||it.q||it.title;
-  return '<div class="card" style="border-color:var(--gold)">'+tlPen("user",it.id)+
+  return '<div class="card" style="border-color:var(--gold)"'+tlAttrs("user",it.id,it.time,it.title)+'>'+tlPen("user",it.id)+
     '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
     '<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
@@ -1941,6 +1968,39 @@ function tlMineRow(it){
     '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
 }
 function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
+function isOrderMark(it){return /^ord[1-6]$/.test((it&&it.id)||"")}
+/* 舊版整張一日遊若已被某人改過，標題沒變就退回，讓新的分段行程出現。改過標題的留著。 */
+var OLD_TL={
+  "b2-0":"陸龍灣一日遊",
+  "b4-0":"Tuan Chau 碼頭報到・登郵輪",
+  "b4-1":"蘭哈灣巡航・皮划艇 / 泳池",
+  "b5-0":"郵輪下船"
+};
+function retireOldPresets(){
+  var n=0;
+  for(var i=sharedTL.length-1;i>=0;i--){
+    var it=sharedTL[i];
+    if(OLD_TL[it.id]&&it.title===OLD_TL[it.id]){
+      dels[it.id]=Date.now();
+      sharedTL.splice(i,1);
+      n++;
+    }
+  }
+  return n;
+}
+function dayOrder(day){
+  var it=sharedTL.find(function(x){return x.id==="ord"+day});
+  if(!it||!it.note)return null;
+  var ids=it.note.split(",").filter(Boolean);
+  return ids.length?ids:null;
+}
+function writeDayOrder(day, ids){
+  var id="ord"+day;
+  var note=ids.join(",").slice(0, VN.LIMITS.note);
+  var it=sharedTL.find(function(x){return x.id===id});
+  if(it){it.note=note;it.day=day;it.upd=Date.now();it.who=ME;it.t=now()}
+  else sharedTL.push({id:id,day:day,time:"",title:"順序",note:note,who:ME,t:now(),upd:Date.now()});
+}
 function renderTL(){
   var rows=[];
   (BASE_TL[curDay]||[]).forEach(function(it,idx){
@@ -1952,11 +2012,21 @@ function renderTL(){
     rows.push({it:ov||it, src:it, base:1, idx:idx});
   });
   sharedTL.forEach(function(it){
-    if(it.day===curDay && !isBaseOverride(it) && !isHideMark(it)) rows.push({it:it, base:0});
+    if(it.day===curDay && !isBaseOverride(it) && !isHideMark(it) && !isOrderMark(it)) rows.push({it:it, base:0});
   });
-  rows.forEach(function(r,i){r.n=i});
+  rows.forEach(function(r,i){
+    r.n=i;
+    r.tid=r.base||r.hide?baseKey(curDay,r.idx):r.it.id;
+  });
+  var ord=dayOrder(curDay);
   rows.sort(function(a,b){
-    var d=timeKey(a.it.time)-timeKey(b.it.time);
+    if(ord){
+      var ia=ord.indexOf(a.tid), ib=ord.indexOf(b.tid);
+      if(ia<0)ia=1000+a.n;
+      if(ib<0)ib=1000+b.n;
+      return ia-ib;
+    }
+    var d=tlSortKey(a.it.time)-tlSortKey(b.it.time);
     return d?d:a.n-b.n;
   });
   var h=rows.map(function(r){
@@ -2854,6 +2924,89 @@ document.addEventListener("click",function(e){
   else if(act==="tl-hide")armDel(t,function(){hideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"))});
   else if(act==="tl-unhide")unhideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"));
   else if(act==="card-open"){ if(e.target.closest&&e.target.closest(".sayb"))return; openCardZoom(+t.getAttribute("data-i")); }
+});
+var tlDrag=null;
+function finishTlDrag(card, before){
+  var ids=[];
+  document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){ids.push(el.getAttribute("data-tlid"))});
+  if(!ids.length||(before&&before.join(",")===ids.join(",")))return;
+  if(!ME){renderTL();return}
+  var mine=tlSortKey(card.getAttribute("data-time"));
+  var nxt=null, n=card.nextElementSibling;
+  while(n){
+    var k=tlSortKey(n.getAttribute("data-time")||"");
+    if(k<1e9){nxt={k:k,time:n.getAttribute("data-time")};break}
+    n=n.nextElementSibling;
+  }
+  var kind=card.getAttribute("data-kind");
+  var day=+card.getAttribute("data-day")||curDay;
+  var idx=card.getAttribute("data-idx");
+  var title=card.getAttribute("data-title")||"";
+  var myTime=card.getAttribute("data-time")||"";
+  var uid=card.getAttribute("data-tlid");
+  writeDayOrder(curDay, ids);
+  saveShared("調整了第 "+curDay+" 天的順序");
+  if(mine<1e9 && nxt && mine>nxt.k){
+    if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
+      if(kind==="base")openTlForm("base", day, +idx);
+      else openTlForm("user", uid);
+    }
+  }
+}
+document.addEventListener("pointerdown",function(e){
+  if(e.button!=null && e.button!==0)return;
+  var card=e.target.closest&&e.target.closest("#tl-list .card");
+  if(!card||card.getAttribute("data-kind")==="hide")return;
+  if(e.target.closest("button,a,input,select,textarea"))return;
+  var pid=e.pointerId, sx=e.clientX, sy=e.clientY, hold=true, before=null;
+  function eat(ev){if(hold)ev.preventDefault()}
+  card.addEventListener("contextmenu", eat);
+  var timer=setTimeout(function(){
+    if(!card.isConnected||!ME)return;
+    before=[];
+    document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){before.push(el.getAttribute("data-tlid"))});
+    tlDrag=card;
+    card.classList.add("tl-dragging");
+  },420);
+  function move(ev){
+    if(ev.pointerId!==pid)return;
+    if(!tlDrag){
+      if(Math.abs(ev.clientX-sx)>10||Math.abs(ev.clientY-sy)>10){
+        hold=false;clearTimeout(timer);
+      }
+      return;
+    }
+    ev.preventDefault();
+    if(ev.clientY<88)window.scrollBy(0,-14);
+    else if(ev.clientY>window.innerHeight-88)window.scrollBy(0,14);
+    var cards=[].slice.call(document.querySelectorAll("#tl-list .card"));
+    var i=cards.indexOf(card);
+    if(i<0)return;
+    if(i>0){
+      var pr=cards[i-1].getBoundingClientRect();
+      if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, cards[i-1]);return}
+    }
+    if(i<cards.length-1){
+      var nr=cards[i+1].getBoundingClientRect();
+      if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, cards[i+1].nextSibling);
+    }
+  }
+  function up(ev){
+    if(ev&&ev.pointerId!=null&&ev.pointerId!==pid)return;
+    clearTimeout(timer);
+    hold=false;
+    card.removeEventListener("contextmenu", eat);
+    document.removeEventListener("pointermove", move);
+    document.removeEventListener("pointerup", up);
+    document.removeEventListener("pointercancel", up);
+    var dragged=tlDrag===card;
+    tlDrag=null;
+    card.classList.remove("tl-dragging");
+    if(dragged)finishTlDrag(card, before);
+  }
+  document.addEventListener("pointermove", move, {passive:false});
+  document.addEventListener("pointerup", up);
+  document.addEventListener("pointercancel", up);
 });
 var cardZoomI=-1;
 function openCardZoom(i){
