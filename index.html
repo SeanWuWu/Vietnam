@@ -346,29 +346,29 @@ main{padding:10px 16px 8px}
 .card .d{margin-top:3px}
 .maplink{margin-top:6px;padding:1px 8px}
 .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-#tl-list .card{padding-right:40px}
-#tl-list .card.tl-dragging{opacity:.55}
-body.demo-on > header,
-body.demo-on > .fxpanel,
-body.demo-on > .wxpanel,
-body.demo-on > main,
-body.demo-on > .tabbar,
-body.demo-on > #idmask{display:none !important}
-body.demo-on{padding-bottom:28px}
-#dragdemo{display:none;max-width:560px;margin:0 auto;padding:22px 16px 40px}
-body.demo-on #dragdemo{display:block}
-#dragdemo h1{font-size:20px;font-weight:700;letter-spacing:.04em}
-#dragdemo .lead{font-size:13px;color:var(--ink2);margin:8px 0 16px;line-height:1.55}
-#dragdemo .drow{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:4px;margin-bottom:8px;padding:8px 12px 8px 0}
-#dragdemo .drow.dragging{opacity:.55}
-#dragdemo .grip{flex:0 0 44px;width:44px;height:52px;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;padding:0;-webkit-user-select:none;user-select:none}
-#dragdemo .grip:active{color:var(--accent);cursor:grabbing}
-#dragdemo .dbody{flex:1;min-width:0}
-#dragdemo .dtime{color:var(--accent);font-size:12.5px;font-weight:600}
-#dragdemo .dtitle{font-weight:700;font-size:14px}
-#dragdemo .dnote{font-size:12.5px;color:var(--ink2);margin-top:2px}
-#dragdemo .status{min-height:2.6em;font-size:13px;color:var(--accent);margin:12px 0}
-#dragdemo .back{display:inline-block;margin-top:8px;color:var(--ink2);font-size:13px}
+#tl-list .card{padding-right:40px;touch-action:pan-y;transition:transform .14s ease}
+#tl-list .card .t .time.pending{background:var(--accent-soft);border-radius:3px;padding:0 4px}
+.tl-tools{margin-left:auto;display:inline-flex;align-items:center;flex:0 0 auto;position:relative;z-index:2}
+.tl-grip,.nudge{width:44px;height:44px;border:none;background:transparent;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-size:13px;font-weight:700;padding:0}
+.tl-grip{touch-action:none;cursor:grab;color:var(--ink3);user-select:none;-webkit-user-select:none}
+.nudge{touch-action:manipulation}
+.tl-grip:focus-visible,.nudge:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tl-grip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+body.tl-sorting{touch-action:none;user-select:none;-webkit-user-select:none}
+body.tl-sorting #tl-list .card{transition:none;animation:none;touch-action:none}
+.tl-src{height:0 !important;margin:0 !important;padding:0 !important;border-width:0 !important;overflow:hidden !important;visibility:hidden !important}
+.tl-ghost{position:fixed;z-index:80;margin:0;pointer-events:none;opacity:.88;transform:scale(1.03);box-shadow:0 10px 28px rgba(38,33,30,.18);animation:none}
+.tl-ghost,.tl-ghost *{pointer-events:none}
+.tl-line{position:fixed;height:3px;background:var(--accent);border-radius:2px;z-index:70;pointer-events:none}
+#tl-dropdays{position:fixed;left:8px;right:8px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:75;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;box-shadow:0 8px 24px rgba(38,33,30,.12)}
+#tl-dropdays[hidden]{display:none !important}
+.tl-dropcap{font-size:11px;color:var(--ink2);margin-bottom:6px}
+#tl-dropgrid{display:flex;gap:6px}
+#tl-dropgrid button{flex:1 1 0;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--bg);border-radius:6px;font-size:11px;font-weight:700;color:var(--ink);padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;touch-action:none}
+#tl-dropgrid button .sub{font-size:10px;font-weight:600;color:var(--ink2)}
+#tl-dropgrid button.over{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+#tl-dropgrid button.over .sub{color:var(--accent)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .penbtn{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;background:transparent;
   color:var(--ink2);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}
 .penbtn svg{width:16px;height:16px;display:block}
@@ -549,6 +549,11 @@ input,select,textarea{max-width:100%}
     <button class="btn ghost" onclick="toggleForm('tl-form',false)">取消</button>
   </div>
   <div id="tl-list"></div>
+  <div id="tl-live" class="sr-only" aria-live="polite"></div>
+  <div id="tl-dropdays" hidden>
+    <div class="tl-dropcap">放到其他天</div>
+    <div id="tl-dropgrid"></div>
+  </div>
   
 
   <div class="seclabel">當日路線 · MAP</div>
@@ -748,16 +753,6 @@ input,select,textarea{max-width:100%}
   <button data-p="card"><img src="icon.svg" alt="">小卡</button>
   <button data-p="more"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAAD49+5cVErUzcC5talrY1jv7eOTi3+oppo8NSzEvrTd2syglIjq5tm1raCAe3Lm38/Lyr8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACU3DZBAAAAMXRSTlMA//////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA77JFZgAAAu5JREFUeNrNVlmWozAMpLzvy/0vOzI2YNIkcffXkEd4gEtLqSSzbf/RgSTUX3A8W8sEoHCZWnFnCCWszTfkwiFZCEFr8sqBdaSTsqTUoEHaQE4XWTEsINUUBP1MsHLRZWSMwwhlqnDCccMlI2PfsY4RIU5AFC9gYuKmaCu+AzXLG7jeooExm+ARntCNXXwqh7fSAzWRY0fnVh0BuCicSfWJoj3M5uJ8khpZnhcurcfbVAMzLSIzh9CAiJxHbRPwVFOobGuTifE/XsEZX5LVj8Aq5X7t/owYHislUAGTSuG2JfoKDVbPtzuu9iRhiDAjfCmSKqxmr4BkbrakxeFc8PZHiwUvfk80XkAoycqN7R5vi4G7YRoxUrS5SXcgsbkmxzoBnZgUeARFPiNP1G4HuRBkRYWKV4ev1PrAoyctMN9w2DyzJerabtJgxj82DSmR8iRydy0QdzZJF4mtmA9Kn8QV0ZFRZtLX/sQKJ6nPix6OqntySDVRcIFKElnamaTx4rmkZuDoEYlnIYdCPpOVVJNeAqBpTUs9AqS+wKXwpvGDajjJjArWnERr6reoMzE7CwphpFw7XktpqE1oZnbYnhZrChY56+Cu5tGx94aHd4FCqspnm2fmSH+GWSmof0zWOiSaNV55wb2jg8YkPfKqJGmze2idzFg2LqrCXTK0OmSpQ7PCo1I1SCazn8f6KT2SHb1lTAZH5Wq6ap0QvdBkkmzyH72I80Jrq2nghqcf2w1pnfw5q54H+/60uYo+0SGSEGMLoMr1d506bNPQ66agzl6d/l/P++aFeXhiyv77rnGLH7/Zp+agP73Bw6opxu+GXtK9YbG0V42FU7o9U2zLXwJHSbaHwY/Pbo8y4ufqj7EPcQzh/LY0GBoDFr9zXjPCMrG3bLDG5lWUc9hjVW5nXwwwfqXT0ZuLqIu9oZg15KyvaRatKV1dFehVXC39pbQTuayVg5Mv1OChq/pV3YD42iGYmvn9p9/78eIyf/9B/g+2rRVtuCzTLQAAAABJRU5ErkJggg==" alt="">更多</button>
 </nav>
-
-<div id="dragdemo">
-  <div class="eyebrow" style="font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600">DEMO</div>
-  <h1>拖拉試用</h1>
-  <p class="lead">按住左邊三個點再拖。這頁是假資料，不會改到大家的行程。文字可以照常選取。</p>
-  <div id="demo-list"></div>
-  <div class="status" id="demo-status"></div>
-  <button class="btn ghost" type="button" id="demo-reset">恢復原順序</button>
-  <div><a class="back" href="#">回到行程</a></div>
-</div>
 
 <div class="idmask" id="idmask" style="display:none">
   <div class="idbox">
@@ -1967,36 +1962,56 @@ function tlMapQ(row, base){
   if(/\b(JX|CI)\d{3}\b/.test(title))return HAN_Q;
   return (row&&row.q)||(base&&base.q)||"";
 }
-function tlAttrs(kind,id,time,title,idx){
-  return ' data-kind="'+kind+'" data-tlid="'+esc(id)+'" data-day="'+curDay+'" data-time="'+esc(time)+'" data-title="'+esc(title)+'"'+(idx==null?"":' data-idx="'+idx+'"');
+function tlAttrs(kind,id,time,title,idx,day){
+  var d=day==null?curDay:day;
+  return ' data-kind="'+kind+'" data-tlid="'+esc(id)+'" data-day="'+d+'" data-time="'+esc(time)+'" data-title="'+esc(title)+'"'+(idx==null?"":' data-idx="'+idx+'"');
 }
-function tlBaseRow(it,idx){
-  var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
+function tlTimeSpan(time){
+  if(time==="待排")return '<span class="time pending">待排</span>';
+  return '<span class="time">'+esc(time)+'</span>';
+}
+function tlTools(tid){
+  var pressed=tlGrab&&tlGrab.tid===tid?"true":"false";
+  return '<span class="tl-tools">'+
+    '<button type="button" class="nudge" data-act="tl-up" data-tlid="'+esc(tid)+'" aria-label="上移這筆行程">上</button>'+
+    '<button type="button" class="nudge" data-act="tl-down" data-tlid="'+esc(tid)+'" aria-label="下移這筆行程">下</button>'+
+    '<button type="button" class="tl-grip" data-tlid="'+esc(tid)+'" aria-pressed="'+pressed+'" aria-label="拖曳排序。Enter 抓起，方向鍵移動，再按 Enter 確認" aria-keyshortcuts="Enter ArrowUp ArrowDown">'+
+    '<svg viewBox="0 0 20 28" width="16" height="22" aria-hidden="true">'+
+    '<circle cx="6" cy="4" r="1.6" fill="currentColor"/><circle cx="14" cy="4" r="1.6" fill="currentColor"/>'+
+    '<circle cx="6" cy="14" r="1.6" fill="currentColor"/><circle cx="14" cy="14" r="1.6" fill="currentColor"/>'+
+    '<circle cx="6" cy="24" r="1.6" fill="currentColor"/><circle cx="14" cy="24" r="1.6" fill="currentColor"/>'+
+    '</svg></button></span>';
+}
+function tlBaseRow(it,idx,day){
+  if(day==null)day=curDay;
+  var ov=sharedTL.find(function(x){return x.id===baseKey(day,idx)});
   var row=ov||it;
   var q=tlMapQ(row,it);
-  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"'+tlAttrs("base",baseKey(curDay,idx),row.time,row.title,idx)+'>'+tlPen("base",curDay,idx)+
-    '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
+  var tid=baseKey(day,idx);
+  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"'+tlAttrs("base",tid,row.time,row.title,idx,day)+'>'+tlPen("base",day,idx)+
+    '<div class="t">'+tlTimeSpan(row.time)+'<span>'+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
     (q?'<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
     '<div class="meta">'+
-    (ov?'<button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button>':"")+
-    '<button class="delbtn" data-label="刪除" data-key="hb:'+curDay+'-'+idx+'" data-act="tl-hide" data-day="'+curDay+'" data-idx="'+idx+'">刪除</button></div>'+
-    "</div>";
+    (ov?'<button class="delbtn" data-label="恢復原行程" data-key="rst:'+day+'-'+idx+'" data-act="tl-restore" data-day="'+day+'" data-idx="'+idx+'">恢復原行程</button>':"")+
+    '<button class="delbtn" data-label="刪除" data-key="hb:'+day+'-'+idx+'" data-act="tl-hide" data-day="'+day+'" data-idx="'+idx+'">刪除</button>'+
+    tlTools(tid)+'</div></div>';
 }
 function hideKey(day,idx){return "h"+day+"-"+idx}
 function isHideMark(it){return /^h\d+-\d+$/.test((it&&it.id)||"")}
-function tlHiddenRow(it,idx){
-  return '<div class="card" style="opacity:.72"'+tlAttrs("hide",baseKey(curDay,idx),it.time,it.title,idx)+'><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
-    '<div class="meta"><button class="delbtn" data-label="恢復" data-key="uh:'+curDay+'-'+idx+'" data-act="tl-unhide" data-day="'+curDay+'" data-idx="'+idx+'">恢復這筆</button></div></div>';
+function tlHiddenRow(it,idx,day){
+  if(day==null)day=curDay;
+  return '<div class="card" style="opacity:.72"'+tlAttrs("hide",baseKey(day,idx),it.time,it.title,idx,day)+'><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
+    '<div class="meta"><button class="delbtn" data-label="恢復" data-key="uh:'+day+'-'+idx+'" data-act="tl-unhide" data-day="'+day+'" data-idx="'+idx+'">恢復這筆</button></div></div>';
 }
 function tlMineRow(it){
   var q=tlMapQ(it,null)||it.q||it.title;
-  return '<div class="card" style="border-color:var(--gold)"'+tlAttrs("user",it.id,it.time,it.title)+'>'+tlPen("user",it.id)+
-    '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
+  return '<div class="card" style="border-color:var(--gold)"'+tlAttrs("user",it.id,it.time,it.title,null,it.day)+'>'+tlPen("user",it.id)+
+    '<div class="t">'+tlTimeSpan(it.time)+'<span>'+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
     '<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
     '<div class="meta"><button class="delbtn" data-label="刪除" data-key="tl:'+esc(it.id)+'" data-act="tl-del" data-id="'+esc(it.id)+'">刪除</button>'+
-    '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
+    '<span>'+esc(it.who)+"·"+esc(it.t)+"</span>"+tlTools(it.id)+"</div></div>";
 }
 function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
 function isOrderMark(it){return /^ord[1-6]$/.test((it&&it.id)||"")}
@@ -2032,37 +2047,186 @@ function writeDayOrder(day, ids){
   if(it){it.note=note;it.day=day;it.upd=Date.now();it.who=ME;it.t=now()}
   else sharedTL.push({id:id,day:day,time:"",title:"順序",note:note,who:ME,t:now(),upd:Date.now()});
 }
-function renderTL(){
-  var rows=[];
-  (BASE_TL[curDay]||[]).forEach(function(it,idx){
-    if(sharedTL.some(function(x){return x.id===hideKey(curDay,idx)})){
-      rows.push({it:{time:it.time,title:it.title}, src:it, hide:1, idx:idx});
-      return;
-    }
-    var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
-    rows.push({it:ov||it, src:it, base:1, idx:idx});
-  });
+function naturalIds(day){
+  var ids=[];
+  (BASE_TL[day]||[]).forEach(function(it,idx){ids.push(baseKey(day,idx))});
   sharedTL.forEach(function(it){
-    if(it.day===curDay && !isBaseOverride(it) && !isHideMark(it) && !isOrderMark(it)) rows.push({it:it, base:0});
+    if(it.day===day && !isBaseOverride(it) && !isHideMark(it) && !isOrderMark(it)) ids.push(it.id);
   });
-  rows.forEach(function(r,i){
-    r.n=i;
-    r.tid=r.base||r.hide?baseKey(curDay,r.idx):r.it.id;
-  });
-  var ord=dayOrder(curDay);
+  return ids;
+}
+function rowForTid(tid){
+  var bm=/^b(\d+)-(\d+)$/.exec(tid||"");
+  if(bm){
+    var day=+bm[1], idx=+bm[2];
+    var src=(BASE_TL[day]||[])[idx];
+    if(!src)return null;
+    if(sharedTL.some(function(x){return x.id===hideKey(day,idx)}))
+      return {hide:1, src:src, idx:idx, day:day, tid:baseKey(day,idx), it:{time:src.time,title:src.title}};
+    var ov=sharedTL.find(function(x){return x.id===baseKey(day,idx)});
+    return {base:1, src:src, it:ov||src, idx:idx, day:day, tid:baseKey(day,idx)};
+  }
+  var it=sharedTL.find(function(x){return x.id===tid});
+  if(!it||isBaseOverride(it)||isHideMark(it)||isOrderMark(it))return null;
+  return {base:0, it:it, day:it.day, tid:it.id};
+}
+function claimMap(){
+  var m={};
+  for(var d=1;d<=6;d++){
+    var ids=dayOrder(d);
+    if(!ids)continue;
+    ids.forEach(function(tid){if(m[tid]==null)m[tid]=d});
+  }
+  return m;
+}
+function visualOrder(day){
+  var claims=claimMap();
+  var ord=dayOrder(day);
+  var out=[], seen={};
+  function take(tid){
+    if(!tid||seen[tid])return;
+    if(claims[tid]!=null && claims[tid]!==day)return;
+    if(!rowForTid(tid))return;
+    seen[tid]=1;
+    out.push(tid);
+  }
+  if(ord)ord.forEach(take);
+  naturalIds(day).forEach(take);
+  if(ord)return out;
+  var rows=out.map(function(tid,i){var r=rowForTid(tid); r.n=i; r.tid=tid; return r});
   rows.sort(function(a,b){
-    if(ord){
-      var ia=ord.indexOf(a.tid), ib=ord.indexOf(b.tid);
-      if(ia<0)ia=1000+a.n;
-      if(ib<0)ib=1000+b.n;
-      return ia-ib;
-    }
     var d=tlSortKey(a.it.time)-tlSortKey(b.it.time);
     return d?d:a.n-b.n;
   });
-  var h=rows.map(function(r){
-    if(r.hide)return tlHiddenRow(r.src,r.idx);
-    return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it);
+  return rows.map(function(r){return r.tid});
+}
+function visualOrders(){
+  var o={};
+  for(var d=1;d<=6;d++)o[d]=visualOrder(d);
+  return o;
+}
+function timeConflicts(time, ids, index){
+  var mine=timeKey(time);
+  if(!(mine<1e9))return false;
+  var i,row,k;
+  for(i=index-1;i>=0;i--){
+    row=rowForTid(ids[i]);
+    if(!row||row.hide)continue;
+    k=timeKey(row.it.time);
+    if(k<1e9){if(mine<k)return true; break}
+  }
+  for(i=index+1;i<ids.length;i++){
+    row=rowForTid(ids[i]);
+    if(!row||row.hide)continue;
+    k=timeKey(row.it.time);
+    if(k<1e9){if(mine>k)return true; break}
+  }
+  return false;
+}
+function markPending(tid){
+  var bm=/^b(\d+)-(\d+)$/.exec(tid||"");
+  if(bm){
+    var day=+bm[1], idx=+bm[2];
+    var src=(BASE_TL[day]||[])[idx]||{};
+    var ov=sharedTL.find(function(x){return x.id===tid});
+    if(ov){ov.time="待排";ov.upd=Date.now();return}
+    var row={id:tid,day:day,time:"待排",title:src.title||"",note:src.note||"",who:ME,t:now(),upd:Date.now()};
+    if(src.q)row.q=src.q;
+    if(src.flight)row.flight=true;
+    sharedTL.push(row);
+    return;
+  }
+  var it=sharedTL.find(function(x){return x.id===tid});
+  if(!it)return;
+  it.time="待排";
+  it.upd=Date.now();
+}
+function moveTid(tid, destDay, insertAt){
+  if(destDay<1||destDay>6)return null;
+  var orders=visualOrders();
+  var fromDay=null, fromIdx=-1, d, i;
+  for(d=1;d<=6;d++){
+    i=orders[d].indexOf(tid);
+    if(i>=0){fromDay=d; fromIdx=i; orders[d].splice(i,1); break}
+  }
+  if(fromDay==null)return null;
+  if(insertAt==null||insertAt<0)insertAt=0;
+  if(insertAt>orders[destDay].length)insertAt=orders[destDay].length;
+  if(fromDay===destDay && insertAt===fromIdx)return null;
+  orders[destDay].splice(insertAt,0,tid);
+  if(fromDay!==destDay){
+    var user=sharedTL.find(function(x){return x.id===tid && !isBaseOverride(x) && !isHideMark(x) && !isOrderMark(x)});
+    if(user){user.day=destDay;user.upd=Date.now()}
+    var row=rowForTid(tid);
+    var time=row&&row.it?row.it.time:"";
+    if(timeConflicts(time, orders[destDay], insertAt))markPending(tid);
+  }
+  for(d=1;d<=6;d++)writeDayOrder(d, orders[d]);
+  return {from:fromDay, to:destDay};
+}
+function peekStep(tid, dir){
+  var orders=visualOrders();
+  var day=null, index=-1, d;
+  for(d=1;d<=6;d++){
+    index=orders[d].indexOf(tid);
+    if(index>=0){day=d;break}
+  }
+  if(day==null)return null;
+  if(dir<0){
+    if(index===0){if(day<=1)return null; return {day:day-1, insertAt:orders[day-1].length}}
+    return {day:day, insertAt:index-1};
+  }
+  if(index===orders[day].length-1){if(day>=6)return null; return {day:day+1, insertAt:0}}
+  return {day:day, insertAt:index+1};
+}
+function stepTid(tid, dir){
+  var p=peekStep(tid, dir);
+  if(!p)return null;
+  return moveTid(tid, p.day, p.insertAt)?p.day:null;
+}
+function closeTlFormForMove(){
+  var form=$("tl-form");
+  if(!form||!form.classList.contains("show"))return true;
+  if(!confirm("表單還沒存，要先關掉再調整順序嗎？"))return false;
+  toggleForm("tl-form",false);
+  return true;
+}
+function nudgeCard(tid, dir){
+  var p=peekStep(tid, dir);
+  if(!p)return;
+  if(!requireMe())return;
+  if(p.day!==curDay && !closeTlFormForMove())return;
+  var dest=stepTid(tid, dir);
+  if(dest==null)return;
+  if(dest!==curDay)setDay(dest);
+  saveShared("調整了行程順序");
+  sayLive(dir<0?"已上移":"已下移");
+}
+function sayLive(msg){
+  var el=$("tl-live");
+  if(!el)return;
+  el.textContent="";
+  setTimeout(function(){el.textContent=msg},30);
+}
+function focusGrip(tid){
+  var grips=document.querySelectorAll("#tl-list .tl-grip");
+  for(var i=0;i<grips.length;i++){
+    if(grips[i].getAttribute("data-tlid")===tid){grips[i].focus();return grips[i]}
+  }
+  return null;
+}
+function focusGrabbedGrip(){
+  if(!tlGrab||!tlGrab.focus)return;
+  focusGrip(tlGrab.tid);
+  tlGrab.focus=false;
+}
+function renderTL(){
+  var ids=visualOrder(curDay);
+  var h=ids.map(function(tid){
+    var r=rowForTid(tid);
+    if(!r)return "";
+    if(r.hide)return tlHiddenRow(r.src, r.idx, r.day);
+    return r.base?tlBaseRow(r.src, r.idx, r.day):tlMineRow(r.it);
   }).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   paintArmed();
@@ -2072,6 +2236,7 @@ function renderTL(){
     $("notice").style.display="flex";
     $("notice").innerHTML='<span><b>更新</b> · '+esc(n.who)+" "+esc(n.msg)+"（"+esc(n.t)+'）</span><button class="nx" aria-label="關閉" onclick="dismissNotice()">×</button>';
   }else $("notice").style.display="none";
+  focusGrabbedGrip();
 }
 function noticeItem(){
   for(var i=0;i<activity.length;i++){
@@ -2954,90 +3119,258 @@ document.addEventListener("click",function(e){
   else if(act==="set-cat")setCat(t.getAttribute("data-cat"));
   else if(act==="tl-hide")armDel(t,function(){hideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"))});
   else if(act==="tl-unhide")unhideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"));
+  else if(act==="tl-up")nudgeCard(t.getAttribute("data-tlid"),-1);
+  else if(act==="tl-down")nudgeCard(t.getAttribute("data-tlid"),1);
   else if(act==="card-open"){ if(e.target.closest&&e.target.closest(".sayb"))return; openCardZoom(+t.getAttribute("data-i")); }
 });
-var tlDrag=null;
-function finishTlDrag(card, before){
-  var ids=[];
-  document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){ids.push(el.getAttribute("data-tlid"))});
-  if(!ids.length||(before&&before.join(",")===ids.join(",")))return;
-  if(!ME){renderTL();return}
-  var mine=tlSortKey(card.getAttribute("data-time"));
-  var nxt=null, n=card.nextElementSibling;
-  while(n){
-    var k=tlSortKey(n.getAttribute("data-time")||"");
-    if(k<1e9){nxt={k:k,time:n.getAttribute("data-time")};break}
-    n=n.nextElementSibling;
+var tlGrab=null, tlPointer=null;
+function openDropBar(fromDay){
+  var h="", d, info;
+  for(d=1;d<=6;d++){
+    if(d===fromDay)continue;
+    info=DAY_INFO[d];
+    h+='<button type="button" data-day="'+d+'" aria-label="放到第 '+d+' 天"><span>Day '+d+'</span>'+
+      (info?'<span class="sub">'+esc(info.dateStr)+'</span>':"")+'</button>';
   }
-  var kind=card.getAttribute("data-kind");
-  var day=+card.getAttribute("data-day")||curDay;
-  var idx=card.getAttribute("data-idx");
-  var title=card.getAttribute("data-title")||"";
-  var myTime=card.getAttribute("data-time")||"";
-  var uid=card.getAttribute("data-tlid");
-  writeDayOrder(curDay, ids);
-  saveShared("調整了第 "+curDay+" 天的順序");
-  if(mine<1e9 && nxt && mine>nxt.k){
-    if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
-      if(kind==="base")openTlForm("base", day, +idx);
-      else openTlForm("user", uid);
+  $("tl-dropgrid").innerHTML=h;
+  $("tl-dropdays").hidden=false;
+}
+function markDrop(day){
+  var btns=document.querySelectorAll("#tl-dropgrid button");
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle("over", !!day && +btns[i].getAttribute("data-day")===day);
+}
+function dayUnderPoint(x,y){
+  var el=document.elementFromPoint(x,y);
+  if(el&&el.closest){
+    var hit=el.closest("#tl-dropgrid button");
+    if(hit)return +hit.getAttribute("data-day")||0;
+  }
+  var btns=document.querySelectorAll("#tl-dropgrid button");
+  for(var i=0;i<btns.length;i++){
+    var r=btns[i].getBoundingClientRect();
+    if(x>=r.left-8&&x<=r.right+8&&y>=r.top-8&&y<=r.bottom+8)return +btns[i].getAttribute("data-day")||0;
+  }
+  return 0;
+}
+function layoutDrag(st){
+  var cards=[].slice.call(document.querySelectorAll("#tl-list .card"));
+  var slots=[], i;
+  for(i=0;i<cards.length;i++) if(!cards[i].classList.contains("tl-src")) slots.push(cards[i]);
+  for(i=0;i<slots.length;i++) slots[i].style.transform="";
+  var over=dayUnderPoint(st.x, st.y);
+  markDrop(over);
+  st.overDay=over;
+  var rects=slots.map(function(c){return c.getBoundingClientRect()});
+  var H=st.H||0;
+  var prev=typeof st.insertAt==="number"?st.insertAt:slots.length;
+  var idx=slots.length;
+  if(!over){
+    for(i=0;i<rects.length;i++){
+      var top=rects[i].top+(i>=prev?H:0);
+      if(st.y<top+rects[i].height/2){idx=i;break}
     }
+  }
+  if(!over){
+    for(i=0;i<slots.length;i++) slots[i].style.transform=i>=idx?"translateY("+H+"px)":"";
+  }
+  st.insertAt=idx;
+  if(st.line){
+    if(over||!rects.length) st.line.style.display="none";
+    else{
+      st.line.style.display="block";
+      var lineTop=idx<rects.length?rects[idx].top:rects[rects.length-1].bottom;
+      st.line.style.top=(lineTop-2)+"px";
+      st.line.style.left=rects[0].left+"px";
+      st.line.style.width=rects[0].width+"px";
+    }
+  }
+  if(st.ghost){
+    st.ghost.style.left=(st.x-st.dx)+"px";
+    st.ghost.style.top=(st.y-st.dy)+"px";
   }
 }
-document.addEventListener("pointerdown",function(e){
-  if(e.button!=null && e.button!==0)return;
-  var card=e.target.closest&&e.target.closest("#tl-list .card");
-  if(!card||card.getAttribute("data-kind")==="hide")return;
-  if(e.target.closest("button,a,input,select,textarea"))return;
-  var pid=e.pointerId, sx=e.clientX, sy=e.clientY, hold=true, before=null;
-  function eat(ev){if(hold)ev.preventDefault()}
-  card.addEventListener("contextmenu", eat);
-  var timer=setTimeout(function(){
-    if(!card.isConnected||!ME)return;
-    before=[];
-    document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){before.push(el.getAttribute("data-tlid"))});
-    tlDrag=card;
-    card.classList.add("tl-dragging");
-  },420);
-  function move(ev){
-    if(ev.pointerId!==pid)return;
-    if(!tlDrag){
-      if(Math.abs(ev.clientX-sx)>10||Math.abs(ev.clientY-sy)>10){
-        hold=false;clearTimeout(timer);
-      }
+function tickDrag(){
+  var st=tlPointer;
+  if(!st||!st.started)return;
+  if(!st.overDay){
+    if(st.y<88)window.scrollBy(0,-16);
+    else if(st.y>window.innerHeight-88)window.scrollBy(0,16);
+  }
+  layoutDrag(st);
+  st.raf=requestAnimationFrame(tickDrag);
+}
+function beginDrag(st){
+  if(st.started||!st.card.isConnected)return;
+  st.started=true;
+  if(tlGrab)tlGrab=null;
+  var r=st.card.getBoundingClientRect();
+  st.dx=st.x-r.left;
+  st.dy=st.y-r.top;
+  st.H=r.height;
+  var ghost=st.card.cloneNode(true);
+  ghost.classList.add("tl-ghost");
+  ghost.setAttribute("aria-hidden","true");
+  ghost.style.width=r.width+"px";
+  ghost.style.left=r.left+"px";
+  ghost.style.top=r.top+"px";
+  document.body.appendChild(ghost);
+  st.ghost=ghost;
+  st.card.classList.add("tl-src");
+  document.body.classList.add("tl-sorting");
+  var line=document.createElement("div");
+  line.className="tl-line";
+  document.body.appendChild(line);
+  st.line=line;
+  openDropBar(curDay);
+  layoutDrag(st);
+  st.raf=requestAnimationFrame(tickDrag);
+}
+function endDragVisual(){
+  var st=tlPointer;
+  document.body.classList.remove("tl-sorting");
+  if(st){
+    if(st.timer)clearTimeout(st.timer);
+    if(st.raf)cancelAnimationFrame(st.raf);
+    if(st.ghost&&st.ghost.parentNode)st.ghost.parentNode.removeChild(st.ghost);
+    if(st.line&&st.line.parentNode)st.line.parentNode.removeChild(st.line);
+    if(st.card)st.card.classList.remove("tl-src");
+  }
+  var cards=document.querySelectorAll("#tl-list .card");
+  for(var i=0;i<cards.length;i++) cards[i].style.transform="";
+  var bar=$("tl-dropdays");
+  if(bar)bar.hidden=true;
+  tlPointer=null;
+}
+function detachPointer(){
+  document.removeEventListener("pointermove", onTlMove);
+  document.removeEventListener("pointerup", onTlUp);
+  document.removeEventListener("pointercancel", onTlCancel);
+}
+function finishPointerDrag(st){
+  var tid=st.tid, over=st.overDay||0, insertAt=st.insertAt, fromDay=curDay;
+  endDragVisual();
+  if(!tid)return;
+  if(!ME){renderTL();toast("先選你是誰，順序才會記住");return}
+  var dest=over&&over!==fromDay?over:fromDay;
+  if(dest!==fromDay && !closeTlFormForMove()){renderTL();return}
+  var moved=moveTid(tid, dest, dest!==fromDay?1e9:insertAt);
+  if(!moved){renderTL();return}
+  if(dest!==curDay)setDay(dest);
+  saveShared(dest!==fromDay?("把行程移到第 "+dest+" 天"):"調整了行程順序");
+  var row=rowForTid(tid);
+  sayLive(dest!==fromDay&&row&&row.it&&row.it.time==="待排"?"已移到第 "+dest+" 天，時間標成待排":(dest!==fromDay?"已移到第 "+dest+" 天":"順序已更新"));
+}
+function onTlMove(e){
+  var st=tlPointer;
+  if(!st||e.pointerId!==st.pid)return;
+  var dx=e.clientX-st.sx, dy=e.clientY-st.sy;
+  if(!st.started){
+    if(st.mode==="hold"){
+      if(Math.abs(dx)>8||Math.abs(dy)>8){detachPointer();endDragVisual()}
       return;
     }
-    ev.preventDefault();
-    if(ev.clientY<88)window.scrollBy(0,-14);
-    else if(ev.clientY>window.innerHeight-88)window.scrollBy(0,14);
-    var cards=[].slice.call(document.querySelectorAll("#tl-list .card"));
-    var i=cards.indexOf(card);
-    if(i<0)return;
-    if(i>0){
-      var pr=cards[i-1].getBoundingClientRect();
-      if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, cards[i-1]);return}
+    if(Math.abs(dx)>6||Math.abs(dy)>6){
+      e.preventDefault();
+      st.x=e.clientX;st.y=e.clientY;
+      beginDrag(st);
     }
-    if(i<cards.length-1){
-      var nr=cards[i+1].getBoundingClientRect();
-      if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, cards[i+1].nextSibling);
+    return;
+  }
+  e.preventDefault();
+  st.x=e.clientX;st.y=e.clientY;
+  layoutDrag(st);
+}
+function onTlUp(e){
+  var st=tlPointer;
+  if(!st||(e&&e.pointerId!=null&&e.pointerId!==st.pid))return;
+  if(st.started&&e){st.x=e.clientX;st.y=e.clientY;layoutDrag(st)}
+  detachPointer();
+  if(!st.started){endDragVisual();return}
+  finishPointerDrag(st);
+}
+function onTlCancel(e){
+  var st=tlPointer;
+  if(!st||(e&&e.pointerId!=null&&e.pointerId!==st.pid))return;
+  detachPointer();
+  var started=st.started;
+  endDragVisual();
+  if(started)renderTL();
+}
+function onTlDown(e){
+  if(tlPointer)return;
+  if(e.button!=null&&e.button!==0)return;
+  var grip=e.target.closest&&e.target.closest(".tl-grip");
+  var card=grip?grip.closest("#tl-list .card"):(e.target.closest&&e.target.closest("#tl-list .card"));
+  if(!card||card.getAttribute("data-kind")==="hide")return;
+  if(!grip&&e.target.closest("button,a,input,select,textarea"))return;
+  var st={card:card,tid:card.getAttribute("data-tlid"),pid:e.pointerId,mode:grip?"grip":"hold",
+    sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,started:false,timer:null};
+  tlPointer=st;
+  if(grip){
+    e.preventDefault();
+    try{grip.setPointerCapture(e.pointerId)}catch(err){}
+  }else{
+    st.timer=setTimeout(function(){
+      if(tlPointer!==st||st.started)return;
+      beginDrag(st);
+    },250);
+  }
+  document.addEventListener("pointermove", onTlMove, {passive:false});
+  document.addEventListener("pointerup", onTlUp);
+  document.addEventListener("pointercancel", onTlCancel);
+}
+document.addEventListener("pointerdown", onTlDown, {passive:false});
+document.addEventListener("contextmenu", function(e){
+  if(tlPointer&&(tlPointer.mode==="hold"||tlPointer.started))e.preventDefault();
+});
+document.addEventListener("keydown", function(e){
+  var grip=e.target.closest&&e.target.closest(".tl-grip");
+  if(!grip)return;
+  var key=e.key;
+  if(key!=="Enter"&&key!==" "&&key!=="Escape"&&key!=="ArrowUp"&&key!=="ArrowDown")return;
+  e.preventDefault();
+  var tid=grip.getAttribute("data-tlid");
+  if(key==="Escape"){
+    if(!tlGrab)return;
+    sharedTL=JSON.parse(tlGrab.backup);
+    var back=tlGrab.tid;
+    tlGrab=null;
+    renderTL();
+    focusGrip(back);
+    sayLive("已取消排序");
+    return;
+  }
+  if(key==="Enter"||key===" "){
+    if(!tlGrab||tlGrab.tid!==tid){
+      tlGrab={tid:tid,backup:JSON.stringify(sharedTL),dirty:false,focus:true};
+      sayLive("已抓起。方向鍵移動，Enter 確認，Escape 取消");
+      renderTL();
+      return;
     }
+    if(tlGrab.dirty){
+      if(!ME){requireMe();return}
+      tlGrab=null;
+      saveShared("調整了行程順序");
+      sayLive("順序已儲存");
+      return;
+    }
+    tlGrab=null;
+    renderTL();
+    sayLive("已放開");
+    return;
   }
-  function up(ev){
-    if(ev&&ev.pointerId!=null&&ev.pointerId!==pid)return;
-    clearTimeout(timer);
-    hold=false;
-    card.removeEventListener("contextmenu", eat);
-    document.removeEventListener("pointermove", move);
-    document.removeEventListener("pointerup", up);
-    document.removeEventListener("pointercancel", up);
-    var dragged=tlDrag===card;
-    tlDrag=null;
-    card.classList.remove("tl-dragging");
-    if(dragged)finishTlDrag(card, before);
-  }
-  document.addEventListener("pointermove", move, {passive:false});
-  document.addEventListener("pointerup", up);
-  document.addEventListener("pointercancel", up);
+  if(!tlGrab||tlGrab.tid!==tid)return;
+  var dir=key==="ArrowUp"?-1:1;
+  var peek=peekStep(tid, dir);
+  if(!peek){sayLive(dir<0?"已經在第一天最上面":"已經在最後一天最下面");return}
+  if(peek.day!==curDay&&!closeTlFormForMove())return;
+  var dest=stepTid(tid, dir);
+  if(dest==null)return;
+  tlGrab.dirty=true;
+  tlGrab.focus=true;
+  if(dest!==curDay)setDay(dest);
+  else renderTL();
+  sayLive("移到第 "+dest+" 天");
 });
 var cardZoomI=-1;
 function openCardZoom(i){
@@ -3084,115 +3417,6 @@ window.addEventListener("online",function(){
   if(CLOUD_ID)saveShared(null);
 });
 window.addEventListener("offline",function(){toast("離線中，資料會存在這台裝置")});
-
-/* 拖拉試用頁。跟正式行程分開，確認手感後才換過去。 */
-(function(){
-  var SEED=[
-    {time:"07:00",title:"坐車出發",note:"河內到寧平，約 2 小時"},
-    {time:"上午",title:"華閭古都",note:"十世紀古都，丁朝和前黎朝的寺廟"},
-    {time:"中午",title:"三谷午餐",note:"附近餐廳自助"},
-    {time:"16:30",title:"坐車回河內",note:"把這張拖到最上面，會問要不要改時間"}
-  ];
-  var rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
-  function dkey(t){
-    var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
-    if(m)return (+m[1])*60+(+m[2]);
-    t=String(t||"");
-    if(t.indexOf("上午")>=0)return 9*60;
-    if(t.indexOf("中午")>=0)return 12*60;
-    if(t.indexOf("下午")>=0)return 14*60;
-    return 1e9;
-  }
-  function paint(){
-    var h="";
-    rows.forEach(function(r,i){
-      h+='<div class="drow" data-i="'+i+'" data-time="'+esc(r.time)+'" data-title="'+esc(r.title)+'">'+
-        '<button class="grip" type="button" aria-label="拖動這一行">'+
-        '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><circle cx="8" cy="3.2" r="1.35" fill="currentColor"/><circle cx="8" cy="8" r="1.35" fill="currentColor"/><circle cx="8" cy="12.8" r="1.35" fill="currentColor"/></svg>'+
-        '</button><div class="dbody"><div><span class="dtime">'+esc(r.time)+'</span> <span class="dtitle">'+esc(r.title)+'</span></div>'+
-        (r.note?'<div class="dnote">'+esc(r.note)+'</div>':"")+'</div></div>';
-    });
-    $("demo-list").innerHTML=h;
-  }
-  function showDemo(){
-    var on=location.hash==="#drag-demo";
-    document.body.classList.toggle("demo-on", on);
-    if(on)paint();
-  }
-  function nextSlot(card){
-    var n=card.nextElementSibling, best=null;
-    while(n){
-      var k=dkey(n.getAttribute("data-time"));
-      if(k<1e9){best={k:k,time:n.getAttribute("data-time")};break}
-      n=n.nextElementSibling;
-    }
-    return best;
-  }
-  $("demo-reset").onclick=function(){
-    rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
-    $("demo-status").textContent="";
-    paint();
-  };
-  document.getElementById("dragdemo").addEventListener("pointerdown",function(e){
-    var grip=e.target.closest&&e.target.closest(".grip");
-    if(!grip)return;
-    var card=grip.closest(".drow");
-    if(!card)return;
-    e.preventDefault();
-    var pid=e.pointerId;
-    var start=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
-    card.classList.add("dragging");
-    try{grip.setPointerCapture(pid)}catch(err){}
-    function move(ev){
-      if(ev.pointerId!==pid)return;
-      ev.preventDefault();
-      if(ev.clientY<72)window.scrollBy(0,-14);
-      else if(ev.clientY>window.innerHeight-72)window.scrollBy(0,14);
-      var list=[].slice.call(document.querySelectorAll("#demo-list .drow"));
-      var i=list.indexOf(card);
-      if(i<0)return;
-      if(i>0){
-        var pr=list[i-1].getBoundingClientRect();
-        if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, list[i-1]);return}
-      }
-      if(i<list.length-1){
-        var nr=list[i+1].getBoundingClientRect();
-        if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, list[i+1].nextSibling);
-      }
-    }
-    function up(ev){
-      if(ev.pointerId!==pid)return;
-      grip.removeEventListener("pointermove", move);
-      grip.removeEventListener("pointerup", up);
-      grip.removeEventListener("pointercancel", up);
-      card.classList.remove("dragging");
-      var now=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
-      if(now===start)return;
-      var mine=dkey(card.getAttribute("data-time"));
-      var nxt=nextSlot(card);
-      var title=card.getAttribute("data-title");
-      var myTime=card.getAttribute("data-time");
-      var order=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return rows[+el.getAttribute("data-i")]});
-      rows=order;
-      paint();
-      var status=$("demo-status");
-      if(mine<1e9 && nxt && mine>nxt.k){
-        if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
-          status.textContent="正式行程裡會打開改時間。這頁先維持 "+myTime+"。";
-        }else{
-          status.textContent="維持原來的時間，順序留在新的位置。";
-        }
-      }else{
-        status.textContent="已排好。時間沒有對不上。";
-      }
-    }
-    grip.addEventListener("pointermove", move);
-    grip.addEventListener("pointerup", up);
-    grip.addEventListener("pointercancel", up);
-  });
-  window.addEventListener("hashchange", showDemo);
-  showDemo();
-})();
 </script>
 </body>
 </html>
