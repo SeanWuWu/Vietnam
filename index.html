@@ -346,29 +346,120 @@ main{padding:10px 16px 8px}
 .card .d{margin-top:3px}
 .maplink{margin-top:6px;padding:1px 8px}
 .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-#tl-list .card{padding-right:40px}
-#tl-list .card.tl-dragging{opacity:.55}
+#page-tl{padding-left:4px;padding-right:4px}
+#page-tl .daytabs{position:sticky;top:env(safe-area-inset-top);z-index:30;background:var(--bg);padding-top:8px}
+body.tl-sorting #page-tl .daytabs{z-index:90}
+#page-tl .daytabs button{min-width:0;flex:1 1 0;padding:8px 0;min-height:48px;gap:4px}
+#page-tl .daytabs button .dname{font-size:13px}
+#page-tl .daytabs button .dsub{font-size:11px}
+#page-tl .daytabs button.over{color:var(--accent);background:var(--accent-soft);border-bottom-color:var(--accent)}
+#tl-status{margin:8px 0 12px;font-size:13px;color:var(--ink2);line-height:1.6}
+#tl-status:empty{display:none}
+#tl-status b{color:var(--gold);font-weight:600}
+#page-tl #tl-list .card{padding:12px 86px 12px 14px;margin-bottom:12px;min-height:84px;touch-action:pan-y;animation:none}
+#page-tl #tl-list .card.hide-row{min-height:0;padding:12px 14px;opacity:.72}
+#page-tl #tl-list .card .t{padding-right:0;line-height:1.35;row-gap:0}
+#page-tl #tl-list .card .d{margin-top:4px;line-height:1.4}
+#page-tl #tl-list .time.pending{color:var(--gold)}
+#page-tl #tl-list .tools{position:absolute;right:48px;top:50%;bottom:auto;width:26px;height:auto;transform:translateY(-50%);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px}
+#page-tl #tl-list .tools .pen,#page-tl #tl-list .tools .pin{width:26px;height:22px;flex:0 0 22px;border:none;background:transparent;color:var(--ink2);display:flex;align-items:center;justify-content:center;padding:0;border-radius:3px;text-decoration:none;min-height:0}
+#page-tl #tl-list .tools .pen:active,#page-tl #tl-list .tools .pin:active{color:var(--ink)}
+#page-tl #tl-list .tools .pen:focus-visible,#page-tl #tl-list .tools .pin:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#page-tl #tl-list .rail{position:absolute;right:10px;top:50%;bottom:auto;width:26px;height:auto;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+#page-tl #tl-list .rail button{width:26px;height:14px;flex:0 0 14px;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;padding:0;border-radius:3px;min-height:0}
+#page-tl #tl-list .rail button.grip{width:26px;height:22px;flex-basis:22px;color:var(--ink2);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#page-tl #tl-list .rail button:active{background:transparent;color:var(--ink)}
+#page-tl #tl-list .rail button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#page-tl #tl-list .grip[aria-pressed="true"]{color:var(--accent)}
+body.tl-sorting{touch-action:none;user-select:none;-webkit-user-select:none}
+body.tl-sorting #page-tl #tl-list .card{transition:none;touch-action:none}
+#page-tl #tl-list .tl-src{height:0 !important;margin:0 !important;padding:0 !important;border-width:0 !important;overflow:hidden !important;visibility:hidden !important}
+#page-tl #tl-list .tl-hold{pointer-events:none}
+.tl-ghost{position:fixed;z-index:80;margin:0;pointer-events:none;opacity:1;transform:scale(1.01);box-shadow:0 8px 20px rgba(38,33,30,.16);animation:none;border-color:var(--line2);padding:10px 14px;background:var(--card)}
+.tl-ghost .rail,.tl-ghost .tools{display:none}
+.tl-ghost,.tl-ghost *{pointer-events:none}
+.tl-line{position:fixed;height:2px;margin:0;background:var(--accent);border-radius:1px;z-index:70;pointer-events:none}
+#tl-form select{height:48px;padding:0 28px 0 12px;font-size:16px;text-align:left;text-align-last:left;-webkit-text-fill-color:var(--ink);appearance:none;-webkit-appearance:none;background-color:var(--bg);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%238A8177' d='M1 1l5 5 5-5'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:10px 7px}
+#tl-form .wheels{display:flex;align-items:center;gap:12px;margin-top:12px}
+#tl-form .wheels[hidden],#tl-form .endtoggle[hidden],#tl-form .tlacts .tldel[hidden],#tl-form .tltext[hidden]{display:none !important}
+#tl-form .wheels select{flex:1;width:auto;min-width:0;font-variant-numeric:tabular-nums;font-weight:650}
+#tl-form .colon{flex:0 0 auto;color:var(--ink2);font-size:18px;font-weight:700;line-height:1}
+#tl-form .endtoggle{display:inline-flex;align-items:center;min-height:44px;margin-top:2px;padding:8px 0;border:none;background:none;color:var(--ink2);font-size:14px;font-weight:600}
+#tl-form .tlacts{display:flex;gap:12px;margin-top:14px}
+#tl-form .tlacts .btn{margin-top:0;flex:1}
+#tl-form .tlacts .tldel{background:var(--card);color:var(--accent);border:1px solid var(--line)}
+#tl-form .tlacts .tldel.armed{background:var(--accent);color:#fff;border-color:var(--accent)}
+#tl-form .tltext{display:block;width:100%;min-height:44px;margin-top:8px;border:none;background:none;color:var(--ink2);font-size:14px;font-weight:600}
+#tl-form .tltext.armed{color:#fff;background:var(--accent);border-radius:4px}
+@media (max-width:360px){
+  #page-tl{padding-left:8px;padding-right:8px}
+}
 body.demo-on > header,
 body.demo-on > .fxpanel,
 body.demo-on > .wxpanel,
 body.demo-on > main,
 body.demo-on > .tabbar,
 body.demo-on > #idmask{display:none !important}
-body.demo-on{padding-bottom:28px}
-#dragdemo{display:none;max-width:560px;margin:0 auto;padding:22px 16px 40px}
+body.demo-on{padding-bottom:env(safe-area-inset-bottom)}
+body.demo-on #cloudfail{display:none !important}
+body.demo-on.has-banner{padding-top:env(safe-area-inset-top)}
+#dragdemo{display:none;max-width:560px;margin:0 auto;padding:12px 20px 32px}
 body.demo-on #dragdemo{display:block}
-#dragdemo h1{font-size:20px;font-weight:700;letter-spacing:.04em}
-#dragdemo .lead{font-size:13px;color:var(--ink2);margin:8px 0 16px;line-height:1.55}
-#dragdemo .drow{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:4px;margin-bottom:8px;padding:8px 12px 8px 0}
-#dragdemo .drow.dragging{opacity:.55}
-#dragdemo .grip{flex:0 0 44px;width:44px;height:52px;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;padding:0;-webkit-user-select:none;user-select:none}
-#dragdemo .grip:active{color:var(--accent);cursor:grabbing}
-#dragdemo .dbody{flex:1;min-width:0}
-#dragdemo .dtime{color:var(--accent);font-size:12.5px;font-weight:600}
-#dragdemo .dtitle{font-weight:700;font-size:14px}
-#dragdemo .dnote{font-size:12.5px;color:var(--ink2);margin-top:2px}
-#dragdemo .status{min-height:2.6em;font-size:13px;color:var(--accent);margin:12px 0}
-#dragdemo .back{display:inline-block;margin-top:8px;color:var(--ink2);font-size:13px}
+body.demo-sorting #dragdemo{padding-bottom:32px}
+#dragdemo .back{display:inline-flex;align-items:center;min-height:40px;margin:0 0 6px;color:var(--ink2);font-size:13px;font-weight:600;letter-spacing:.06em;text-decoration:none}
+#dragdemo .lead{font-size:13px;color:var(--ink2);margin:0;padding-bottom:16px;border-bottom:1px solid var(--line);line-height:1.6}
+#dragdemo .daytabs{position:sticky;top:env(safe-area-inset-top);z-index:30;background:var(--bg);margin:0 -20px 16px;padding:12px 20px 12px}
+body.demo-sorting #dragdemo .daytabs{z-index:90}
+#dragdemo .daytabs button{min-width:0;flex:1 1 0;padding:8px 0;min-height:48px;gap:4px}
+#dragdemo .daytabs button .dname{font-size:13px}
+#dragdemo .daytabs button .dsub{font-size:11px}
+#dragdemo .daytabs button.over{color:var(--accent);background:var(--accent-soft);border-bottom-color:var(--accent)}
+#dragdemo .empty{margin:4px 0 16px;font-size:13px;color:var(--ink2);line-height:1.5}
+#dragdemo .seclabel{margin:28px 0 14px}
+#dragdemo .card{padding:12px 86px 12px 14px;margin-bottom:12px;min-height:84px;touch-action:pan-y;animation:none}
+#dragdemo .card .t{padding-right:0;line-height:1.35;row-gap:0}
+#dragdemo .card .d{margin-top:4px;line-height:1.4}
+#dragdemo .time.pending{color:var(--gold)}
+#dragdemo .tools{position:absolute;right:48px;top:50%;bottom:auto;width:26px;height:auto;transform:translateY(-50%);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px}
+#dragdemo .tools .pen,#dragdemo .tools .pin{width:26px;height:22px;flex:0 0 22px;border:none;background:transparent;color:var(--ink2);display:flex;align-items:center;justify-content:center;padding:0;border-radius:3px;text-decoration:none}
+#dragdemo .tools .pen:active,#dragdemo .tools .pin:active{color:var(--ink)}
+#dragdemo .tools .pen:focus-visible,#dragdemo .tools .pin:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#dragdemo .rail{position:absolute;right:10px;top:50%;bottom:auto;width:26px;height:auto;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+#dragdemo .rail button{width:26px;height:14px;flex:0 0 14px;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;padding:0;border-radius:3px;min-height:0}
+#dragdemo .rail button.grip{width:26px;height:22px;flex-basis:22px;color:var(--ink2);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#dragdemo .rail button:active{background:transparent;color:var(--ink)}
+#dragdemo .rail button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#dragdemo .grip[aria-pressed="true"]{color:var(--accent)}
+#demo-map{background:none;border:none;padding:0}
+#dragdemo .mapcard{content-visibility:visible;contain-intrinsic-size:auto;margin-top:0}
+#demo-edit{position:fixed;left:0;right:0;bottom:0;z-index:85;max-height:min(86vh,640px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(250,248,243,.98);border-top:1px solid var(--line);padding:18px 20px calc(18px + env(safe-area-inset-bottom))}
+#demo-edit[hidden]{display:none !important}
+#demo-edit .who{margin:0 0 12px;font-size:15px;font-weight:700;line-height:1.4}
+#demo-edit label{display:block;margin:16px 0 6px;font-size:12px;color:var(--ink2)}
+#demo-edit input,#demo-edit select{width:100%;height:48px;border:1px solid var(--line);border-radius:4px;background-color:var(--card);padding:0 28px 0 12px;font-size:16px;color:var(--ink);text-align:left;text-align-last:left;-webkit-text-fill-color:var(--ink)}
+#demo-edit select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%238A8177' d='M1 1l5 5 5-5'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:10px 7px}
+#demo-edit .wheels{display:flex;align-items:center;gap:12px;margin-top:12px}
+#demo-edit .wheels[hidden],#demo-edit .endtoggle[hidden]{display:none !important}
+#demo-edit .wheels select{flex:1;width:auto;min-width:0;font-variant-numeric:tabular-nums;font-weight:650}
+#demo-edit .colon{flex:0 0 auto;color:var(--ink2);font-size:18px;font-weight:700;line-height:1}
+#demo-edit .endtoggle{display:inline-flex;align-items:center;min-height:44px;margin-top:2px;padding:8px 0;border:none;background:none;color:var(--ink2);font-size:14px;font-weight:600}
+#demo-edit .acts{display:flex;gap:12px;margin-top:18px}
+#demo-edit .acts button{flex:1;height:48px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;text-decoration:none}
+#demo-edit .acts .save{background:var(--ink);color:#fff;border-color:var(--ink)}
+#demo-edit .acts .del{color:var(--accent)}
+#demo-edit .acts .del.armed{background:var(--accent);color:#fff;border-color:var(--accent)}
+#dragdemo .status{margin:0 0 14px;font-size:13px;color:var(--ink2);line-height:1.6}
+#dragdemo .status:empty{display:none}
+#dragdemo .status b{color:var(--gold);font-weight:600}
+body.demo-sorting{touch-action:none;user-select:none;-webkit-user-select:none}
+body.demo-sorting #dragdemo .card{transition:none;touch-action:none}
+#dragdemo .demo-src{height:0 !important;margin:0 !important;padding:0 !important;border-width:0 !important;overflow:hidden !important;visibility:hidden !important}
+#dragdemo .demo-hold{pointer-events:none}
+.demo-ghost{position:fixed;z-index:80;margin:0;pointer-events:none;opacity:1;transform:scale(1.01);box-shadow:0 8px 20px rgba(38,33,30,.16);animation:none;border-color:var(--line2);padding:10px 14px;background:var(--card)}
+.demo-ghost .rail,.demo-ghost .tools{display:none}
+.demo-ghost,.demo-ghost *{pointer-events:none}
+.demo-line{position:fixed;height:2px;margin:0;background:var(--accent);border-radius:1px;z-index:70;pointer-events:none}
+
 .penbtn{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;background:transparent;
   color:var(--ink2);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}
 .penbtn svg{width:16px;height:16px;display:block}
@@ -524,35 +615,39 @@ input,select,textarea{max-width:100%}
 <!-- ===== 時間表 ===== -->
 <div class="page on" id="page-tl">
   <div class="daytabs" id="daypills"></div>
+  <p class="tlstatus" id="tl-status"></p>
   <button class="addbtn tl" onclick="openTlForm()"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAADNxrqyqZrDuq3X0sb7+PFSSUOTioK5sahaVE11a2JDPTc1LymfmI9qYVmqmY2DenPn49ri3NGJgnRqW1MfGxbv7+R5PjR/f3+qqqruwbwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0Z5B2AAAAMXRSTlMA//////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA5wjBaQAAA3FJREFUeNrVVtt2pCoQpSjuF0HRTjL//6GnCltiJ/acdN6mlktA2dRlbxQh/lWbf/cue2OfvFLBePcM50ywUV6+0ja16J8BZZy1r9dheqttfBqpEWINWmjNoxs3fUDXzXtRE+gLVA2eY5mSNyZMdFunMIUQ/TRN3vvNi/fE/fyAWqYt0UvDQNPNx2hGjyxVUbeUYtymB1yqoHQzs/DhdhWPMEFYCnXBup1qJLdeS2tAhCeli++iRuQ17fY+Smb22TkpbZ4ByeO9qnEEi3Ffw0VT4xMFhFQPHn2E+0M4Zktv5DOuQpw+9l7b1OEx2Vf0XIdHTO+vAL2B33n0EYdG60vAdHh0JIuZTH3dEqc9uM+FWSllhkdMiYRlDltJZt6v3vhDdN5HmmLoRqJLWzo8uBi9qaFbpbZaa4lQa2UONmfrJx+bjZOlQQvNbKM4JMSf2C5indMRqnqtOHYUR0X7S6BprwGXA5jy1YSFOOrfECV45gzQ2wePVzkSY6Co8IBARq1EhwxpQ6tqusoRENHtgFKodUVKCf3rO4DrFVAhAu5AkOTZEc4x9Xk9BLCEqxwXAAWLFhypmzUvgD1UF4Y2L4GCc+wxU9DUmSnDPs6Dgzm8xKMIOEJ9CSgnePA4o4Ke/J0GoQAX1Yd9vAAVmZ+jXx5yXIimXkWQzJcGScSpm0CkchKASOmtxmkeoRaugXROOuZvBy6WCCCgQ1kKZeVsLsyjhhGq6qESCiUy0LlOfKExE0/40vmUHSggHMBlLXtq2KXFuQCneJeaIiGoPSIeU45qSE4esu73ZYY9C7Wcnx8fIDxJLp+3+P99B+TkvgD1j4DKeXwIFW1Yg+TcKJnOG5m6OGJI/6kcBv6Jb29vVCXkbUA0gHPE7DfcDXA9QsUOBMK9Wd5OVFc133fDt+hnB+uxHHTl/GFg2wXAfC2SQ/4GVFIN4F1yjT/Bd6nCSZtfU1RmAPtB7HPt2/yX8kp1Aob0oX/GBe3iGwwB0KkjVdtyRvpbtGYLZ5ebdaVQZXuRaIcgi9xWp+X6mcCabG618e+mlWJLyZQvt4WW4R49pj8SLTlr8E2fjn/kUukHu/Xr0/q5Ts8fJpxLjRP9BulHyBd1+Bi3rtNq1lrpQBdaCySrfqoz9UvpFmlbq7ZaSZLLNkuKVvIWlLxPpdv72cK/d+z/D1CjJUU6+D0qAAAAAElFTkSuQmCC" alt="">＋ 新增行程</button>
   <div class="form" id="tl-form">
     <div class="formhint" id="f-dayhint">加入 Day 1</div>
-    <label>時間</label>
-    <div class="timesel">
-      <div class="timepair">
-        <select id="f-hh" aria-label="開始時"></select>
-        <span class="timesep">:</span>
-        <select id="f-mm" aria-label="開始分"></select>
-      </div>
-      <span class="timesep timearrow" id="f-endlab">→</span>
-      <div class="timepair">
-        <select id="f-hh2" aria-label="結束時"></select>
-        <span class="timesep">:</span>
-        <select id="f-mm2" aria-label="結束分"></select>
-      </div>
+    <label for="f-kind">時間</label>
+    <select id="f-kind" aria-label="時間種類"></select>
+    <div class="wheels" id="f-wheels">
+      <select id="f-hh" aria-label="開始時"></select>
+      <span class="colon" aria-hidden="true">:</span>
+      <select id="f-mm" aria-label="開始分"></select>
     </div>
+    <div class="wheels" id="f-wheels2" hidden>
+      <select id="f-hh2" aria-label="結束時"></select>
+      <span class="colon" aria-hidden="true">:</span>
+      <select id="f-mm2" aria-label="結束分"></select>
+    </div>
+    <button type="button" class="endtoggle" id="f-endtoggle">加結束時間</button>
     <label>地點／事項</label>
     <input id="f-title" placeholder="例：午餐 Pho 10" enterkeyhint="next" autocomplete="off" autocapitalize="sentences">
     <label>備註</label><input id="f-note" placeholder="選填" enterkeyhint="done" autocomplete="off">
     <div class="formerr" id="tl-err"></div>
-    <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
-    <button class="btn ghost" onclick="toggleForm('tl-form',false)">取消</button>
+    <div class="tlacts">
+      <button class="btn" id="tl-save" onclick="saveTimeline()">新增到行程</button>
+      <button type="button" class="btn tldel" id="tl-form-del" data-label="刪除" hidden>刪除</button>
+    </div>
+    <button type="button" class="tltext" id="tl-form-restore" data-label="恢復原行程" hidden>恢復原行程</button>
+    <button type="button" class="btn ghost" id="tl-cancel" onclick="toggleForm('tl-form',false)">取消</button>
   </div>
   <div id="tl-list"></div>
   
 
-  <div class="seclabel">當日路線 · MAP</div>
-  <div class="mapcard">
+  <div class="seclabel" id="tl-maplabel">當日路線 · MAP</div>
+  <div class="mapcard" id="realmap">
     <div class="mapframe">
       <img class="mbase" id="mapimg" alt="手繪示意地圖" decoding="async" style="aspect-ratio:7/9">
       <svg viewBox="0 0 896 1152" preserveAspectRatio="none">
@@ -750,13 +845,37 @@ input,select,textarea{max-width:100%}
 </nav>
 
 <div id="dragdemo">
-  <div class="eyebrow" style="font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600">DEMO</div>
-  <h1>拖拉試用</h1>
-  <p class="lead">按住左邊三個點再拖。這頁是假資料，不會改到大家的行程。文字可以照常選取。</p>
+  <a class="back" href="#">‹ 回到行程</a>
+  <p class="lead">試用頁，不會改到大家的行程。</p>
+  <div class="daytabs" id="demo-days" role="tablist" aria-label="選擇日期"></div>
+  <p class="status" id="demo-status"></p>
   <div id="demo-list"></div>
-  <div class="status" id="demo-status"></div>
-  <button class="btn ghost" type="button" id="demo-reset">恢復原順序</button>
-  <div><a class="back" href="#">回到行程</a></div>
+  <div class="seclabel" id="demo-maplabel">當日路線 · MAP</div>
+  <div id="demo-map"></div>
+  <div id="demo-edit" hidden>
+    <div class="who" id="demo-edit-who"></div>
+    <label for="demo-kind">時間</label>
+    <select id="demo-kind"></select>
+    <div class="wheels" id="demo-wheels">
+      <select id="demo-hh" aria-label="開始，時"></select>
+      <span class="colon" aria-hidden="true">:</span>
+      <select id="demo-mm" aria-label="開始，分"></select>
+    </div>
+    <div class="wheels" id="demo-wheels2" hidden>
+      <select id="demo-hh2" aria-label="結束，時"></select>
+      <span class="colon" aria-hidden="true">:</span>
+      <select id="demo-mm2" aria-label="結束，分"></select>
+    </div>
+    <button type="button" class="endtoggle" id="demo-endtoggle">加結束時間</button>
+    <label for="demo-edit-name">事項</label>
+    <input id="demo-edit-name" autocomplete="off" enterkeyhint="next">
+    <label for="demo-edit-note">備註</label>
+    <input id="demo-edit-note" autocomplete="off" enterkeyhint="done">
+    <div class="acts">
+      <button type="button" class="save" id="demo-edit-save">儲存</button>
+      <button type="button" class="del" id="demo-edit-del">刪除</button>
+    </div>
+  </div>
 </div>
 
 <div class="idmask" id="idmask" style="display:none">
@@ -1261,7 +1380,6 @@ async function checkFlightsDaily(){
   finally{flightChecking=false}
 }
 async function loadAll(){
-  if(location.protocol==="file:")toast("請用 https 網址開啟，不要用檔案直接開");
   if(location.protocol==="http:"&&location.hostname!=="localhost"&&location.hostname!=="127.0.0.1")toast("請改用 HTTPS");
   ME_LOCKED=(await kvGet("me-locked"))==="1";
   var raw=await kvGet("trip-data",true);
@@ -1804,13 +1922,16 @@ function renderWx(){renderWxPill();if($("wxpanel")&&$("wxpanel").classList.conta
 function renderDays(){var h="";for(var i=1;i<=6;i++){
   var info=DAY_INFO[i];
   var sub=info?'<span class="dsub">'+info.dateStr+'</span>':'';
-  h+='<button class="'+(i===curDay?"on":"")+'" onclick="setDay('+i+')"><span class="dname">Day '+i+'</span>'+sub+"</button>"}
+  h+='<button type="button" data-day="'+i+'" class="'+(i===curDay?"on":"")+'" onclick="setDay('+i+')"><span class="dname">Day '+i+'</span>'+sub+"</button>"}
   $("daypills").innerHTML=h}
 function setDay(d){
+  if(tlSwallowClick){tlSwallowClick=false;return}
   if($("tl-form")&&$("tl-form").classList.contains("show")&&!confirm("表單還沒存，要換到別天嗎？"))return;
   curDay=d;
   if($("tl-form")&&$("tl-form").classList.contains("show"))toggleForm("tl-form",false);
+  var st=$("tl-status"); if(st) st.textContent="";
   renderDays();renderTL();renderMap();
+  revealTl();
 }
 var vehRaf=null,vehStart=0;
 function renderMap(){
@@ -1867,20 +1988,106 @@ function fillSelectPair(hh,mm){
     mm.appendChild(o);
   }
 }
+var tlUiReady=false, tlArmTimer=null;
+var TL_DAYPARTS=["上午","中午","下午","待排"];
 function initTimeSelects(){
   fillSelectPair($("f-hh"),$("f-mm"));
   fillSelectPair($("f-hh2"),$("f-mm2"));
+  if(tlUiReady)return;
+  tlUiReady=true;
   ["f-hh","f-mm","f-hh2","f-mm2"].forEach(function(id){
     var el=$(id); if(!el)return;
-    el.onchange=function(){
+    el.addEventListener("change", function(){
       tlTimeTouched=true;
-      var v=el.value;
-      el.value="";
-      el.value=v;
-    };
+      var v=this.value;
+      this.value="";
+      this.value=v;
+    });
   });
+  var kind=$("f-kind");
+  if(kind) kind.addEventListener("change", function(){
+    tlTimeTouched=true;
+    var v=this.value;
+    this.value="";
+    this.value=v;
+    applyTlKind();
+  });
+  var end=$("f-endtoggle");
+  if(end) end.addEventListener("click", function(){
+    var box=$("f-wheels2");
+    tlTimeTouched=true;
+    if(box.hidden){
+      setWheelPair("f-hh2","f-mm2",(+$("f-hh").value+1)%24, +$("f-mm").value);
+      box.hidden=false;
+    }else box.hidden=true;
+    syncTlEndBtn();
+  });
+  var del=$("tl-form-del");
+  if(del) del.addEventListener("click", tlFormDel);
+  var rst=$("tl-form-restore");
+  if(rst) rst.addEventListener("click", tlFormRestore);
 }
 var tlTimeTouched=false, tlOrigTime="";
+function ensureTlOpt(el, val){
+  if(!el||el.querySelector('option[value="'+val+'"]'))return;
+  var o=document.createElement("option");
+  o.value=o.textContent=val;
+  el.appendChild(o);
+}
+function setWheelPair(hId,mId,h,mi){
+  initTimeSelects();
+  var hh=$(hId), mm=$(mId), hs=pad2(h), ms=pad2(mi);
+  ensureTlOpt(hh, hs);
+  ensureTlOpt(mm, ms);
+  hh.value=hs;
+  mm.value=ms;
+}
+function syncTlEndBtn(){
+  var btn=$("f-endtoggle");
+  if(!btn)return;
+  btn.textContent=$("f-wheels2").hidden?"加結束時間":"拿掉結束時間";
+}
+function applyTlKind(){
+  var clock=$("f-kind")&&$("f-kind").value==="clock";
+  if($("f-wheels")) $("f-wheels").hidden=!clock;
+  if($("f-endtoggle")) $("f-endtoggle").hidden=!clock;
+  if(!clock && $("f-wheels2")) $("f-wheels2").hidden=true;
+  syncTlEndBtn();
+}
+function tlParseEditClock(t){
+  var m=/^(\d{1,2}):(\d{2})(?:→(\d{1,2}):(\d{2}))?$/.exec(String(t||"").trim());
+  if(!m)return null;
+  return {h1:+m[1], m1:+m[2], h2:m[3]==null?null:+m[3], m2:m[4]==null?null:+m[4]};
+}
+function loadTimeControl(t, preferNow){
+  initTimeSelects();
+  var rg=tlParseEditClock(t);
+  var html='<option value="clock">指定時間</option>';
+  TL_DAYPARTS.forEach(function(p){html+='<option value="'+p+'">'+p+'</option>'});
+  if(!rg && TL_DAYPARTS.indexOf(t)<0 && t) html+='<option value="'+esc(t)+'">'+esc(t)+'</option>';
+  $("f-kind").innerHTML=html;
+  if(rg){
+    $("f-kind").value="clock";
+    setWheelPair("f-hh","f-mm",rg.h1,rg.m1);
+    if(rg.h2!=null){
+      setWheelPair("f-hh2","f-mm2",rg.h2,rg.m2);
+      $("f-wheels2").hidden=false;
+    }else{
+      setWheelPair("f-hh2","f-mm2",rg.h1,rg.m1);
+      $("f-wheels2").hidden=true;
+    }
+  }else if(preferNow||!t){
+    $("f-kind").value="clock";
+    setTimeSelectsNow();
+    $("f-wheels2").hidden=true;
+  }else{
+    $("f-kind").value=t;
+    setWheelPair("f-hh","f-mm",9,0);
+    setWheelPair("f-hh2","f-mm2",10,0);
+    $("f-wheels2").hidden=true;
+  }
+  applyTlKind();
+}
 function setTimeSelects(h,m){
   initTimeSelects();
   var hh=pad2(h), mm=pad2(Math.round(m/5)*5%60);
@@ -1898,21 +2105,60 @@ function setTimeSelectsNow(){
   setTimeSelects(d.getHours(),d.getMinutes());
   $("f-hh2").value=$("f-hh").value;$("f-mm2").value=$("f-mm").value;
 }
-function applyTimeToForm(t){
-  var rg=VN.parseClockRange(t);
-  if(!rg){setTimeSelectsNow();return}
-  setTimeSelects(rg.h1,rg.m1);
-  if(rg.h2!=null){
-    $("f-hh2").value=pad2(rg.h2);$("f-mm2").value=pad2(rg.m2);
-  }else{
-    $("f-hh2").value=pad2(rg.h1);$("f-mm2").value=pad2(rg.m1);
-  }
-}
+function applyTimeToForm(t){loadTimeControl(t, !t)}
 function readTimeFromForm(){
-  if(!tlTimeTouched && tlOrigTime)return tlOrigTime;
-  var h1=$("f-hh").value,m1=$("f-mm").value,h2=$("f-hh2").value,m2=$("f-mm2").value;
-  if(h2!==h1||m2!==m1)return VN.formatClockRange(+h1,+m1,+h2,+m2);
-  return pad2(h1)+":"+pad2(m1);
+  var kind=$("f-kind")&&$("f-kind").value;
+  if(kind && kind!=="clock") return kind;
+  var h1=$("f-hh").value, m1=$("f-mm").value;
+  if($("f-wheels2") && !$("f-wheels2").hidden){
+    var h2=$("f-hh2").value, m2=$("f-mm2").value;
+    if(h2!==h1||m2!==m1) return h1+":"+m1+"→"+h2+":"+m2;
+  }
+  return h1+":"+m1;
+}
+function resetTlArms(){
+  clearTimeout(tlArmTimer);
+  ["tl-form-del","tl-form-restore"].forEach(function(id){
+    var b=$(id); if(!b)return;
+    b.classList.remove("armed");
+    b.textContent=b.getAttribute("data-label")||b.textContent;
+  });
+}
+function armTlBtn(btn){
+  btn.classList.add("armed");
+  btn.textContent=btn.id==="tl-form-restore"?"再按恢復":"再按刪除";
+  clearTimeout(tlArmTimer);
+  tlArmTimer=setTimeout(function(){
+    if(!btn.isConnected)return;
+    btn.classList.remove("armed");
+    btn.textContent=btn.getAttribute("data-label")||"刪除";
+  },3000);
+}
+function tlFormDel(){
+  if(!tlEditing||!requireMe())return;
+  var btn=$("tl-form-del");
+  if(!btn.classList.contains("armed")){armTlBtn(btn);return}
+  var ed=tlEditing;
+  toggleForm("tl-form",false);
+  if(ed.kind==="user") delTL(ed.id,true);
+  else hideBase(ed.day, ed.idx, true);
+}
+function tlFormRestore(){
+  if(!tlEditing||tlEditing.kind!=="base"||!requireMe())return;
+  var btn=$("tl-form-restore");
+  if(!btn.classList.contains("armed")){armTlBtn(btn);return}
+  var ed=tlEditing;
+  toggleForm("tl-form",false);
+  restoreBase(ed.day, ed.idx, true);
+}
+function syncTlEditorButtons(){
+  resetTlArms();
+  var del=$("tl-form-del"), rst=$("tl-form-restore");
+  if(!del||!rst)return;
+  if(!tlEditing){del.hidden=true;rst.hidden=true;return}
+  del.hidden=false;
+  var show=tlEditing.kind==="base"&&sharedTL.some(function(x){return x.id===baseKey(tlEditing.day,tlEditing.idx)});
+  rst.hidden=!show;
 }
 function parseClock(t){return VN.parseClock(t)}
 function fillTlHint(){
@@ -1930,7 +2176,7 @@ function openTlForm(kind,a,b){
   if(!kind){
     tlEditing=null;
     $("f-title").value="";$("f-note").value="";
-    setTimeSelectsNow();
+    loadTimeControl("", true);
   }else if(kind==="base"){
     var src=(BASE_TL[a]||[])[b]||{};
     var ov=sharedTL.find(function(x){return x.id===baseKey(a,b)});
@@ -1940,7 +2186,7 @@ function openTlForm(kind,a,b){
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
     tlOrigTime=it.time||"";
-    applyTimeToForm(it.time);
+    loadTimeControl(it.time||"", false);
   }else{
     var it=sharedTL.find(function(x){return x.id===a});
     if(!it)return;
@@ -1950,16 +2196,39 @@ function openTlForm(kind,a,b){
     $("f-title").value=it.title||"";
     $("f-note").value=it.note||"";
     tlOrigTime=it.time||"";
-    applyTimeToForm(it.time);
+    loadTimeControl(it.time||"", false);
   }
+  syncTlEditorButtons();
   fillTlHint();
   toggleForm("tl-form",true);
   setTimeout(function(){$("f-title").focus()},40);
 }
 function baseKey(day,idx){return "b"+day+"-"+idx}
-function tlPen(kind,a,b){
+var TL_PEN='<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+var TL_PIN='<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 20.5s5.2-4.6 5.2-9.2a5.2 5.2 0 1 0-10.4 0c0 4.6 5.2 9.2 5.2 9.2z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="11.2" r="1.6" fill="currentColor"/></svg>';
+var TL_UP='<svg viewBox="0 0 12 8" width="9" height="6" aria-hidden="true"><path d="M1.4 6L6 1.8 10.6 6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var TL_DOWN='<svg viewBox="0 0 12 8" width="9" height="6" aria-hidden="true"><path d="M1.4 2L6 6.2 10.6 2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var TL_DOTS='<svg viewBox="0 0 10 16" width="10" height="14" aria-hidden="true"><circle cx="2.3" cy="2.2" r="1.05" fill="currentColor"/><circle cx="7.7" cy="2.2" r="1.05" fill="currentColor"/><circle cx="2.3" cy="8" r="1.05" fill="currentColor"/><circle cx="7.7" cy="8" r="1.05" fill="currentColor"/><circle cx="2.3" cy="13.8" r="1.05" fill="currentColor"/><circle cx="7.7" cy="13.8" r="1.05" fill="currentColor"/></svg>';
+function tlPenBtn(kind,a,b){
   var ds=kind==="base"?('data-act="tl-edit-base" data-day="'+a+'" data-idx="'+b+'"'):('data-act="tl-edit-user" data-id="'+esc(a)+'"');
-  return '<button class="penbtn" '+ds+' aria-label="修改行程"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.8 6.4l4.8 4.8" stroke="#C99A4B" stroke-width="1.4"/></svg></button>';
+  return '<button type="button" class="pen" '+ds+' aria-label="修改這筆行程">'+TL_PEN+"</button>";
+}
+function tlTimeHtml(time){
+  if(time==="待排") return '<span class="time pending">待排</span>';
+  return '<span class="time">'+esc(time)+"</span>";
+}
+function tlPin(q){
+  if(!q) return "";
+  return '<a class="pin" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer" aria-label="在地圖開啟這個地點">'+TL_PIN+"</a>";
+}
+function tlRail(tid){
+  var pressed=tlGrab&&tlGrab.tid===tid?"true":"false";
+  return '<div class="rail"><button type="button" class="nudge" data-act="tl-nudge" data-dir="-1" aria-label="上移這筆行程">'+TL_UP+'</button>'+
+    '<button type="button" class="grip" data-tid="'+esc(tid)+'" aria-pressed="'+pressed+'" aria-label="拖曳排序。Enter 抓起，方向鍵移動，再按 Enter 確認">'+TL_DOTS+'</button>'+
+    '<button type="button" class="nudge" data-act="tl-nudge" data-dir="1" aria-label="下移這筆行程">'+TL_DOWN+"</button></div>";
+}
+function tlSide(pen,q,tid){
+  return '<div class="tools">'+pen+tlPin(q)+"</div>"+tlRail(tid);
 }
 function tlMapQ(row, base){
   if((row&&row.flight)||(base&&base.flight))return HAN_Q;
@@ -1967,36 +2236,33 @@ function tlMapQ(row, base){
   if(/\b(JX|CI)\d{3}\b/.test(title))return HAN_Q;
   return (row&&row.q)||(base&&base.q)||"";
 }
-function tlAttrs(kind,id,time,title,idx){
-  return ' data-kind="'+kind+'" data-tlid="'+esc(id)+'" data-day="'+curDay+'" data-time="'+esc(time)+'" data-title="'+esc(title)+'"'+(idx==null?"":' data-idx="'+idx+'"');
+function tlAttrs(kind,id,time,title,idx,pos){
+  return ' data-kind="'+kind+'" data-tlid="'+esc(id)+'" data-day="'+curDay+'" data-i="'+pos+'" data-time="'+esc(time)+'" data-title="'+esc(title)+'"'+(idx==null?"":' data-idx="'+idx+'"');
 }
-function tlBaseRow(it,idx){
+function tlBaseRow(it,idx,pos){
   var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
   var row=ov||it;
-  var q=tlMapQ(row,it);
-  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"'+tlAttrs("base",baseKey(curDay,idx),row.time,row.title,idx)+'>'+tlPen("base",curDay,idx)+
-    '<div class="t"><span class="time">'+esc(row.time)+'</span><span>'+esc(row.title)+"</span></div>"+
+  var q=tlMapQ(row,it)||row.title;
+  var tid=baseKey(curDay,idx);
+  return '<div class="card'+(row.flight||it.flight?" flight":"")+'"'+tlAttrs("base",tid,row.time,row.title,idx,pos)+'>'+
+    tlSide(tlPenBtn("base",curDay,idx),q,tid)+
+    '<div class="t">'+tlTimeHtml(row.time)+"<span>"+esc(row.title)+"</span></div>"+
     (row.note?'<div class="d">'+esc(row.note)+"</div>":"")+
-    (q?'<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>':"")+
-    '<div class="meta">'+
-    (ov?'<button class="delbtn" data-label="恢復原行程" data-key="rst:'+curDay+'-'+idx+'" data-act="tl-restore" data-day="'+curDay+'" data-idx="'+idx+'">恢復原行程</button>':"")+
-    '<button class="delbtn" data-label="刪除" data-key="hb:'+curDay+'-'+idx+'" data-act="tl-hide" data-day="'+curDay+'" data-idx="'+idx+'">刪除</button></div>'+
     "</div>";
 }
 function hideKey(day,idx){return "h"+day+"-"+idx}
 function isHideMark(it){return /^h\d+-\d+$/.test((it&&it.id)||"")}
-function tlHiddenRow(it,idx){
-  return '<div class="card" style="opacity:.72"'+tlAttrs("hide",baseKey(curDay,idx),it.time,it.title,idx)+'><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
+function tlHiddenRow(it,idx,pos){
+  return '<div class="card hide-row"'+tlAttrs("hide",baseKey(curDay,idx),it.time,it.title,idx,pos)+'><div class="d">已拿掉「'+esc(it.title)+'」</div>'+
     '<div class="meta"><button class="delbtn" data-label="恢復" data-key="uh:'+curDay+'-'+idx+'" data-act="tl-unhide" data-day="'+curDay+'" data-idx="'+idx+'">恢復這筆</button></div></div>';
 }
-function tlMineRow(it){
+function tlMineRow(it,pos){
   var q=tlMapQ(it,null)||it.q||it.title;
-  return '<div class="card" style="border-color:var(--gold)"'+tlAttrs("user",it.id,it.time,it.title)+'>'+tlPen("user",it.id)+
-    '<div class="t"><span class="time">'+esc(it.time)+'</span><span>'+esc(it.title)+"</span></div>"+
+  return '<div class="card"'+tlAttrs("user",it.id,it.time,it.title,null,pos)+'>'+
+    tlSide(tlPenBtn("user",it.id),q,it.id)+
+    '<div class="t">'+tlTimeHtml(it.time)+"<span>"+esc(it.title)+"</span></div>"+
     (it.note?'<div class="d">'+esc(it.note)+"</div>":"")+
-    '<a class="maplink" href="'+gm(q)+'" target="_blank" rel="noopener noreferrer">地圖</a>'+
-    '<div class="meta"><button class="delbtn" data-label="刪除" data-key="tl:'+esc(it.id)+'" data-act="tl-del" data-id="'+esc(it.id)+'">刪除</button>'+
-    '<span>'+esc(it.who)+"·"+esc(it.t)+"</span></div></div>";
+    "</div>";
 }
 function isBaseOverride(it){return /^b\d+-\d+$/.test((it&&it.id)||"")}
 function isOrderMark(it){return /^ord[1-6]$/.test((it&&it.id)||"")}
@@ -2032,24 +2298,42 @@ function writeDayOrder(day, ids){
   if(it){it.note=note;it.day=day;it.upd=Date.now();it.who=ME;it.t=now()}
   else sharedTL.push({id:id,day:day,time:"",title:"順序",note:note,who:ME,t:now(),upd:Date.now()});
 }
-function renderTL(){
+function tlClock(t){
+  var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
+  return m?(+m[1])*60+(+m[2]):1e9;
+}
+function tlConflicts(time, rows, index){
+  var mine=tlClock(time), i, k;
+  if(!(mine<1e9))return false;
+  for(i=index-1;i>=0;i--){
+    k=tlClock(rows[i].time);
+    if(k<1e9)return mine<k;
+  }
+  for(i=index;i<rows.length;i++){
+    k=tlClock(rows[i].time);
+    if(k<1e9)return mine>k;
+  }
+  return false;
+}
+function tlVisible(day){
   var rows=[];
-  (BASE_TL[curDay]||[]).forEach(function(it,idx){
-    if(sharedTL.some(function(x){return x.id===hideKey(curDay,idx)})){
-      rows.push({it:{time:it.time,title:it.title}, src:it, hide:1, idx:idx});
+  (BASE_TL[day]||[]).forEach(function(it,idx){
+    var hid=sharedTL.find(function(x){return x.id===hideKey(day,idx)});
+    if(hid){
+      if(String(hid.note||"").indexOf("移走")===0) return;
+      rows.push({kind:"hide", tid:baseKey(day,idx), idx:idx, it:it, src:it, time:it.time, title:it.title, note:it.note||"", q:"", flight:!!it.flight});
       return;
     }
-    var ov=sharedTL.find(function(x){return x.id===baseKey(curDay,idx)});
-    rows.push({it:ov||it, src:it, base:1, idx:idx});
+    var ov=sharedTL.find(function(x){return x.id===baseKey(day,idx)});
+    var row=ov||it;
+    rows.push({kind:"base", tid:baseKey(day,idx), idx:idx, it:row, src:it, time:row.time, title:row.title, note:row.note||"", q:tlMapQ(row,it)||row.title, flight:!!(row.flight||it.flight)});
   });
   sharedTL.forEach(function(it){
-    if(it.day===curDay && !isBaseOverride(it) && !isHideMark(it) && !isOrderMark(it)) rows.push({it:it, base:0});
+    if(it.day===day && !isBaseOverride(it) && !isHideMark(it) && !isOrderMark(it))
+      rows.push({kind:"user", tid:it.id, it:it, time:it.time, title:it.title, note:it.note||"", q:tlMapQ(it,null)||it.q||it.title, flight:!!it.flight});
   });
-  rows.forEach(function(r,i){
-    r.n=i;
-    r.tid=r.base||r.hide?baseKey(curDay,r.idx):r.it.id;
-  });
-  var ord=dayOrder(curDay);
+  rows.forEach(function(r,i){r.n=i});
+  var ord=dayOrder(day);
   rows.sort(function(a,b){
     if(ord){
       var ia=ord.indexOf(a.tid), ib=ord.indexOf(b.tid);
@@ -2057,15 +2341,26 @@ function renderTL(){
       if(ib<0)ib=1000+b.n;
       return ia-ib;
     }
-    var d=tlSortKey(a.it.time)-tlSortKey(b.it.time);
+    var d=tlSortKey(a.time)-tlSortKey(b.time);
     return d?d:a.n-b.n;
   });
-  var h=rows.map(function(r){
-    if(r.hide)return tlHiddenRow(r.src,r.idx);
-    return r.base?tlBaseRow(r.src,r.idx):tlMineRow(r.it);
+  return rows;
+}
+function renderTL(){
+  var rows=tlVisible(curDay);
+  var h=rows.map(function(r,i){
+    if(r.kind==="hide") return tlHiddenRow(r.it, r.idx, i);
+    if(r.kind==="base") return tlBaseRow(r.src, r.idx, i);
+    return tlMineRow(r.it, i);
   }).join("");
   $("tl-list").innerHTML=h||'<div class="d" style="text-align:center;color:var(--ink3)">這天還沒有行程</div>';
   paintArmed();
+  if(tlAfterPaint){
+    var fn=tlAfterPaint; tlAfterPaint=null;
+    setTimeout(fn, 30);
+  }else if(tlFocusTid){
+    setTimeout(tlFocusGrip, 30);
+  }
   var n=noticeItem(), dismissed=null;
   try{dismissed=sessionStorage.getItem("vn-notice")}catch(e){}
   if(n && dismissed!==n.who+"|"+n.msg+"|"+n.t){
@@ -2088,7 +2383,7 @@ function dismissNotice(){
 }
 function toggleForm(id,s){$(id).classList[s?"add":"remove"]("show");
   if(id==="exp-form"&&s){renderExpForm();if(ME)$("e-payer").value=ME}
-  if(id==="tl-form"&&!s)tlEditing=null;
+  if(id==="tl-form"&&!s){tlEditing=null;resetTlArms()}
   if(id==="exp-form"&&!s)expEditing=null;
   if(s){var el=$(id);if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},50)}
 }
@@ -2133,11 +2428,11 @@ function saveTimeline(){
   saveShared("新增了 Day"+d+"「"+t+"」");
 }
 function addTimeline(){saveTimeline()}
-function hideBase(day,idx){
+function hideBase(day,idx,quiet){
   if(!requireMe())return;
   var src=(BASE_TL[day]||[])[idx]; if(!src)return;
   var ov=sharedTL.find(function(x){return x.id===baseKey(day,idx)});
-  if(ov&&!allowTl(ov))return;
+  if(ov&&!quiet&&!allowTl(ov))return;
   var id=hideKey(day,idx);
   if(!sharedTL.some(function(x){return x.id===id}))
     sharedTL.push({id:id,day:day,time:"",title:src.title,note:"",who:ME,t:now(),upd:Date.now()});
@@ -2154,17 +2449,17 @@ function unhideBase(day,idx){
   pushAudit("unhide-tl",id);
   saveShared("恢復了「"+t+"」");
 }
-function delTL(id){
+function delTL(id,quiet){
   if(!requireMe())return;
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
-  if(!allowTl(sharedTL[i]))return;
+  if(!quiet&&!allowTl(sharedTL[i]))return;
   dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("del-tl",id);saveShared("刪除了「"+t+"」")}
-function restoreBase(day,idx){
+function restoreBase(day,idx,quiet){
   if(!requireMe())return;
   var id=baseKey(day,idx);
   var i=sharedTL.findIndex(function(x){return x.id===id});if(i<0)return;
-  if(!allowTl(sharedTL[i]))return;
+  if(!quiet&&!allowTl(sharedTL[i]))return;
   dels[id]=Date.now();
   var t=sharedTL[i].title;sharedTL.splice(i,1);pushAudit("rst-tl",id);saveShared("恢復了「"+t+"」原行程")}
 
@@ -2954,90 +3249,295 @@ document.addEventListener("click",function(e){
   else if(act==="set-cat")setCat(t.getAttribute("data-cat"));
   else if(act==="tl-hide")armDel(t,function(){hideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"))});
   else if(act==="tl-unhide")unhideBase(+t.getAttribute("data-day"),+t.getAttribute("data-idx"));
+  else if(act==="tl-nudge"){
+    var card=t.closest(".card");
+    if(!card||tlSt)return;
+    tlGrab=null;
+    tlStep(+card.getAttribute("data-day"), +card.getAttribute("data-i"), +t.getAttribute("data-dir"));
+  }
   else if(act==="card-open"){ if(e.target.closest&&e.target.closest(".sayb"))return; openCardZoom(+t.getAttribute("data-i")); }
 });
-var tlDrag=null;
-function finishTlDrag(card, before){
-  var ids=[];
-  document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){ids.push(el.getAttribute("data-tlid"))});
-  if(!ids.length||(before&&before.join(",")===ids.join(",")))return;
-  if(!ME){renderTL();return}
-  var mine=tlSortKey(card.getAttribute("data-time"));
-  var nxt=null, n=card.nextElementSibling;
-  while(n){
-    var k=tlSortKey(n.getAttribute("data-time")||"");
-    if(k<1e9){nxt={k:k,time:n.getAttribute("data-time")};break}
-    n=n.nextElementSibling;
+var tlGrab=null, tlSt=null, tlAfterPaint=null, tlFocusTid=null, tlSwallowClick=false;
+function cssAttr(s){
+  if(window.CSS&&CSS.escape) return CSS.escape(String(s));
+  return String(s).replace(/["\\]/g,"\\$&");
+}
+function revealTl(){
+  var tabs=$("daypills"), list=$("tl-list");
+  if(!tabs||!list)return;
+  var anchor=$("tl-status");
+  if(!anchor||!anchor.textContent) anchor=list.querySelector(".card")||list;
+  var below=tabs.getBoundingClientRect().bottom+16;
+  var top=anchor.getBoundingClientRect().top;
+  if(top>=below-1&&top<below+80)return;
+  window.scrollBy(0, top-below);
+}
+function tlFocusGrip(){
+  if(!tlFocusTid)return;
+  var tid=tlFocusTid; tlFocusTid=null;
+  var g=document.querySelector('#tl-list .grip[data-tid="'+cssAttr(tid)+'"]');
+  if(g){try{g.focus({preventScroll:true})}catch(e){g.focus()}}
+}
+function tlPaintFollow(){revealTl();tlFocusGrip()}
+function tlCommitMove(fromDay, fromIndex, toDay, toIndex){
+  if(!requireMe())return null;
+  var srcRows=tlVisible(fromDay);
+  var moving=srcRows[fromIndex];
+  if(!moving||moving.kind==="hide")return null;
+  if(fromDay===toDay && toIndex===fromIndex)return null;
+  var srcIds=srcRows.map(function(r){return r.tid});
+  srcIds.splice(fromIndex,1);
+  var destRows=fromDay===toDay?srcRows.filter(function(_,i){return i!==fromIndex}):tlVisible(toDay);
+  if(toIndex<0)toIndex=0;
+  if(toIndex>destRows.length)toIndex=destRows.length;
+  var time=moving.time;
+  var cross=fromDay!==toDay;
+  if(cross && tlConflicts(time, destRows, toIndex)) time="待排";
+  var newTid=moving.tid;
+  if(cross && moving.kind==="base"){
+    var hk=hideKey(fromDay, moving.idx);
+    var hid=sharedTL.find(function(x){return x.id===hk});
+    if(!hid) sharedTL.push({id:hk,day:fromDay,time:"",title:moving.src.title,note:"移走",who:ME,t:now(),upd:Date.now()});
+    else{hid.note="移走";hid.title=moving.src.title;hid.day=fromDay;hid.upd=Date.now();hid.who=ME;hid.t=now()}
+    newTid=uid();
+    var copy={id:newTid,day:toDay,time:time,title:moving.title,note:moving.note||"",q:moving.q||"",who:ME,t:now(),upd:Date.now()};
+    if(moving.flight) copy.flight=true;
+    sharedTL.push(copy);
+  }else if(cross){
+    moving.it.day=toDay;
+    moving.it.time=time;
+    moving.it.upd=Date.now();
+    moving.it.who=ME;
+    moving.it.t=now();
   }
-  var kind=card.getAttribute("data-kind");
-  var day=+card.getAttribute("data-day")||curDay;
-  var idx=card.getAttribute("data-idx");
-  var title=card.getAttribute("data-title")||"";
-  var myTime=card.getAttribute("data-time")||"";
-  var uid=card.getAttribute("data-tlid");
-  writeDayOrder(curDay, ids);
-  saveShared("調整了第 "+curDay+" 天的順序");
-  if(mine<1e9 && nxt && mine>nxt.k){
-    if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
-      if(kind==="base")openTlForm("base", day, +idx);
-      else openTlForm("user", uid);
+  var destIds=destRows.map(function(r){return r.tid});
+  destIds.splice(toIndex,0,newTid);
+  if(cross){writeDayOrder(fromDay, srcIds); writeDayOrder(toDay, destIds)}
+  else writeDayOrder(fromDay, destIds);
+  if($("tl-form")&&$("tl-form").classList.contains("show")) toggleForm("tl-form",false);
+  curDay=toDay;
+  var el=$("tl-status");
+  if(el) el.innerHTML=cross?(esc(moving.title)+" 放到第 "+toDay+" 天"+(time==="待排"?"，時間標成 <b>待排</b>":"，時間仍是 "+esc(time))):"";
+  if(tlGrab){tlGrab.tid=newTid;tlGrab.dirty=true;tlFocusTid=newTid}
+  tlAfterPaint=tlPaintFollow;
+  saveShared(cross?("把「"+moving.title+"」移到第 "+toDay+" 天"):("調整了第 "+fromDay+" 天的順序"));
+  return {title:moving.title,time:time,day:toDay,tid:newTid};
+}
+function tlStep(day, index, dir){
+  if(!requireMe())return;
+  var rows=tlVisible(day);
+  var item=rows[index];
+  if(!item||item.kind==="hide")return;
+  var dest=day, at;
+  if(dir<0){
+    if(index===0){if(day<=1)return; dest=day-1; at=tlVisible(dest).length}
+    else at=index-1;
+  }else if(index===rows.length-1){
+    if(day>=6)return; dest=day+1; at=0;
+  }else at=index+1;
+  tlCommitMove(day, index, dest, at);
+}
+function tlEndDrag(){
+  document.body.classList.remove("tl-sorting");
+  var st=tlSt;
+  if(st){
+    if(st.raf) cancelAnimationFrame(st.raf);
+    if(st.ghost&&st.ghost.parentNode) st.ghost.parentNode.removeChild(st.ghost);
+    if(st.line&&st.line.parentNode) st.line.parentNode.removeChild(st.line);
+    if(st.hold&&st.hold.parentNode) st.hold.parentNode.removeChild(st.hold);
+    if(st.card) st.card.classList.remove("tl-src");
+  }
+  var cards=document.querySelectorAll("#tl-list .card");
+  for(var i=0;i<cards.length;i++) cards[i].style.transform="";
+  var tabs=document.querySelectorAll("#daypills button");
+  for(var j=0;j<tabs.length;j++) tabs[j].classList.remove("over");
+  tlSt=null;
+}
+function tlOtherDay(x,y,from){
+  var el=document.elementFromPoint(x,y);
+  if(!el||!el.closest) return 0;
+  var tab=el.closest("#daypills button");
+  if(!tab) return 0;
+  var d=+tab.getAttribute("data-day");
+  return d&&d!==from?d:0;
+}
+function tlLayout(st){
+  var list=st.list, slots=[], nodes=list.children, i;
+  for(i=0;i<nodes.length;i++) if(nodes[i].classList&&nodes[i].classList.contains("card")&&!nodes[i].classList.contains("tl-src")) slots.push(nodes[i]);
+  for(i=0;i<slots.length;i++) slots[i].style.transform="";
+  var foreign=tlOtherDay(st.x, st.y, st.day);
+  st.foreign=foreign;
+  var tabs=document.querySelectorAll("#daypills button");
+  for(i=0;i<tabs.length;i++) tabs[i].classList.toggle("over", +tabs[i].getAttribute("data-day")===foreign);
+  var rects=slots.map(function(c){return c.getBoundingClientRect()});
+  var prev=typeof st.insertAt==="number"?st.insertAt:st.from;
+  var idx=Math.min(st.from, slots.length);
+  if(!foreign){
+    idx=slots.length;
+    for(i=0;i<rects.length;i++){
+      var top=rects[i].top+(i>=prev?st.H:0);
+      if(st.y<top+rects[i].height/2){idx=i;break}
     }
   }
+  for(i=0;i<slots.length;i++) slots[i].style.transform=i>=idx?"translateY("+st.H+"px)":"";
+  st.insertAt=idx;
+  if(st.line){
+    if(foreign||!rects.length) st.line.style.display="none";
+    else{
+      st.line.style.display="block";
+      var edge=slots[0].getBoundingClientRect();
+      var y=idx<slots.length?slots[idx].getBoundingClientRect().top-st.H/2:slots[slots.length-1].getBoundingClientRect().bottom+6;
+      st.line.style.top=(y-1)+"px";
+      st.line.style.left=edge.left+"px";
+      st.line.style.width=edge.width+"px";
+    }
+  }
+  if(st.ghost){st.ghost.style.left=st.originLeft+"px";st.ghost.style.top=(st.y-st.dy)+"px"}
 }
-document.addEventListener("pointerdown",function(e){
-  if(e.button!=null && e.button!==0)return;
-  var card=e.target.closest&&e.target.closest("#tl-list .card");
-  if(!card||card.getAttribute("data-kind")==="hide")return;
-  if(e.target.closest("button,a,input,select,textarea"))return;
-  var pid=e.pointerId, sx=e.clientX, sy=e.clientY, hold=true, before=null;
-  function eat(ev){if(hold)ev.preventDefault()}
-  card.addEventListener("contextmenu", eat);
-  var timer=setTimeout(function(){
-    if(!card.isConnected||!ME)return;
-    before=[];
-    document.querySelectorAll("#tl-list .card[data-tlid]").forEach(function(el){before.push(el.getAttribute("data-tlid"))});
-    tlDrag=card;
-    card.classList.add("tl-dragging");
-  },420);
-  function move(ev){
-    if(ev.pointerId!==pid)return;
-    if(!tlDrag){
-      if(Math.abs(ev.clientX-sx)>10||Math.abs(ev.clientY-sy)>10){
-        hold=false;clearTimeout(timer);
-      }
+function tlTick(){
+  var st=tlSt;
+  if(!st||!st.started) return;
+  var tabs=$("daypills");
+  var tr=tabs?tabs.getBoundingClientRect():null;
+  var onTabs=tr&&st.y>=tr.top-8&&st.y<=tr.bottom+12;
+  if(!onTabs){
+    if(st.y<72) window.scrollBy(0,-14);
+    else if(st.y>window.innerHeight-96) window.scrollBy(0,14);
+  }
+  tlLayout(st);
+  st.raf=requestAnimationFrame(tlTick);
+}
+function tlBegin(st){
+  if(st.started||!st.card.isConnected) return;
+  st.started=true;
+  if($("tl-form")&&$("tl-form").classList.contains("show")) toggleForm("tl-form",false);
+  tlGrab=null;
+  var r=st.card.getBoundingClientRect();
+  st.dx=st.x-r.left; st.dy=st.y-r.top;
+  st.list=st.card.parentNode;
+  st.day=+st.card.getAttribute("data-day");
+  st.from=+st.card.getAttribute("data-i");
+  st.insertAt=st.from;
+  var ghost=st.card.cloneNode(true);
+  ghost.classList.add("tl-ghost");
+  ghost.setAttribute("aria-hidden","true");
+  ghost.style.width=r.width+"px";
+  st.originLeft=r.left;
+  ghost.style.left=r.left+"px";
+  ghost.style.top=r.top+"px";
+  document.body.appendChild(ghost);
+  st.ghost=ghost;
+  document.body.classList.add("tl-sorting");
+  var map=document.getElementById("tl-maplabel");
+  var y0=map?map.getBoundingClientRect().top:0;
+  st.card.classList.add("tl-src");
+  var hold=document.createElement("div");
+  hold.className="tl-hold";
+  hold.style.height="0px";
+  st.list.appendChild(hold);
+  var lost=map?y0-map.getBoundingClientRect().top:r.height;
+  if(lost<1) lost=r.height;
+  hold.style.height=lost+"px";
+  if(map){
+    var drift=map.getBoundingClientRect().top-y0;
+    if(Math.abs(drift)>0.5) hold.style.height=(lost-drift)+"px";
+  }
+  st.H=parseFloat(hold.style.height)||r.height;
+  st.hold=hold;
+  var line=document.createElement("div");
+  line.className="tl-line";
+  document.body.appendChild(line);
+  st.line=line;
+  tlLayout(st);
+  st.raf=requestAnimationFrame(tlTick);
+}
+function tlFinish(st){
+  var day=st.day, from=st.from, foreign=st.foreign, at=st.insertAt;
+  tlSwallowClick=true;
+  setTimeout(function(){tlSwallowClick=false},0);
+  tlEndDrag();
+  if(foreign&&foreign!==day){tlCommitMove(day, from, foreign, 1e9);return}
+  if(at===from) return;
+  tlCommitMove(day, from, day, at);
+}
+function tlOnMove(e){
+  var st=tlSt;
+  if(!st||e.pointerId!==st.pid) return;
+  var dx=e.clientX-st.sx, dy=e.clientY-st.sy;
+  if(!st.started){
+    if(Math.abs(dx)>6||Math.abs(dy)>6){e.preventDefault();st.x=e.clientX;st.y=e.clientY;tlBegin(st)}
+    return;
+  }
+  e.preventDefault();
+  st.x=e.clientX; st.y=e.clientY;
+  tlLayout(st);
+}
+function tlOnUp(e){
+  var st=tlSt;
+  if(!st||(e&&e.pointerId!=null&&e.pointerId!==st.pid)) return;
+  document.removeEventListener("pointermove", tlOnMove);
+  document.removeEventListener("pointerup", tlOnUp);
+  document.removeEventListener("pointercancel", tlOnUp);
+  if(!st.started){tlEndDrag();return}
+  st.x=e.clientX; st.y=e.clientY; tlLayout(st);
+  tlFinish(st);
+}
+document.addEventListener("click",function(e){
+  if(!tlSwallowClick) return;
+  tlSwallowClick=false;
+  e.preventDefault();
+  e.stopPropagation();
+}, true);
+var tlListEl=document.getElementById("tl-list");
+if(tlListEl) tlListEl.addEventListener("pointerdown", function(e){
+  if(tlSt) return;
+  if(e.button!=null&&e.button!==0) return;
+  var grip=e.target.closest&&e.target.closest(".grip");
+  if(!grip) return;
+  var card=grip.closest(".card");
+  if(!card||card.getAttribute("data-kind")==="hide") return;
+  if(!ME){requireMe();return}
+  tlSt={card:card,pid:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,started:false};
+  e.preventDefault();
+  try{grip.setPointerCapture(e.pointerId)}catch(err){}
+  document.addEventListener("pointermove", tlOnMove, {passive:false});
+  document.addEventListener("pointerup", tlOnUp);
+  document.addEventListener("pointercancel", tlOnUp);
+}, {passive:false});
+document.addEventListener("contextmenu", function(e){ if(tlSt) e.preventDefault(); });
+document.addEventListener("keydown", function(e){
+  var grip=e.target.closest&&e.target.closest("#tl-list .grip");
+  if(!grip) return;
+  var key=e.key;
+  if(key!=="Enter"&&key!==" "&&key!=="Escape"&&key!=="ArrowUp"&&key!=="ArrowDown") return;
+  e.preventDefault();
+  var tid=grip.getAttribute("data-tid");
+  if(key==="Escape"){
+    if(!tlGrab) return;
+    try{sharedTL=JSON.parse(tlGrab.backup)}catch(err){tlGrab=null;return}
+    curDay=tlGrab.day;
+    tlGrab=null;
+    tlFocusTid=tid;
+    var box=$("tl-status"); if(box) box.textContent="";
+    tlAfterPaint=tlPaintFollow;
+    saveShared("取消了剛才的順序調整");
+    return;
+  }
+  if(key==="Enter"||key===" "){
+    if(!tlGrab||tlGrab.tid!==tid){
+      tlGrab={tid:tid,backup:JSON.stringify(sharedTL),day:curDay,dirty:false};
+      tlFocusTid=tid;
+      renderTL();
       return;
     }
-    ev.preventDefault();
-    if(ev.clientY<88)window.scrollBy(0,-14);
-    else if(ev.clientY>window.innerHeight-88)window.scrollBy(0,14);
-    var cards=[].slice.call(document.querySelectorAll("#tl-list .card"));
-    var i=cards.indexOf(card);
-    if(i<0)return;
-    if(i>0){
-      var pr=cards[i-1].getBoundingClientRect();
-      if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, cards[i-1]);return}
-    }
-    if(i<cards.length-1){
-      var nr=cards[i+1].getBoundingClientRect();
-      if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, cards[i+1].nextSibling);
-    }
+    tlGrab=null;
+    tlFocusTid=tid;
+    renderTL();
+    return;
   }
-  function up(ev){
-    if(ev&&ev.pointerId!=null&&ev.pointerId!==pid)return;
-    clearTimeout(timer);
-    hold=false;
-    card.removeEventListener("contextmenu", eat);
-    document.removeEventListener("pointermove", move);
-    document.removeEventListener("pointerup", up);
-    document.removeEventListener("pointercancel", up);
-    var dragged=tlDrag===card;
-    tlDrag=null;
-    card.classList.remove("tl-dragging");
-    if(dragged)finishTlDrag(card, before);
-  }
-  document.addEventListener("pointermove", move, {passive:false});
-  document.addEventListener("pointerup", up);
-  document.addEventListener("pointercancel", up);
+  if(!tlGrab||tlGrab.tid!==tid) return;
+  var card=grip.closest(".card");
+  tlStep(+card.getAttribute("data-day"), +card.getAttribute("data-i"), key==="ArrowUp"?-1:1);
 });
 var cardZoomI=-1;
 function openCardZoom(i){
@@ -3085,110 +3585,546 @@ window.addEventListener("online",function(){
 });
 window.addEventListener("offline",function(){toast("離線中，資料會存在這台裝置")});
 
-/* 拖拉試用頁。跟正式行程分開，確認手感後才換過去。 */
+/* 排序試用。假資料，不寫入行程。 */
 (function(){
-  var SEED=[
-    {time:"07:00",title:"坐車出發",note:"河內到寧平，約 2 小時"},
-    {time:"上午",title:"華閭古都",note:"十世紀古都，丁朝和前黎朝的寺廟"},
-    {time:"中午",title:"三谷午餐",note:"附近餐廳自助"},
-    {time:"16:30",title:"坐車回河內",note:"把這張拖到最上面，會問要不要改時間"}
-  ];
-  var rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
-  function dkey(t){
-    var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
-    if(m)return (+m[1])*60+(+m[2]);
-    t=String(t||"");
-    if(t.indexOf("上午")>=0)return 9*60;
-    if(t.indexOf("中午")>=0)return 12*60;
-    if(t.indexOf("下午")>=0)return 14*60;
-    return 1e9;
-  }
-  function paint(){
-    var h="";
-    rows.forEach(function(r,i){
-      h+='<div class="drow" data-i="'+i+'" data-time="'+esc(r.time)+'" data-title="'+esc(r.title)+'">'+
-        '<button class="grip" type="button" aria-label="拖動這一行">'+
-        '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><circle cx="8" cy="3.2" r="1.35" fill="currentColor"/><circle cx="8" cy="8" r="1.35" fill="currentColor"/><circle cx="8" cy="12.8" r="1.35" fill="currentColor"/></svg>'+
-        '</button><div class="dbody"><div><span class="dtime">'+esc(r.time)+'</span> <span class="dtitle">'+esc(r.title)+'</span></div>'+
-        (r.note?'<div class="dnote">'+esc(r.note)+'</div>':"")+'</div></div>';
-    });
-    $("demo-list").innerHTML=h;
-  }
-  function showDemo(){
-    var on=location.hash==="#drag-demo";
-    document.body.classList.toggle("demo-on", on);
-    if(on)paint();
-  }
-  function nextSlot(card){
-    var n=card.nextElementSibling, best=null;
-    while(n){
-      var k=dkey(n.getAttribute("data-time"));
-      if(k<1e9){best={k:k,time:n.getAttribute("data-time")};break}
-      n=n.nextElementSibling;
+  var PEN='<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M14.1 5.1l4.8 4.8-10 10H4.1v-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  var PIN='<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 20.5s5.2-4.6 5.2-9.2a5.2 5.2 0 1 0-10.4 0c0 4.6 5.2 9.2 5.2 9.2z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="11.2" r="1.6" fill="currentColor"/></svg>';
+  var UP='<svg viewBox="0 0 12 8" width="9" height="6" aria-hidden="true"><path d="M1.4 6L6 1.8 10.6 6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var DOWN='<svg viewBox="0 0 12 8" width="9" height="6" aria-hidden="true"><path d="M1.4 2L6 6.2 10.6 2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var DOTS='<svg viewBox="0 0 10 16" width="10" height="14" aria-hidden="true">'+
+    '<circle cx="2.3" cy="2.2" r="1.05" fill="currentColor"/><circle cx="7.7" cy="2.2" r="1.05" fill="currentColor"/>'+
+    '<circle cx="2.3" cy="8" r="1.05" fill="currentColor"/><circle cx="7.7" cy="8" r="1.05" fill="currentColor"/>'+
+    '<circle cx="2.3" cy="13.8" r="1.05" fill="currentColor"/><circle cx="7.7" cy="13.8" r="1.05" fill="currentColor"/></svg>';
+  var days=null, viewDay=1, grab=null, drag=null, editing=null, savedDay=null, wheelsReady=false;
+  var DAYPARTS=["上午","中午","下午","待排"];
+  function copyDays(){
+    var o={};
+    for(var d=1;d<=6;d++){
+      o[d]=[];
+      (BASE_TL[d]||[]).forEach(function(r){
+        o[d].push({time:r.time,title:r.title,note:r.note||"",q:r.q||""});
+      });
     }
-    return best;
+    return o;
   }
-  $("demo-reset").onclick=function(){
-    rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
+  function mapsUrl(q){
+    if(window.VN&&VN.mapsQueryUrl)return VN.mapsQueryUrl(q);
+    return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q||"");
+  }
+  function p2(n){n=String(Math.abs(+n)||0);return n.length<2?"0"+n:n}
+  function fillWheels(){
+    if(wheelsReady)return;
+    wheelsReady=true;
+    ["demo-hh","demo-hh2"].forEach(function(id){
+      var el=$(id);
+      for(var i=0;i<24;i++){
+        var o=document.createElement("option");
+        o.value=o.textContent=p2(i);
+        el.appendChild(o);
+      }
+    });
+    ["demo-mm","demo-mm2"].forEach(function(id){
+      var el=$(id);
+      for(var i=0;i<60;i+=5){
+        var o=document.createElement("option");
+        o.value=o.textContent=p2(i);
+        el.appendChild(o);
+      }
+    });
+    ["demo-hh","demo-mm","demo-hh2","demo-mm2","demo-kind"].forEach(function(id){
+      $(id).addEventListener("change", function(){
+        var v=this.value;
+        this.value="";
+        this.value=v;
+      });
+    });
+    $("demo-kind").addEventListener("change", applyKind);
+    $("demo-endtoggle").addEventListener("click", function(){
+      var box=$("demo-wheels2");
+      if(box.hidden){
+        $("demo-hh2").value=$("demo-hh").value;
+        $("demo-mm2").value=$("demo-mm").value;
+        var h=(+$("demo-hh").value+1)%24;
+        $("demo-hh2").value=p2(h);
+        box.hidden=false;
+      }else box.hidden=true;
+      syncEndBtn();
+    });
+  }
+  function ensureOpt(el, val){
+    if(el.querySelector('option[value="'+val+'"]'))return;
+    var o=document.createElement("option");
+    o.value=o.textContent=val;
+    el.appendChild(o);
+  }
+  function setWheel(hId, mId, h, mi){
+    var hh=$(hId), mm=$(mId), hs=p2(h), ms=p2(mi);
+    ensureOpt(hh, hs);
+    ensureOpt(mm, ms);
+    hh.value=hs;
+    mm.value=ms;
+  }
+  function syncEndBtn(){
+    var btn=$("demo-endtoggle");
+    if(!btn)return;
+    btn.textContent=$("demo-wheels2").hidden?"加結束時間":"拿掉結束時間";
+  }
+  function applyKind(){
+    var clock=$("demo-kind").value==="clock";
+    $("demo-wheels").hidden=!clock;
+    $("demo-endtoggle").hidden=!clock;
+    if(!clock)$("demo-wheels2").hidden=true;
+    syncEndBtn();
+  }
+  function parseEditClock(t){
+    var m=/^(\d{1,2}):(\d{2})(?:→(\d{1,2}):(\d{2}))?$/.exec(String(t||""));
+    if(!m)return null;
+    return {h1:+m[1], m1:+m[2], h2:m[3]==null?null:+m[3], m2:m[4]==null?null:+m[4]};
+  }
+  function readEditTime(){
+    if($("demo-kind").value!=="clock")return $("demo-kind").value;
+    var h1=$("demo-hh").value, m1=$("demo-mm").value;
+    if(!$("demo-wheels2").hidden){
+      var h2=$("demo-hh2").value, m2=$("demo-mm2").value;
+      if(h2!==h1||m2!==m1)return h1+":"+m1+"→"+h2+":"+m2;
+    }
+    return h1+":"+m1;
+  }
+  function closeEdit(){
+    editing=null;
+    var box=$("demo-edit");
+    if(box)box.hidden=true;
+    var del=$("demo-edit-del");
+    if(del){del.classList.remove("armed");del.textContent="刪除"}
+  }
+  function openEdit(day, index){
+    var it=days[day]&&days[day][index];
+    if(!it)return;
+    fillWheels();
+    editing={day:day,i:index};
+    $("demo-edit-who").textContent=it.title;
+    $("demo-edit-name").value=it.title;
+    $("demo-edit-note").value=it.note||"";
+    var rg=parseEditClock(it.time);
+    var html='<option value="clock">指定時間</option>';
+    DAYPARTS.forEach(function(p){html+='<option value="'+p+'">'+p+'</option>'});
+    if(!rg && DAYPARTS.indexOf(it.time)<0 && it.time) html+='<option value="'+esc(it.time)+'">'+esc(it.time)+'</option>';
+    $("demo-kind").innerHTML=html;
+    if(rg){
+      $("demo-kind").value="clock";
+      setWheel("demo-hh","demo-mm",rg.h1,rg.m1);
+      if(rg.h2!=null){
+        setWheel("demo-hh2","demo-mm2",rg.h2,rg.m2);
+        $("demo-wheels2").hidden=false;
+      }else{
+        setWheel("demo-hh2","demo-mm2",rg.h1,rg.m1);
+        $("demo-wheels2").hidden=true;
+      }
+    }else{
+      $("demo-kind").value=it.time;
+      setWheel("demo-hh","demo-mm",9,0);
+      setWheel("demo-hh2","demo-mm2",10,0);
+      $("demo-wheels2").hidden=true;
+    }
+    applyKind();
+    var del=$("demo-edit-del");
+    del.classList.remove("armed");
+    del.textContent="刪除";
+    $("demo-edit").hidden=false;
+  }
+  function clock(t){
+    var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
+    return m?(+m[1])*60+(+m[2]):1e9;
+  }
+  function conflicts(time, list, index){
+    var mine=clock(time), i, k;
+    if(!(mine<1e9))return false;
+    for(i=index-1;i>=0;i--){
+      k=clock(list[i].time);
+      if(k<1e9)return mine<k;
+    }
+    for(i=index;i<list.length;i++){
+      k=clock(list[i].time);
+      if(k<1e9)return mine>k;
+    }
+    return false;
+  }
+  function renderTabs(){
+    var h="";
+    for(var i=1;i<=6;i++){
+      var info=DAY_INFO[i];
+      var on=i===viewDay;
+      h+='<button type="button" role="tab" aria-selected="'+(on?"true":"false")+'" class="'+(on?"on":"")+'" data-day="'+i+'"><span class="dname">Day '+i+'</span><span class="dsub">'+(info?info.dateStr:"")+'</span></button>';
+    }
+    $("demo-days").innerHTML=h;
+  }
+  function revealDay(){
+    var tabs=$("demo-days"), list=$("demo-list");
+    if(!tabs||!list)return;
+    var anchor=$("demo-status");
+    if(!anchor||!anchor.textContent)anchor=list.querySelector(".card, .empty")||list;
+    var below=tabs.getBoundingClientRect().bottom+16;
+    var top=anchor.getBoundingClientRect().top;
+    if(top>=below-1&&top<below+80)return;
+    window.scrollBy(0, top-below);
+  }
+  function selectDay(d){
+    d=+d;
+    if(d<1||d>6||d===viewDay)return;
+    viewDay=d;
+    closeEdit();
     $("demo-status").textContent="";
     paint();
-  };
-  document.getElementById("dragdemo").addEventListener("pointerdown",function(e){
-    var grip=e.target.closest&&e.target.closest(".grip");
-    if(!grip)return;
-    var card=grip.closest(".drow");
+    showDayMap();
+    revealDay();
+  }
+  function paint(){
+    renderTabs();
+    var d=viewDay, h="";
+    (days[d]||[]).forEach(function(r,i){
+      var pressed=grab&&grab.title===r.title?"true":"false";
+      var time=r.time==="待排"?'<span class="time pending">待排</span>':'<span class="time">'+esc(r.time)+'</span>';
+      h+='<div class="card'+(r.title.indexOf("JX")===0?" flight":"")+'" data-day="'+d+'" data-i="'+i+'" data-time="'+esc(r.time)+'" data-title="'+esc(r.title)+'">'+
+        '<div class="tools">'+
+        '<button type="button" class="pen" aria-label="修改這筆行程">'+PEN+'</button>'+
+        '<a class="pin" href="'+esc(mapsUrl(r.q||r.title))+'" target="_blank" rel="noopener noreferrer" aria-label="在地圖開啟這個地點">'+PIN+'</a>'+
+        '</div><div class="rail">'+
+        '<button type="button" class="nudge" data-dir="-1" aria-label="上移這筆行程">'+UP+'</button>'+
+        '<button type="button" class="grip" data-title="'+esc(r.title)+'" aria-pressed="'+pressed+'" aria-label="拖曳排序。Enter 抓起，方向鍵移動，再按 Enter 確認">'+DOTS+'</button>'+
+        '<button type="button" class="nudge" data-dir="1" aria-label="下移這筆行程">'+DOWN+'</button>'+
+        '</div><div class="t">'+time+'<span>'+esc(r.title)+'</span></div>'+
+        (r.note?'<div class="d">'+esc(r.note)+'</div>':"")+'</div>';
+    });
+    if(!h)h='<p class="empty">這天還沒有行程</p>';
+    $("demo-list").innerHTML=h;
+    if(grab&&grab.focus){
+      var grips=document.querySelectorAll("#dragdemo .grip");
+      for(var i=0;i<grips.length;i++){
+        if(grips[i].getAttribute("data-title")===grab.title){grips[i].focus();break}
+      }
+      grab.focus=false;
+    }
+  }
+  function say(item, dest){
+    if(!item){$("demo-status").textContent="";return}
+    $("demo-status").innerHTML=esc(item.title)+" 放到第 "+dest+" 天"+(item.time==="待排"?"，時間標成 <b>待排</b>":"，時間仍是 "+esc(item.time));
+  }
+  function relocate(day, index, dest, at){
+    var src=days[day][index];
+    if(!src)return null;
+    var item={time:src.time,title:src.title,note:src.note,q:src.q};
+    days[day].splice(index,1);
+    if(at<0)at=0;
+    if(at>days[dest].length)at=days[dest].length;
+    if(day===dest && at===index){days[day].splice(index,0,item);return null}
+    if(day!==dest && conflicts(item.time, days[dest], at)) item.time="待排";
+    days[dest].splice(at,0,item);
+    return item;
+  }
+  function step(day, index, dir){
+    var dest=day, at, list=days[day]||[];
+    if(dir<0){
+      if(index===0){if(day<=1)return;dest=day-1;at=days[dest].length}
+      else at=index-1;
+    }else if(index===list.length-1){
+      if(day>=6)return;dest=day+1;at=0;
+    }else at=index+1;
+    var item=relocate(day, index, dest, at);
+    if(!item)return;
+    if(dest!==day)viewDay=dest;
+    paint();
+    showDayMap();
+    if(dest!==day){say(item, dest);revealDay()}
+    else $("demo-status").textContent="";
+  }
+  function placeMap(on){
+    var card=document.getElementById("realmap");
     if(!card)return;
-    e.preventDefault();
-    var pid=e.pointerId;
-    var start=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
-    card.classList.add("dragging");
-    try{grip.setPointerCapture(pid)}catch(err){}
-    function move(ev){
-      if(ev.pointerId!==pid)return;
-      ev.preventDefault();
-      if(ev.clientY<72)window.scrollBy(0,-14);
-      else if(ev.clientY>window.innerHeight-72)window.scrollBy(0,14);
-      var list=[].slice.call(document.querySelectorAll("#demo-list .drow"));
-      var i=list.indexOf(card);
-      if(i<0)return;
-      if(i>0){
-        var pr=list[i-1].getBoundingClientRect();
-        if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, list[i-1]);return}
-      }
-      if(i<list.length-1){
-        var nr=list[i+1].getBoundingClientRect();
-        if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, list[i+1].nextSibling);
+    if(on){
+      var slot=$("demo-map");
+      if(slot&&card.parentNode!==slot)slot.replaceChildren(card);
+    }else{
+      var label=document.querySelector("#page-tl .seclabel");
+      if(label&&card.previousElementSibling!==label)label.after(card);
+    }
+  }
+  function showDayMap(){
+    if(!document.body.classList.contains("demo-on"))return;
+    curDay=viewDay;
+    try{renderMap()}catch(e){}
+  }
+  function showDemo(){
+    var on=location.hash==="#drag-demo"||location.protocol==="file:";
+    document.body.classList.toggle("demo-on", on);
+    var back=document.querySelector("#dragdemo .back");
+    if(back)back.style.display=location.protocol==="file:"?"none":"";
+    closeEdit();
+    if(on){
+      if(savedDay==null)savedDay=curDay;
+      viewDay=1;
+      days=copyDays();grab=null;$("demo-status").textContent="";paint();
+      placeMap(true);
+      showDayMap();
+      setTimeout(showDayMap,800);
+      setTimeout(showDayMap,2000);
+    }else{
+      placeMap(false);
+      if(savedDay!=null){curDay=savedDay;savedDay=null;try{renderMap()}catch(e){}}
+    }
+  }
+  function endDrag(){
+    document.body.classList.remove("demo-sorting");
+    var st=drag;
+    if(st){
+      if(st.timer)clearTimeout(st.timer);
+      if(st.raf)cancelAnimationFrame(st.raf);
+      if(st.ghost&&st.ghost.parentNode)st.ghost.parentNode.removeChild(st.ghost);
+      if(st.line&&st.line.parentNode)st.line.parentNode.removeChild(st.line);
+      if(st.hold&&st.hold.parentNode)st.hold.parentNode.removeChild(st.hold);
+      if(st.card)st.card.classList.remove("demo-src");
+    }
+    var cards=document.querySelectorAll("#dragdemo .card");
+    for(var i=0;i<cards.length;i++)cards[i].style.transform="";
+    var tabs=document.querySelectorAll("#demo-days button");
+    for(var j=0;j<tabs.length;j++)tabs[j].classList.remove("over");
+    drag=null;
+  }
+  function otherDay(x,y,from){
+    var el=document.elementFromPoint(x,y);
+    if(!el||!el.closest)return 0;
+    var tab=el.closest("#demo-days button");
+    if(!tab)return 0;
+    var d=+tab.getAttribute("data-day");
+    return d&&d!==from?d:0;
+  }
+  function layout(st){
+    var list=st.list;
+    var slots=[], nodes=list.children, i;
+    for(i=0;i<nodes.length;i++) if(nodes[i].classList && nodes[i].classList.contains("card") && !nodes[i].classList.contains("demo-src")) slots.push(nodes[i]);
+    for(i=0;i<slots.length;i++) slots[i].style.transform="";
+    var foreign=otherDay(st.x, st.y, st.day);
+    st.foreign=foreign;
+    var tabs=document.querySelectorAll("#demo-days button");
+    for(i=0;i<tabs.length;i++)tabs[i].classList.toggle("over", +tabs[i].getAttribute("data-day")===foreign);
+    var rects=slots.map(function(c){return c.getBoundingClientRect()});
+    var prev=typeof st.insertAt==="number"?st.insertAt:st.from;
+    var idx=Math.min(st.from, slots.length);
+    if(!foreign){
+      idx=slots.length;
+      for(i=0;i<rects.length;i++){
+        var top=rects[i].top+(i>=prev?st.H:0);
+        if(st.y<top+rects[i].height/2){idx=i;break}
       }
     }
-    function up(ev){
-      if(ev.pointerId!==pid)return;
-      grip.removeEventListener("pointermove", move);
-      grip.removeEventListener("pointerup", up);
-      grip.removeEventListener("pointercancel", up);
-      card.classList.remove("dragging");
-      var now=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
-      if(now===start)return;
-      var mine=dkey(card.getAttribute("data-time"));
-      var nxt=nextSlot(card);
-      var title=card.getAttribute("data-title");
-      var myTime=card.getAttribute("data-time");
-      var order=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return rows[+el.getAttribute("data-i")]});
-      rows=order;
+    for(i=0;i<slots.length;i++) slots[i].style.transform=i>=idx?"translateY("+st.H+"px)":"";
+    st.insertAt=idx;
+    if(st.line){
+      if(foreign||!rects.length) st.line.style.display="none";
+      else{
+        st.line.style.display="block";
+        var edge=slots[0].getBoundingClientRect();
+        var y;
+        if(idx<slots.length) y=slots[idx].getBoundingClientRect().top-st.H/2;
+        else y=slots[slots.length-1].getBoundingClientRect().bottom+6;
+        st.line.style.top=(y-1)+"px";
+        st.line.style.left=edge.left+"px";
+        st.line.style.width=edge.width+"px";
+      }
+    }
+    if(st.ghost){st.ghost.style.left=st.originLeft+"px";st.ghost.style.top=(st.y-st.dy)+"px"}
+  }
+  function tick(){
+    var st=drag;
+    if(!st||!st.started)return;
+    var tabs=$("demo-days");
+    var tr=tabs?tabs.getBoundingClientRect():null;
+    var onTabs=tr&&st.y>=tr.top-8&&st.y<=tr.bottom+12;
+    if(!onTabs){
+      if(st.y<72)window.scrollBy(0,-14);
+      else if(st.y>window.innerHeight-96)window.scrollBy(0,14);
+    }
+    layout(st);
+    st.raf=requestAnimationFrame(tick);
+  }
+  function begin(st){
+    if(st.started||!st.card.isConnected)return;
+    st.started=true;
+    closeEdit();
+    grab=null;
+    var r=st.card.getBoundingClientRect();
+    st.dx=st.x-r.left; st.dy=st.y-r.top;
+    st.list=st.card.parentNode;
+    st.day=+st.card.getAttribute("data-day");
+    st.from=+st.card.getAttribute("data-i");
+    st.insertAt=st.from;
+    var ghost=st.card.cloneNode(true);
+    ghost.classList.add("demo-ghost");
+    ghost.setAttribute("aria-hidden","true");
+    ghost.style.width=r.width+"px";
+    st.originLeft=r.left;
+    ghost.style.left=r.left+"px";
+    ghost.style.top=r.top+"px";
+    document.body.appendChild(ghost);
+    st.ghost=ghost;
+    document.body.classList.add("demo-sorting");
+    var map=document.getElementById("demo-maplabel");
+    var y0=map.getBoundingClientRect().top;
+    st.card.classList.add("demo-src");
+    var hold=document.createElement("div");
+    hold.className="demo-hold";
+    hold.style.height="0px";
+    st.list.appendChild(hold);
+    var lost=y0-map.getBoundingClientRect().top;
+    if(lost<1)lost=r.height;
+    hold.style.height=lost+"px";
+    var drift=map.getBoundingClientRect().top-y0;
+    if(Math.abs(drift)>0.5)hold.style.height=(lost-drift)+"px";
+    st.H=parseFloat(hold.style.height);
+    st.hold=hold;
+    var line=document.createElement("div");
+    line.className="demo-line";
+    document.body.appendChild(line);
+    st.line=line;
+    layout(st);
+    st.raf=requestAnimationFrame(tick);
+  }
+  function finish(st){
+    var day=st.day, from=st.from, foreign=st.foreign, at=st.insertAt;
+    endDrag();
+    if(foreign && foreign!==day){
+      var item=relocate(day, from, foreign, 1e9);
+      viewDay=foreign;
       paint();
-      var status=$("demo-status");
-      if(mine<1e9 && nxt && mine>nxt.k){
-        if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
-          status.textContent="正式行程裡會打開改時間。這頁先維持 "+myTime+"。";
-        }else{
-          status.textContent="維持原來的時間，順序留在新的位置。";
-        }
-      }else{
-        status.textContent="已排好。時間沒有對不上。";
-      }
+      showDayMap();
+      say(item, foreign);
+      revealDay();
+      return;
     }
-    grip.addEventListener("pointermove", move);
-    grip.addEventListener("pointerup", up);
-    grip.addEventListener("pointercancel", up);
+    if(at===from)return;
+    relocate(day, from, day, at);
+    paint();
+    $("demo-status").textContent="";
+  }
+  function onMove(e){
+    var st=drag;
+    if(!st||e.pointerId!==st.pid)return;
+    var dx=e.clientX-st.sx, dy=e.clientY-st.sy;
+    if(!st.started){
+      if(st.mode==="hold"){
+        if(Math.abs(dx)>8||Math.abs(dy)>8){
+          document.removeEventListener("pointermove", onMove);
+          document.removeEventListener("pointerup", onUp);
+          document.removeEventListener("pointercancel", onCancel);
+          endDrag();
+        }
+        return;
+      }
+      if(Math.abs(dx)>6||Math.abs(dy)>6){e.preventDefault();st.x=e.clientX;st.y=e.clientY;begin(st)}
+      return;
+    }
+    e.preventDefault();
+    st.x=e.clientX; st.y=e.clientY;
+    layout(st);
+  }
+  function onUp(e){
+    var st=drag;
+    if(!st||(e&&e.pointerId!=null&&e.pointerId!==st.pid))return;
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+    document.removeEventListener("pointercancel", onCancel);
+    if(!st.started){endDrag();return}
+    st.x=e.clientX; st.y=e.clientY; layout(st);
+    finish(st);
+  }
+  function onCancel(e){
+    var st=drag;
+    if(!st||(e&&e.pointerId!=null&&e.pointerId!==st.pid))return;
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+    document.removeEventListener("pointercancel", onCancel);
+    endDrag();
+  }
+  document.getElementById("dragdemo").addEventListener("pointerdown", function(e){
+    if(drag)return;
+    if(e.button!=null&&e.button!==0)return;
+    var grip=e.target.closest&&e.target.closest(".grip");
+    var card=grip?grip.closest(".card"):(e.target.closest&&e.target.closest("#dragdemo .card"));
+    if(!card)return;
+    if(!grip&&e.target.closest("button,a"))return;
+    var st={card:card,pid:e.pointerId,mode:grip?"grip":"hold",sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,started:false,timer:null};
+    drag=st;
+    if(grip){e.preventDefault();try{grip.setPointerCapture(e.pointerId)}catch(err){}}
+    else st.timer=setTimeout(function(){if(drag===st&&!st.started)begin(st)},250);
+    document.addEventListener("pointermove", onMove, {passive:false});
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onCancel);
+  }, {passive:false});
+  document.getElementById("dragdemo").addEventListener("click", function(e){
+    var tab=e.target.closest&&e.target.closest("#demo-days button");
+    if(tab){selectDay(tab.getAttribute("data-day"));return}
+    var pen=e.target.closest&&e.target.closest(".pen");
+    if(pen){
+      var pc=pen.closest(".card");
+      openEdit(+pc.getAttribute("data-day"), +pc.getAttribute("data-i"));
+      return;
+    }
+    var b=e.target.closest&&e.target.closest(".nudge");
+    if(!b)return;
+    var card=b.closest(".card");
+    grab=null;
+    closeEdit();
+    step(+card.getAttribute("data-day"), +card.getAttribute("data-i"), +b.getAttribute("data-dir"));
+  });
+  $("demo-edit-save").addEventListener("click", function(){
+    if(!editing)return;
+    var day=editing.day, i=editing.i, it=days[day][i];
+    if(!it){closeEdit();return}
+    var time=readEditTime()||it.time;
+    var title=$("demo-edit-name").value.trim()||it.title;
+    var note=$("demo-edit-note").value.trim();
+    var rest=days[day].slice();
+    rest.splice(i,1);
+    if(conflicts(time, rest, i)) time="待排";
+    it.time=time; it.title=title; it.note=note;
+    closeEdit();
+    paint();
+    $("demo-status").textContent=time==="待排"?"時間和前後對不上，先標成待排":"";
+  });
+  $("demo-edit-del").addEventListener("click", function(){
+    if(!editing)return;
+    var del=$("demo-edit-del");
+    if(!del.classList.contains("armed")){del.classList.add("armed");del.textContent="再按刪除";return}
+    days[editing.day].splice(editing.i,1);
+    closeEdit();
+    paint();
+    $("demo-status").textContent="";
+  });
+  document.addEventListener("keydown", function(e){
+    var grip=e.target.closest&&e.target.closest("#dragdemo .grip");
+    if(!grip)return;
+    var key=e.key;
+    if(key!=="Enter"&&key!==" "&&key!=="Escape"&&key!=="ArrowUp"&&key!=="ArrowDown")return;
+    e.preventDefault();
+    var title=grip.getAttribute("data-title");
+    if(key==="Escape"){
+      if(!grab)return;
+      days=JSON.parse(grab.backup);
+      grab=null;
+      paint();
+      $("demo-status").textContent="";
+      return;
+    }
+    if(key==="Enter"||key===" "){
+      if(!grab||grab.title!==title){grab={title:title,backup:JSON.stringify(days),dirty:false,focus:true};paint();return}
+      grab=null; paint(); return;
+    }
+    if(!grab||grab.title!==title)return;
+    var card=grip.closest(".card");
+    step(+card.getAttribute("data-day"), +card.getAttribute("data-i"), key==="ArrowUp"?-1:1);
+    grab.dirty=true; grab.focus=true; paint();
+  });
+  document.addEventListener("contextmenu", function(e){
+    if(drag&&(drag.mode==="hold"||drag.started))e.preventDefault();
   });
   window.addEventListener("hashchange", showDemo);
   showDemo();
