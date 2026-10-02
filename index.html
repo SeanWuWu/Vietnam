@@ -348,6 +348,27 @@ main{padding:10px 16px 8px}
 .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #tl-list .card{padding-right:40px}
 #tl-list .card.tl-dragging{opacity:.55}
+body.demo-on > header,
+body.demo-on > .fxpanel,
+body.demo-on > .wxpanel,
+body.demo-on > main,
+body.demo-on > .tabbar,
+body.demo-on > #idmask{display:none !important}
+body.demo-on{padding-bottom:28px}
+#dragdemo{display:none;max-width:560px;margin:0 auto;padding:22px 16px 40px}
+body.demo-on #dragdemo{display:block}
+#dragdemo h1{font-size:20px;font-weight:700;letter-spacing:.04em}
+#dragdemo .lead{font-size:13px;color:var(--ink2);margin:8px 0 16px;line-height:1.55}
+#dragdemo .drow{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:4px;margin-bottom:8px;padding:8px 12px 8px 0}
+#dragdemo .drow.dragging{opacity:.55}
+#dragdemo .grip{flex:0 0 44px;width:44px;height:52px;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;padding:0;-webkit-user-select:none;user-select:none}
+#dragdemo .grip:active{color:var(--accent);cursor:grabbing}
+#dragdemo .dbody{flex:1;min-width:0}
+#dragdemo .dtime{color:var(--accent);font-size:12.5px;font-weight:600}
+#dragdemo .dtitle{font-weight:700;font-size:14px}
+#dragdemo .dnote{font-size:12.5px;color:var(--ink2);margin-top:2px}
+#dragdemo .status{min-height:2.6em;font-size:13px;color:var(--accent);margin:12px 0}
+#dragdemo .back{display:inline-block;margin-top:8px;color:var(--ink2);font-size:13px}
 .penbtn{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;background:transparent;
   color:var(--ink2);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0}
 .penbtn svg{width:16px;height:16px;display:block}
@@ -727,6 +748,16 @@ input,select,textarea{max-width:100%}
   <button data-p="card"><img src="icon.svg" alt="">小卡</button>
   <button data-p="more"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA5CAMAAABUBBiJAAAAw1BMVEUAAAD49+5cVErUzcC5talrY1jv7eOTi3+oppo8NSzEvrTd2syglIjq5tm1raCAe3Lm38/Lyr8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACU3DZBAAAAMXRSTlMA//////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA77JFZgAAAu5JREFUeNrNVlmWozAMpLzvy/0vOzI2YNIkcffXkEd4gEtLqSSzbf/RgSTUX3A8W8sEoHCZWnFnCCWszTfkwiFZCEFr8sqBdaSTsqTUoEHaQE4XWTEsINUUBP1MsHLRZWSMwwhlqnDCccMlI2PfsY4RIU5AFC9gYuKmaCu+AzXLG7jeooExm+ARntCNXXwqh7fSAzWRY0fnVh0BuCicSfWJoj3M5uJ8khpZnhcurcfbVAMzLSIzh9CAiJxHbRPwVFOobGuTifE/XsEZX5LVj8Aq5X7t/owYHislUAGTSuG2JfoKDVbPtzuu9iRhiDAjfCmSKqxmr4BkbrakxeFc8PZHiwUvfk80XkAoycqN7R5vi4G7YRoxUrS5SXcgsbkmxzoBnZgUeARFPiNP1G4HuRBkRYWKV4ev1PrAoyctMN9w2DyzJerabtJgxj82DSmR8iRydy0QdzZJF4mtmA9Kn8QV0ZFRZtLX/sQKJ6nPix6OqntySDVRcIFKElnamaTx4rmkZuDoEYlnIYdCPpOVVJNeAqBpTUs9AqS+wKXwpvGDajjJjArWnERr6reoMzE7CwphpFw7XktpqE1oZnbYnhZrChY56+Cu5tGx94aHd4FCqspnm2fmSH+GWSmof0zWOiSaNV55wb2jg8YkPfKqJGmze2idzFg2LqrCXTK0OmSpQ7PCo1I1SCazn8f6KT2SHb1lTAZH5Wq6ap0QvdBkkmzyH72I80Jrq2nghqcf2w1pnfw5q54H+/60uYo+0SGSEGMLoMr1d506bNPQ66agzl6d/l/P++aFeXhiyv77rnGLH7/Zp+agP73Bw6opxu+GXtK9YbG0V42FU7o9U2zLXwJHSbaHwY/Pbo8y4ufqj7EPcQzh/LY0GBoDFr9zXjPCMrG3bLDG5lWUc9hjVW5nXwwwfqXT0ZuLqIu9oZg15KyvaRatKV1dFehVXC39pbQTuayVg5Mv1OChq/pV3YD42iGYmvn9p9/78eIyf/9B/g+2rRVtuCzTLQAAAABJRU5ErkJggg==" alt="">更多</button>
 </nav>
+
+<div id="dragdemo">
+  <div class="eyebrow" style="font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600">DEMO</div>
+  <h1>拖拉試用</h1>
+  <p class="lead">按住左邊三個點再拖。這頁是假資料，不會改到大家的行程。文字可以照常選取。</p>
+  <div id="demo-list"></div>
+  <div class="status" id="demo-status"></div>
+  <button class="btn ghost" type="button" id="demo-reset">恢復原順序</button>
+  <div><a class="back" href="#">回到行程</a></div>
+</div>
 
 <div class="idmask" id="idmask" style="display:none">
   <div class="idbox">
@@ -3053,6 +3084,115 @@ window.addEventListener("online",function(){
   if(CLOUD_ID)saveShared(null);
 });
 window.addEventListener("offline",function(){toast("離線中，資料會存在這台裝置")});
+
+/* 拖拉試用頁。跟正式行程分開，確認手感後才換過去。 */
+(function(){
+  var SEED=[
+    {time:"07:00",title:"坐車出發",note:"河內到寧平，約 2 小時"},
+    {time:"上午",title:"華閭古都",note:"十世紀古都，丁朝和前黎朝的寺廟"},
+    {time:"中午",title:"三谷午餐",note:"附近餐廳自助"},
+    {time:"16:30",title:"坐車回河內",note:"把這張拖到最上面，會問要不要改時間"}
+  ];
+  var rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
+  function dkey(t){
+    var m=/(\d{1,2}):(\d{2})/.exec(String(t||""));
+    if(m)return (+m[1])*60+(+m[2]);
+    t=String(t||"");
+    if(t.indexOf("上午")>=0)return 9*60;
+    if(t.indexOf("中午")>=0)return 12*60;
+    if(t.indexOf("下午")>=0)return 14*60;
+    return 1e9;
+  }
+  function paint(){
+    var h="";
+    rows.forEach(function(r,i){
+      h+='<div class="drow" data-i="'+i+'" data-time="'+esc(r.time)+'" data-title="'+esc(r.title)+'">'+
+        '<button class="grip" type="button" aria-label="拖動這一行">'+
+        '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><circle cx="8" cy="3.2" r="1.35" fill="currentColor"/><circle cx="8" cy="8" r="1.35" fill="currentColor"/><circle cx="8" cy="12.8" r="1.35" fill="currentColor"/></svg>'+
+        '</button><div class="dbody"><div><span class="dtime">'+esc(r.time)+'</span> <span class="dtitle">'+esc(r.title)+'</span></div>'+
+        (r.note?'<div class="dnote">'+esc(r.note)+'</div>':"")+'</div></div>';
+    });
+    $("demo-list").innerHTML=h;
+  }
+  function showDemo(){
+    var on=location.hash==="#drag-demo";
+    document.body.classList.toggle("demo-on", on);
+    if(on)paint();
+  }
+  function nextSlot(card){
+    var n=card.nextElementSibling, best=null;
+    while(n){
+      var k=dkey(n.getAttribute("data-time"));
+      if(k<1e9){best={k:k,time:n.getAttribute("data-time")};break}
+      n=n.nextElementSibling;
+    }
+    return best;
+  }
+  $("demo-reset").onclick=function(){
+    rows=SEED.map(function(x){return {time:x.time,title:x.title,note:x.note}});
+    $("demo-status").textContent="";
+    paint();
+  };
+  document.getElementById("dragdemo").addEventListener("pointerdown",function(e){
+    var grip=e.target.closest&&e.target.closest(".grip");
+    if(!grip)return;
+    var card=grip.closest(".drow");
+    if(!card)return;
+    e.preventDefault();
+    var pid=e.pointerId;
+    var start=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
+    card.classList.add("dragging");
+    try{grip.setPointerCapture(pid)}catch(err){}
+    function move(ev){
+      if(ev.pointerId!==pid)return;
+      ev.preventDefault();
+      if(ev.clientY<72)window.scrollBy(0,-14);
+      else if(ev.clientY>window.innerHeight-72)window.scrollBy(0,14);
+      var list=[].slice.call(document.querySelectorAll("#demo-list .drow"));
+      var i=list.indexOf(card);
+      if(i<0)return;
+      if(i>0){
+        var pr=list[i-1].getBoundingClientRect();
+        if(ev.clientY<pr.top+pr.height/2){card.parentNode.insertBefore(card, list[i-1]);return}
+      }
+      if(i<list.length-1){
+        var nr=list[i+1].getBoundingClientRect();
+        if(ev.clientY>nr.top+nr.height/2)card.parentNode.insertBefore(card, list[i+1].nextSibling);
+      }
+    }
+    function up(ev){
+      if(ev.pointerId!==pid)return;
+      grip.removeEventListener("pointermove", move);
+      grip.removeEventListener("pointerup", up);
+      grip.removeEventListener("pointercancel", up);
+      card.classList.remove("dragging");
+      var now=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return el.getAttribute("data-i")}).join(",");
+      if(now===start)return;
+      var mine=dkey(card.getAttribute("data-time"));
+      var nxt=nextSlot(card);
+      var title=card.getAttribute("data-title");
+      var myTime=card.getAttribute("data-time");
+      var order=[].map.call(document.querySelectorAll("#demo-list .drow"),function(el){return rows[+el.getAttribute("data-i")]});
+      rows=order;
+      paint();
+      var status=$("demo-status");
+      if(mine<1e9 && nxt && mine>nxt.k){
+        if(confirm("「"+title+"」是 "+myTime+"，現在排在 "+nxt.time+" 前面。要改時間嗎？")){
+          status.textContent="正式行程裡會打開改時間。這頁先維持 "+myTime+"。";
+        }else{
+          status.textContent="維持原來的時間，順序留在新的位置。";
+        }
+      }else{
+        status.textContent="已排好。時間沒有對不上。";
+      }
+    }
+    grip.addEventListener("pointermove", move);
+    grip.addEventListener("pointerup", up);
+    grip.addEventListener("pointercancel", up);
+  });
+  window.addEventListener("hashchange", showDemo);
+  showDemo();
+})();
 </script>
 </body>
 </html>
